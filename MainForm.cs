@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -16,10 +15,6 @@ using NBagOfUis;
 using MidiLib;
 
 
-
-// out midi devices need channel sel, patch, vol
-
-
 namespace MidiGenerator
 {
     public partial class MainForm : Form
@@ -28,27 +23,22 @@ namespace MidiGenerator
 
         #endregion
 
-        #region Fields - internal
-        /// <summary>All the channels. Index is 0-based, not channel number.</summary>
-        readonly Channel[] _channels = new Channel[MidiDefs.NUM_CHANNELS];
+        #region Fields
+        /// <summary>User settings.</summary>
+        readonly UserSettings _settings;
 
-        /// <summary>Midi player.</summary>
-        MidiSender _sender;
+        /// <summary>Midi component.</summary>
+        readonly MidiSender? _sender1;
 
-        /// <summary>Adjust to taste.</summary>
-        readonly string _exportPath = @"C:\Dev\repos\MidiLib\out";
+        /// <summary>Midi component.</summary>
+        readonly MidiSender? _sender2;
+
+        /// <summary>The fast timer.</summary>
+        readonly MmTimerEx _mmTimer = new();
+
+        /// <summary>Where to put stuff.</summary>
+        readonly string _outPath = "???";
         #endregion
-
-        #region Fields - user custom
-        /// <summary>Cosmetics.</summary>
-        readonly Color _controlColor = Color.Aquamarine;
-
-        /// <summary>My midi out.</summary>
-        readonly string _midiOutDevice = "VirtualMIDISynth #1";
-        //readonly string _midiOutDevice = "loopMIDI Port";
-        #endregion
-
-        UserSettings _settings;
 
         #region Lifecycle
         /// <summary>
@@ -61,8 +51,8 @@ namespace MidiGenerator
             // Get settings and set up paths.
             string appDir = MiscUtils.GetAppDataDir("MidiGenerator", "Ephemera");
             _settings = (UserSettings)Settings.Load(appDir, typeof(UserSettings));
-            _exportPath = Path.Combine(appDir, "export");
-            DirectoryInfo di = new(_exportPath);
+            _outPath = Path.Combine(appDir, "out");
+            DirectoryInfo di = new(_outPath);
             di.Create();
 
             // Init main form from settings
@@ -73,7 +63,7 @@ namespace MidiGenerator
             //KeyPreview = true; // for routing kbd strokes through OnKeyDown
 
             // Configure UI.
-            toolStrip1.Renderer = new NBagOfUis.CheckBoxRenderer() { SelectedColor = _controlColor };
+            toolStrip1.Renderer = new NBagOfUis.CheckBoxRenderer() { SelectedColor = _settings.ControlColor };
 
             // The text output.
             txtViewer.Font = Font;
@@ -81,19 +71,57 @@ namespace MidiGenerator
             txtViewer.Colors.Add("ERR", Color.LightPink);
             txtViewer.Colors.Add("WRN", Color.Plum);
 
+            // The channels.
+            vkeyCh.ChannelNumber = _settings.VkeyChannel.ChannelNumber;
+            vkeyCh.DeviceNumber = _settings.VkeyChannel.DeviceNumber;
+            vkeyCh.Patch = _settings.VkeyChannel.Patch;
+            vkeyCh.Volume = _settings.VkeyChannel.Volume;
+
             // Set up midi.
             DumpMidiDevices();
-            _sender = new(_midiOutDevice, _exportPath);
-            if (!_sender.Valid)
+            btnLogMidi.Checked = _settings.LogMidi;
+
+            if(_settings.MidiOutDevice1 != Definitions.NONE)
             {
-                LogMessage($"ERR Something wrong with your midi output device:{_midiOutDevice}");
+                _sender1 = new(_settings.MidiOutDevice1, _outPath);
+                if (!_sender1.Valid)
+                {
+                    LogMessage($"ERR Something wrong with your midi output device:{_settings.MidiOutDevice1}");
+                }
+            }
+
+            if (_settings.MidiOutDevice2 != Definitions.NONE)
+            {
+                _sender2 = new(_settings.MidiOutDevice2, _outPath);
+                if (!_sender2.Valid)
+                {
+                    LogMessage($"ERR Something wrong with your midi output device:{_settings.MidiOutDevice2}");
+                }
             }
 
             // Hook up some simple UI handlers.
-            btnKillMidi.Click += (_, __) => { _sender.KillAll(); };
-            btnLogMidi.Click += (_, __) => { _sender.LogMidi = btnLogMidi.Checked; };
+            btnKillMidi.Click += (_, __) => { _sender1?.KillAll(); _sender2?.KillAll(); };
+            btnLogMidi.Click += (_, __) => { _settings.LogMidi = btnLogMidi.Checked; };
+
+            // Init patch.
+            vkeyCh.PatchChange += Channel_PatchChange;
+            GetSender(vkeyCh.DeviceNumber)?.SendPatch(vkeyCh.ChannelNumber, vkeyCh.Patch);
 
             vkey.ShowNoteNames = true;
+
+            SetTimer(100);
+            //_mmTimer.Start();
+
+        }
+
+        /// <summary>
+        /// Save stuff.
+        /// </summary>
+        /// <param name="e"></param>
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            SaveSettings();
+            base.OnFormClosing(e);
         }
 
         /// <summary>
@@ -103,7 +131,11 @@ namespace MidiGenerator
         protected override void Dispose(bool disposing)
         {
             // Resources.
-            _sender.Dispose();
+            _mmTimer.Stop();
+            _mmTimer.Dispose();
+
+            _sender1?.Dispose();
+            _sender2?.Dispose();
 
             if (disposing && (components is not null))
             {
@@ -114,6 +146,98 @@ namespace MidiGenerator
         }
         #endregion
 
+
+        #region MM timer
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="tempo"></param>
+        void SetTimer(double tempo)
+        {
+            MidiTimeConverter mt = new(0, tempo);
+            double period = mt.RoundedInternalPeriod();
+            _mmTimer.SetTimer((int)Math.Round(period), MmTimerCallback);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="totalElapsed"></param>
+        /// <param name="periodElapsed"></param>
+        void MmTimerCallback(double totalElapsed, double periodElapsed)
+        {
+            try
+            {
+                //TODO some work.
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+        #endregion
+
+
+        /// <summary>
+        /// Do something with events.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void Vkey_KeyboardEvent(object? sender, VirtualKeyboard.KeyboardEventArgs e)
+        {
+            if(_settings.LogMidi)
+            {
+                LogMessage($"INF Vkey N:{e.NoteId} V:{e.Velocity}");
+            }
+
+            var ms = GetSender(vkeyCh.DeviceNumber);
+            if (ms is not null)
+            {
+                LogMessage($"INF Vkey C:{vkeyCh.ChannelNumber} D:{vkeyCh.DeviceNumber} N:{e.NoteId} V:{e.Velocity}");
+
+                NoteEvent nevt;
+
+                if(e.Velocity > 0)
+                {
+                    nevt = new NoteOnEvent(0, vkeyCh.ChannelNumber, e.NoteId, Math.Min((int)(e.Velocity * vkeyCh.Volume), MidiDefs.MAX_MIDI), 0);
+                    //evt.OffEvent is null ? 0 : evt.NoteLength); // Fix NAudio NoteLength bug.
+                }
+                else // off
+                {
+                    nevt = new NoteEvent(0, vkeyCh.ChannelNumber, MidiCommandCode.NoteOff, e.NoteId, 0);
+                }
+
+                ms.MidiSend(nevt);
+            }
+            else
+            {
+                LogMessage($"WRN Invalid device:{vkeyCh.DeviceNumber}");
+            }
+        }
+
+
+        /// <summary>
+        /// User requests a patch change.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Channel_PatchChange(object? sender, EventArgs e)
+        {
+            var cc = sender as ChannelControl;
+
+            if(cc == vkeyCh)
+            {
+                var ms = GetSender(vkeyCh.DeviceNumber);
+                if(ms is not null)
+                {
+                    ms.SendPatch(vkeyCh.ChannelNumber, vkeyCh.Patch);
+                }
+            }
+        }
+
+
+
+
         #region User settings
         /// <summary>
         /// Collect and save user settings.
@@ -121,6 +245,12 @@ namespace MidiGenerator
         void SaveSettings()
         {
             _settings.FormGeometry = new Rectangle(Location.X, Location.Y, Width, Height);
+
+            _settings.VkeyChannel.ChannelNumber = vkeyCh.ChannelNumber;
+            _settings.VkeyChannel.DeviceNumber = vkeyCh.DeviceNumber;
+            _settings.VkeyChannel.Patch = vkeyCh.Patch;
+            _settings.VkeyChannel.Volume = vkeyCh.Volume;
+
             _settings.Save();
         }
 
@@ -132,21 +262,31 @@ namespace MidiGenerator
             var changes = _settings.Edit("User Settings");
 
             // Detect changes of interest.
-            bool restart = false;
+            //bool restart = false;
 
-            foreach (var (name, cat) in changes)
-            {
-                restart |= name.EndsWith("Device");
-            }
-
-            if (restart)
-            {
-                MessageBox.Show("Restart required for device changes to take effect");
-            }
+            MessageBox.Show("Restart required for changes to take effect");
 
             SaveSettings();
         }
         #endregion
+
+        #region Misc functions
+        /// <summary>
+        /// Utility.
+        /// </summary>
+        /// <param name="devNum"></param>
+        /// <returns></returns>
+        MidiSender? GetSender(int devNum)
+        {
+            MidiSender? ret = devNum switch
+            {
+                0 => null,
+                1 => _sender1,
+                2 => _sender2,
+                _ => throw new ArgumentOutOfRangeException(nameof(devNum)),
+            };
+            return ret;
+        }
 
         /// <summary>
         /// Something you should know.
@@ -173,16 +313,6 @@ namespace MidiGenerator
                 LogMessage($"Midi Out {i} \"{MidiOut.DeviceInfo(i).ProductName}\"");
             }
         }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        void Vkey_KeyboardEvent(object? sender, VirtualKeyboard.KeyboardEventArgs e)
-        {
-            LogMessage($"INF Vkey C:{e.ChannelNumber} N:{e.NoteId} V:{e.Velocity}");
-        }
+        #endregion
     }
 }
-
