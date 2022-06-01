@@ -76,6 +76,7 @@ namespace MidiGenerator
             vkeyCh.DeviceNumber = _settings.VkeyChannel.DeviceNumber;
             vkeyCh.Patch = _settings.VkeyChannel.Patch;
             vkeyCh.Volume = _settings.VkeyChannel.Volume;
+            vkeyCh.ControlColor = _settings.ControlColor; //TODOX fix this.
 
             // Set up midi.
             DumpMidiDevices();

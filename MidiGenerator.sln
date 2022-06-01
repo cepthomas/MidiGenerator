@@ -5,8 +5,6 @@ VisualStudioVersion = 16.0.32413.511
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MidiGenerator", "MidiGenerator.csproj", "{48F02C31-9B8F-4591-B9A0-CD50D814CA4F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MidiLib", "..\MidiLib\MidiLib.csproj", "{196850EA-094D-4B70-B33D-50E2F99EED00}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,10 +15,6 @@ Global
 		{48F02C31-9B8F-4591-B9A0-CD50D814CA4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{48F02C31-9B8F-4591-B9A0-CD50D814CA4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{48F02C31-9B8F-4591-B9A0-CD50D814CA4F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{196850EA-094D-4B70-B33D-50E2F99EED00}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{196850EA-094D-4B70-B33D-50E2F99EED00}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{196850EA-094D-4B70-B33D-50E2F99EED00}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{196850EA-094D-4B70-B33D-50E2F99EED00}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
