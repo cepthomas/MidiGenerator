@@ -59,5 +59,45 @@ namespace MidiGenerator.Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap glyphicons_137_cogwheel {
+            get {
+                object obj = ResourceManager.GetObject("glyphicons_137_cogwheel", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap glyphicons_170_record {
+            get {
+                object obj = ResourceManager.GetObject("glyphicons_170_record", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap glyphicons_242_flash {
+            get {
+                object obj = ResourceManager.GetObject("glyphicons_242_flash", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon toro {
+            get {
+                object obj = ResourceManager.GetObject("toro", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
     }
 }

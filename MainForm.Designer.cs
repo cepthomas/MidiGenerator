@@ -50,10 +50,11 @@ namespace MidiGenerator
             // btnLogMidi
             // 
             this.btnLogMidi.CheckOnClick = true;
-            this.btnLogMidi.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnLogMidi.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.btnLogMidi.Image = global::MidiGenerator.Properties.Resources.glyphicons_170_record;
             this.btnLogMidi.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.btnLogMidi.Name = "btnLogMidi";
-            this.btnLogMidi.Size = new System.Drawing.Size(35, 24);
+            this.btnLogMidi.Size = new System.Drawing.Size(29, 24);
             this.btnLogMidi.Text = "log";
             this.btnLogMidi.ToolTipText = "Enable logging midi events";
             // 
@@ -64,10 +65,11 @@ namespace MidiGenerator
             // 
             // btnKillMidi
             // 
-            this.btnKillMidi.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnKillMidi.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.btnKillMidi.Image = global::MidiGenerator.Properties.Resources.glyphicons_242_flash;
             this.btnKillMidi.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.btnKillMidi.Name = "btnKillMidi";
-            this.btnKillMidi.Size = new System.Drawing.Size(32, 24);
+            this.btnKillMidi.Size = new System.Drawing.Size(29, 24);
             this.btnKillMidi.Text = "kill";
             this.btnKillMidi.ToolTipText = "Kill all midi channels";
             // 
@@ -78,10 +80,11 @@ namespace MidiGenerator
             // 
             // btnSettings
             // 
-            this.btnSettings.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.btnSettings.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.btnSettings.Image = global::MidiGenerator.Properties.Resources.glyphicons_137_cogwheel;
             this.btnSettings.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.btnSettings.Name = "btnSettings";
-            this.btnSettings.Size = new System.Drawing.Size(64, 24);
+            this.btnSettings.Size = new System.Drawing.Size(29, 24);
             this.btnSettings.Text = "settings";
             this.btnSettings.Click += new System.EventHandler(this.Settings_Click);
             // 
@@ -117,11 +120,12 @@ namespace MidiGenerator
             // vkeyCh
             // 
             this.vkeyCh.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.vkeyCh.ChannelNumber = 0;
+            this.vkeyCh.ChannelNumber = 1;
             this.vkeyCh.ControlColor = System.Drawing.Color.MediumOrchid;
+            this.vkeyCh.DeviceNumber = 1;
             this.vkeyCh.Location = new System.Drawing.Point(22, 43);
             this.vkeyCh.Name = "vkeyCh";
-            this.vkeyCh.Patch = -1;
+            this.vkeyCh.Patch = 0;
             this.vkeyCh.Size = new System.Drawing.Size(292, 44);
             this.vkeyCh.TabIndex = 94;
             this.vkeyCh.Volume = 0.8D;
