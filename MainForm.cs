@@ -11,6 +11,7 @@ using System.IO;
 using System.Diagnostics;
 using NAudio.Midi;
 using NBagOfTricks;
+using NBagOfTricks.Slog;
 using NBagOfUis;
 using MidiLib;
 
@@ -19,11 +20,10 @@ namespace MidiGenerator
 {
     public partial class MainForm : Form
     {
-        #region Types
-
-        #endregion
-
         #region Fields
+        /// <summary>My logger.</summary>
+        readonly Logger _logger = LogManager.CreateLogger("MainForm");
+
         /// <summary>User settings.</summary>
         readonly UserSettings _settings;
 
@@ -35,9 +35,6 @@ namespace MidiGenerator
 
         /// <summary>The fast timer.</summary>
         readonly MmTimerEx _mmTimer = new();
-
-        /// <summary>Where to put stuff.</summary>
-        readonly string _outPath = "???";
         #endregion
 
         #region Lifecycle
@@ -51,9 +48,12 @@ namespace MidiGenerator
             // Get settings and set up paths.
             string appDir = MiscUtils.GetAppDataDir("MidiGenerator", "Ephemera");
             _settings = (UserSettings)Settings.Load(appDir, typeof(UserSettings));
-            _outPath = Path.Combine(appDir, "out");
-            DirectoryInfo di = new(_outPath);
-            di.Create();
+
+            // Init logging.
+            LogManager.MinLevelFile = Level.Debug;
+            LogManager.MinLevelNotif = Level.Trace;
+            LogManager.LogEvent += LogManager_LogEvent;
+            LogManager.Run();
 
             // Init main form from settings
             WindowState = FormWindowState.Normal;
@@ -76,33 +76,24 @@ namespace MidiGenerator
             vkeyCh.DeviceNumber = _settings.VkeyChannel.DeviceNumber;
             vkeyCh.Patch = _settings.VkeyChannel.Patch;
             vkeyCh.Volume = _settings.VkeyChannel.Volume;
-            vkeyCh.ControlColor = _settings.ControlColor; //TODOX fix this.
+            vkeyCh.ControlColor = _settings.ControlColor;
 
             // Set up midi.
-            DumpMidiDevices();
             btnLogMidi.Checked = _settings.LogMidi;
 
             if(_settings.MidiOutDevice1 != Definitions.NONE)
             {
-                _sender1 = new(_settings.MidiOutDevice1, _outPath);
-                if (!_sender1.Valid)
-                {
-                    LogMessage($"ERR Something wrong with your midi output device:{_settings.MidiOutDevice1}");
-                }
+                _sender1 = new(_settings.MidiOutDevice1);
             }
 
             if (_settings.MidiOutDevice2 != Definitions.NONE)
             {
-                _sender2 = new(_settings.MidiOutDevice2, _outPath);
-                if (!_sender2.Valid)
-                {
-                    LogMessage($"ERR Something wrong with your midi output device:{_settings.MidiOutDevice2}");
-                }
+                _sender2 = new(_settings.MidiOutDevice2);
             }
+            LogMidi_Click(null, EventArgs.Empty);
 
             // Hook up some simple UI handlers.
             btnKillMidi.Click += (_, __) => { _sender1?.KillAll(); _sender2?.KillAll(); };
-            btnLogMidi.Click += (_, __) => { _settings.LogMidi = btnLogMidi.Checked; };
 
             // Init patch.
             vkeyCh.PatchChange += Channel_PatchChange;
@@ -111,8 +102,27 @@ namespace MidiGenerator
             vkey.ShowNoteNames = true;
 
             SetTimer(100);
-            //_mmTimer.Start();
+        }
 
+        /// <summary>
+        /// Form is legal now. Init things that want to log.
+        /// </summary>
+        /// <param name="e"></param>
+        protected override void OnLoad(EventArgs e)
+        {
+            _logger.LogInfo($"Hello!");
+
+            DumpMidiDevices();
+
+            if (_sender1 is not null && !_sender1.Valid)
+            {
+                _logger.LogError($"Something wrong with your midi output device:{_settings.MidiOutDevice1}");
+            }
+
+            if (_sender2 is not null && !_sender2.Valid)
+            {
+                _logger.LogError($"Something wrong with your midi output device:{_settings.MidiOutDevice2}");
+            }
         }
 
         /// <summary>
@@ -121,7 +131,9 @@ namespace MidiGenerator
         /// <param name="e"></param>
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
+            LogManager.Stop();
             SaveSettings();
+
             base.OnFormClosing(e);
         }
 
@@ -147,7 +159,6 @@ namespace MidiGenerator
         }
         #endregion
 
-
         #region MM timer
         /// <summary>
         /// 
@@ -169,7 +180,7 @@ namespace MidiGenerator
         {
             try
             {
-                //TODO some work.
+                //TODO some work?
             }
             catch (Exception ex)
             {
@@ -177,67 +188,6 @@ namespace MidiGenerator
             }
         }
         #endregion
-
-
-        /// <summary>
-        /// Do something with events.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        void Vkey_KeyboardEvent(object? sender, VirtualKeyboard.KeyboardEventArgs e)
-        {
-            if(_settings.LogMidi)
-            {
-                LogMessage($"INF Vkey N:{e.NoteId} V:{e.Velocity}");
-            }
-
-            var ms = GetSender(vkeyCh.DeviceNumber);
-            if (ms is not null)
-            {
-                LogMessage($"INF Vkey C:{vkeyCh.ChannelNumber} D:{vkeyCh.DeviceNumber} N:{e.NoteId} V:{e.Velocity}");
-
-                NoteEvent nevt;
-
-                if(e.Velocity > 0)
-                {
-                    nevt = new NoteOnEvent(0, vkeyCh.ChannelNumber, e.NoteId, Math.Min((int)(e.Velocity * vkeyCh.Volume), MidiDefs.MAX_MIDI), 0);
-                    //evt.OffEvent is null ? 0 : evt.NoteLength); // Fix NAudio NoteLength bug.
-                }
-                else // off
-                {
-                    nevt = new NoteEvent(0, vkeyCh.ChannelNumber, MidiCommandCode.NoteOff, e.NoteId, 0);
-                }
-
-                ms.MidiSend(nevt);
-            }
-            else
-            {
-                LogMessage($"WRN Invalid device:{vkeyCh.DeviceNumber}");
-            }
-        }
-
-
-        /// <summary>
-        /// User requests a patch change.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void Channel_PatchChange(object? sender, EventArgs e)
-        {
-            var cc = sender as ChannelControl;
-
-            if(cc == vkeyCh)
-            {
-                var ms = GetSender(vkeyCh.DeviceNumber);
-                if(ms is not null)
-                {
-                    ms.SendPatch(vkeyCh.ChannelNumber, vkeyCh.Patch);
-                }
-            }
-        }
-
-
-
 
         #region User settings
         /// <summary>
@@ -271,6 +221,93 @@ namespace MidiGenerator
         }
         #endregion
 
+        #region Event handlers
+        /// <summary>
+        /// Do something with events.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void Vkey_KeyboardEvent(object? sender, VirtualKeyboard.KeyboardEventArgs e)
+        {
+            var ms = GetSender(vkeyCh.DeviceNumber);
+            if (ms is not null)
+            {
+                //_logger.LogTrace($"Vkey C:{vkeyCh.ChannelNumber} D:{vkeyCh.DeviceNumber} N:{e.NoteId} V:{e.Velocity}");
+
+                NoteEvent nevt;
+
+                if (e.Velocity > 0)
+                {
+                    nevt = new NoteOnEvent(0, vkeyCh.ChannelNumber, e.NoteId, Math.Min((int)(e.Velocity * vkeyCh.Volume), MidiDefs.MAX_MIDI), 0);
+                    //evt.OffEvent is null ? 0 : evt.NoteLength); // Fix NAudio NoteLength bug.
+                }
+                else // off
+                {
+                    nevt = new NoteEvent(0, vkeyCh.ChannelNumber, MidiCommandCode.NoteOff, e.NoteId, 0);
+                }
+
+                ms.MidiSend(nevt);
+            }
+            else
+            {
+                _logger.LogWarn($"Invalid device:{vkeyCh.DeviceNumber}");
+            }
+        }
+
+        /// <summary>
+        /// User requests a patch change.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void Channel_PatchChange(object? sender, EventArgs e)
+        {
+            var cc = sender as ChannelControl;
+
+            if (cc == vkeyCh)
+            {
+                var ms = GetSender(vkeyCh.DeviceNumber);
+                if (ms is not null)
+                {
+                    ms.SendPatch(vkeyCh.ChannelNumber, vkeyCh.Patch);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Show log events.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void LogManager_LogEvent(object? sender, LogEventArgs e)
+        {
+            // Usually come from a different thread.
+            if (IsHandleCreated)
+            {
+                this.InvokeIfRequired(_ => { txtViewer.AppendLine($"> {e.Message}"); });
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void LogMidi_Click(object? sender, EventArgs e)
+        {
+            _settings.LogMidi = btnLogMidi.Checked;
+
+            if(_sender1 is not null)
+            {
+                _sender1.LogMidi = _settings.LogMidi;
+            }
+
+            if (_sender2 is not null)
+            {
+                _sender2.LogMidi = _settings.LogMidi;
+            }
+        }
+        #endregion
+
         #region Misc functions
         /// <summary>
         /// Utility.
@@ -290,28 +327,18 @@ namespace MidiGenerator
         }
 
         /// <summary>
-        /// Something you should know.
-        /// </summary>
-        /// <param name="msg"></param>
-        void LogMessage(string msg)
-        {
-            string s = $"> {msg}";
-            txtViewer.AppendLine(s);
-        }
-
-        /// <summary>
         /// Tell me what you have.
         /// </summary>
         void DumpMidiDevices()
         {
             for (int i = 0; i < MidiIn.NumberOfDevices; i++)
             {
-                LogMessage($"Midi In {i} \"{MidiIn.DeviceInfo(i).ProductName}\"");
+                _logger.LogTrace($"Midi In {i} \"{MidiIn.DeviceInfo(i).ProductName}\"");
             }
 
             for (int i = 0; i < MidiOut.NumberOfDevices; i++)
             {
-                LogMessage($"Midi Out {i} \"{MidiOut.DeviceInfo(i).ProductName}\"");
+                _logger.LogTrace($"Midi Out {i} \"{MidiOut.DeviceInfo(i).ProductName}\"");
             }
         }
         #endregion

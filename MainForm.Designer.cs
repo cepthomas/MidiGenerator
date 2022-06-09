@@ -18,6 +18,7 @@ namespace MidiGenerator
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.btnLogMidi = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
@@ -57,6 +58,7 @@ namespace MidiGenerator
             this.btnLogMidi.Size = new System.Drawing.Size(29, 24);
             this.btnLogMidi.Text = "log";
             this.btnLogMidi.ToolTipText = "Enable logging midi events";
+            this.btnLogMidi.Click += new System.EventHandler(this.LogMidi_Click);
             // 
             // toolStripSeparator1
             // 
@@ -139,6 +141,7 @@ namespace MidiGenerator
             this.Controls.Add(this.vkey);
             this.Controls.Add(this.txtViewer);
             this.Controls.Add(this.toolStrip1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Location = new System.Drawing.Point(300, 50);
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.Name = "MainForm";
