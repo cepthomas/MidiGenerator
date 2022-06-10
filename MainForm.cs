@@ -246,7 +246,7 @@ namespace MidiGenerator
                     nevt = new NoteEvent(0, vkeyCh.ChannelNumber, MidiCommandCode.NoteOff, e.NoteId, 0);
                 }
 
-                ms.MidiSend(nevt);
+                ms.SendMidi(nevt);
             }
             else
             {
