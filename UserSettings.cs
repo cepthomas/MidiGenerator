@@ -17,9 +17,6 @@ using MidiLib;
 
 namespace MidiGenerator
 {
-
-
-
     [Serializable]
     public class UserSettings : Settings
     {
@@ -30,22 +27,19 @@ namespace MidiGenerator
         [JsonConverter(typeof(JsonColorConverter))]
         public Color ControlColor { get; set; } = Color.MediumOrchid;
 
-        [DisplayName("Midi Output Device 1")]
+        [DisplayName("Midi Output Device")]
         [Description("Who to talk to.")]
         [Browsable(true)]
         [TypeConverter(typeof(FixedListTypeConverter))]
-        public string MidiOutDevice1 { get; set; } = Definitions.NONE;
-
-        [DisplayName("Midi Output Device 2")]
-        [Description("Who to talk to.")]
-        [Browsable(true)]
-        [TypeConverter(typeof(FixedListTypeConverter))]
-        public string MidiOutDevice2 { get; set; } = Definitions.NONE;
+        public string MidiOutDevice { get; set; } = Definitions.NONE;
         #endregion
 
         #region Persisted Non-editable Properties
         [Browsable(false)]
         public ChannelSettings VkeyChannel { get; set; } = new();
+
+        [Browsable(false)]
+        public ChannelSettings BingBongChannel { get; set; } = new();
 
         [Browsable(false)]
         public bool LogMidi { get; set; } = false;
@@ -65,10 +59,6 @@ namespace MidiGenerator
         [Browsable(false)]
         public int ChannelNumber { get; set; } = 0;
 
-        /// <summary>Actual 1-based midi device number. Client responsible.</summary>
-        [Browsable(false)]
-        public int DeviceNumber { get; set; } = 0;
-
         /// <summary>Current patch.</summary>
         [Browsable(false)]
         public int Patch { get; set; } = 0;
@@ -78,7 +68,6 @@ namespace MidiGenerator
         public double Volume { get; set; } = InternalDefs.VOLUME_DEFAULT;
         #endregion
     }
-
 
     #region Editing helpers
     /// <summary>Converter for selecting property value from known lists.</summary>
@@ -94,8 +83,7 @@ namespace MidiGenerator
 
             switch (context.PropertyDescriptor.Name)
             {
-                case "MidiOutDevice1":
-                case "MidiOutDevice2":
+                case "MidiOutDevice":
                     rec = new List<string>() { Definitions.NONE };
                     for (int devindex = 0; devindex < MidiOut.NumberOfDevices; devindex++)
                     {

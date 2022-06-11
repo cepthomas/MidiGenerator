@@ -28,8 +28,11 @@ namespace MidiGenerator
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.txtViewer = new NBagOfUis.TextViewer();
             this.vkey = new MidiLib.VirtualKeyboard();
-            this.vkeyCh = new MidiLib.ChannelControl();
+            this.ccVkey = new MidiLib.ChannelControl();
+            this.ccBingBong = new MidiLib.ChannelControl();
+            this.pboxBingBong = new System.Windows.Forms.PictureBox();
             this.toolStrip1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pboxBingBong)).BeginInit();
             this.SuspendLayout();
             // 
             // toolStrip1
@@ -119,25 +122,48 @@ namespace MidiGenerator
             this.vkey.TabIndex = 93;
             this.vkey.KeyboardEvent += new System.EventHandler<MidiLib.VirtualKeyboard.KeyboardEventArgs>(this.Vkey_KeyboardEvent);
             // 
-            // vkeyCh
+            // ccVkey
             // 
-            this.vkeyCh.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.vkeyCh.ChannelNumber = 1;
-            this.vkeyCh.ControlColor = System.Drawing.Color.MediumOrchid;
-            this.vkeyCh.DeviceNumber = 1;
-            this.vkeyCh.Location = new System.Drawing.Point(22, 43);
-            this.vkeyCh.Name = "vkeyCh";
-            this.vkeyCh.Patch = 0;
-            this.vkeyCh.Size = new System.Drawing.Size(292, 44);
-            this.vkeyCh.TabIndex = 94;
-            this.vkeyCh.Volume = 0.8D;
+            this.ccVkey.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.ccVkey.ChannelNumber = 1;
+            this.ccVkey.ControlColor = System.Drawing.Color.MediumOrchid;
+            this.ccVkey.Location = new System.Drawing.Point(22, 43);
+            this.ccVkey.Name = "ccVkey";
+            this.ccVkey.Patch = 0;
+            this.ccVkey.Size = new System.Drawing.Size(292, 44);
+            this.ccVkey.TabIndex = 94;
+            this.ccVkey.Volume = 0.8D;
+            // 
+            // ccBingBong
+            // 
+            this.ccBingBong.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.ccBingBong.ChannelNumber = 1;
+            this.ccBingBong.ControlColor = System.Drawing.Color.MediumOrchid;
+            this.ccBingBong.Location = new System.Drawing.Point(33, 250);
+            this.ccBingBong.Name = "ccBingBong";
+            this.ccBingBong.Patch = 0;
+            this.ccBingBong.Size = new System.Drawing.Size(292, 44);
+            this.ccBingBong.TabIndex = 101;
+            this.ccBingBong.Volume = 0.8D;
+            // 
+            // pboxBingBong
+            // 
+            this.pboxBingBong.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.pboxBingBong.Location = new System.Drawing.Point(33, 315);
+            this.pboxBingBong.Name = "pboxBingBong";
+            this.pboxBingBong.Size = new System.Drawing.Size(256, 256);
+            this.pboxBingBong.TabIndex = 102;
+            this.pboxBingBong.TabStop = false;
+            this.pboxBingBong.Click += new System.EventHandler(this.BingBong_Click);
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1235, 779);
-            this.Controls.Add(this.vkeyCh);
+            this.Controls.Add(this.pboxBingBong);
+            this.Controls.Add(this.ccBingBong);
+            this.Controls.Add(this.ccVkey);
             this.Controls.Add(this.vkey);
             this.Controls.Add(this.txtViewer);
             this.Controls.Add(this.toolStrip1);
@@ -149,6 +175,7 @@ namespace MidiGenerator
             this.Text = "Midi Generator";
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pboxBingBong)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -165,7 +192,9 @@ namespace MidiGenerator
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
-        private ChannelControl vkeyCh;
+        private ChannelControl ccVkey;
+        private ChannelControl ccBingBong;
+        private System.Windows.Forms.PictureBox pboxBingBong;
     }
 }
 
