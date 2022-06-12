@@ -31,7 +31,7 @@ namespace MidiGenerator
         [Description("Who to talk to.")]
         [Browsable(true)]
         [TypeConverter(typeof(FixedListTypeConverter))]
-        public string MidiOutDevice { get; set; } = Definitions.NONE;
+        public string MidiOutDevice { get; set; } = "NONE";
         #endregion
 
         #region Persisted Non-editable Properties
@@ -84,7 +84,7 @@ namespace MidiGenerator
             switch (context.PropertyDescriptor.Name)
             {
                 case "MidiOutDevice":
-                    rec = new List<string>() { Definitions.NONE };
+                    rec = new List<string>() { "NONE" };
                     for (int devindex = 0; devindex < MidiOut.NumberOfDevices; devindex++)
                     {
                         rec.Add(MidiOut.DeviceInfo(devindex).ProductName);

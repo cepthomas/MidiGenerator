@@ -14,7 +14,8 @@ using NBagOfTricks;
 using NBagOfTricks.Slog;
 using NBagOfUis;
 using MidiLib;
-
+using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
 
 namespace MidiGenerator
 {
@@ -45,6 +46,7 @@ namespace MidiGenerator
             // Get settings and set up paths.
             string appDir = MiscUtils.GetAppDataDir("MidiGenerator", "Ephemera");
             _settings = (UserSettings)Settings.Load(appDir, typeof(UserSettings));
+            LoadSettings();
 
             // Init logging.
             LogManager.MinLevelFile = Level.Debug;
@@ -52,41 +54,16 @@ namespace MidiGenerator
             LogManager.LogEvent += LogManager_LogEvent;
             LogManager.Run();
 
-            // Init main form from settings
-            WindowState = FormWindowState.Normal;
-            StartPosition = FormStartPosition.Manual;
-            Location = new Point(_settings.FormGeometry.X, _settings.FormGeometry.Y);
-            Size = new Size(_settings.FormGeometry.Width, _settings.FormGeometry.Height);
-            //KeyPreview = true; // for routing kbd strokes through OnKeyDown
-
             // Configure UI.
             toolStrip1.Renderer = new NBagOfUis.CheckBoxRenderer() { SelectedColor = _settings.ControlColor };
-
-            // The text output.
             txtViewer.Font = Font;
-            txtViewer.WordWrap = true;
             txtViewer.Colors.Add("ERR", Color.LightPink);
             txtViewer.Colors.Add("WRN", Color.Plum);
 
-            // The channel controlss.
-            ccVkey.ChannelNumber = _settings.VkeyChannel.ChannelNumber;
-            ccVkey.Patch = _settings.VkeyChannel.Patch;
-            ccVkey.Volume = _settings.VkeyChannel.Volume;
-            ccVkey.ControlColor = _settings.ControlColor;
-
-            ccBingBong.ChannelNumber = _settings.BingBongChannel.ChannelNumber;
-            ccBingBong.Patch = _settings.BingBongChannel.Patch;
-            ccBingBong.Volume = _settings.BingBongChannel.Volume;
-            ccBingBong.ControlColor = _settings.ControlColor;
-
             // Set up midi.
-            btnLogMidi.Checked = _settings.LogMidi;
-
             _sender = new(_settings.MidiOutDevice);
-            // Init logging.
+            btnLogMidi.Checked = _settings.LogMidi;
             LogMidi_Click(null, EventArgs.Empty);
-
-            // Hook up some simple UI handlers.
             btnKillMidi.Click += (_, __) => { _sender?.KillAll(); };
 
             // Init patches.
@@ -95,8 +72,11 @@ namespace MidiGenerator
             ccBingBong.ChannelChangeEvent += Channel_ChannelChangeEvent;
             _sender.SendPatch(ccBingBong.ChannelNumber, ccBingBong.Patch);
 
-            vkey.ShowNoteNames = true;
+            // Virtual device events.
+            bb.DeviceEvent += Virtual_DeviceEvent;
+            vkey.DeviceEvent += Virtual_DeviceEvent;
 
+            // Fast timer for future use.
             SetTimer(100);
         }
 
@@ -178,20 +158,13 @@ namespace MidiGenerator
         }
         #endregion
 
-
-        void BingBong_Click(object sender, EventArgs e) // TODOX
-        {
-
-        }
-
-
         #region User settings
         /// <summary>
         /// Collect and save user settings.
         /// </summary>
         void SaveSettings()
         {
-            _settings.FormGeometry = new Rectangle(Location.X, Location.Y, Width, Height);
+            _settings.FormGeometry = new Rectangle(Location, Size);
 
             _settings.VkeyChannel.ChannelNumber = ccVkey.ChannelNumber;
             _settings.VkeyChannel.Patch = ccVkey.Patch;
@@ -205,14 +178,32 @@ namespace MidiGenerator
         }
 
         /// <summary>
+        /// Init UI from settings.
+        /// </summary>
+        void LoadSettings()
+        {
+            // Init main form from settings.
+            Location = _settings.FormGeometry.Location;
+            Size = _settings.FormGeometry.Size;
+
+            // The channel controls.
+            ccVkey.ChannelNumber = _settings.VkeyChannel.ChannelNumber;
+            ccVkey.Patch = _settings.VkeyChannel.Patch;
+            ccVkey.Volume = _settings.VkeyChannel.Volume;
+            ccVkey.ControlColor = _settings.ControlColor;
+
+            ccBingBong.ChannelNumber = _settings.BingBongChannel.ChannelNumber;
+            ccBingBong.Patch = _settings.BingBongChannel.Patch;
+            ccBingBong.Volume = _settings.BingBongChannel.Volume;
+            ccBingBong.ControlColor = _settings.ControlColor;
+        }
+
+        /// <summary>
         /// Edit the common options in a property grid.
         /// </summary>
         void Settings_Click(object? sender, EventArgs e)
         {
             var changes = _settings.Edit("User Settings");
-
-            // Detect changes of interest.
-            //bool restart = false;
 
             MessageBox.Show("Restart required for changes to take effect");
 
@@ -226,17 +217,17 @@ namespace MidiGenerator
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void Vkey_KeyboardEvent(object? sender, VirtualKeyboard.KeyboardEventArgs e)
+        void Virtual_DeviceEvent(object? sender, DeviceEventArgs e)
         {
-            NoteEvent nevt;
-            if (e.Velocity > 0)
-            {
-                nevt = new NoteOnEvent(0, ccVkey.ChannelNumber, e.NoteId, Math.Min((int)(e.Velocity * ccVkey.Volume), MidiDefs.MAX_MIDI), 0);
-            }
-            else // off
-            {
-                nevt = new NoteEvent(0, ccVkey.ChannelNumber, MidiCommandCode.NoteOff, e.NoteId, 0);
-            }
+            _logger.LogDebug($"VirtDev N:{e.NoteId} V:{e.Velocity}");
+
+            int chanNum = sender == vkey ?
+                ccVkey.ChannelNumber :
+                ccBingBong.ChannelNumber;
+
+            NoteEvent nevt = e.Velocity > 0 ?
+                new NoteOnEvent(0, chanNum, e.NoteId % MidiDefs.MAX_MIDI, e.Velocity % MidiDefs.MAX_MIDI, 0) :
+                new NoteEvent(0, chanNum, MidiCommandCode.NoteOff, e.NoteId, 0);
 
             _sender.SendMidi(nevt);
         }
