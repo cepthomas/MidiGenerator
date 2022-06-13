@@ -49,8 +49,8 @@ namespace MidiGenerator
             LoadSettings();
 
             // Init logging.
-            LogManager.MinLevelFile = Level.Debug;
-            LogManager.MinLevelNotif = Level.Trace;
+            LogManager.MinLevelFile = LogLevel.Debug;
+            LogManager.MinLevelNotif = LogLevel.Trace;
             LogManager.LogEvent += LogManager_LogEvent;
             LogManager.Run();
 
@@ -86,13 +86,13 @@ namespace MidiGenerator
         /// <param name="e"></param>
         protected override void OnLoad(EventArgs e)
         {
-            _logger.LogInfo($"Hello!");
+            _logger.Info($"Hello!");
 
             DumpMidiDevices();
 
             if (!_sender.Valid)
             {
-                _logger.LogError($"Something wrong with your midi output device:{_settings.MidiOutDevice}");
+                _logger.Error($"Something wrong with your midi output device:{_settings.MidiOutDevice}");
             }
         }
 
@@ -219,7 +219,7 @@ namespace MidiGenerator
         /// <param name="e"></param>
         void Virtual_DeviceEvent(object? sender, DeviceEventArgs e)
         {
-            _logger.LogDebug($"VirtDev N:{e.NoteId} V:{e.Velocity}");
+            _logger.Debug($"VirtDev N:{e.NoteId} V:{e.Velocity}");
 
             int chanNum = sender == vkey ?
                 ccVkey.ChannelNumber :
@@ -256,7 +256,7 @@ namespace MidiGenerator
             // Usually come from a different thread.
             if (IsHandleCreated)
             {
-                this.InvokeIfRequired(_ => { txtViewer.AppendLine($"> {e.Message}"); });
+                this.InvokeIfRequired(_ => { txtViewer.AppendLine($"{e.Message}"); });
             }
         }
 
@@ -280,12 +280,12 @@ namespace MidiGenerator
         {
             for (int i = 0; i < MidiIn.NumberOfDevices; i++)
             {
-                _logger.LogTrace($"Your Midi In {i} \"{MidiIn.DeviceInfo(i).ProductName}\"");
+                _logger.Trace($"Your Midi In {i} \"{MidiIn.DeviceInfo(i).ProductName}\"");
             }
 
             for (int i = 0; i < MidiOut.NumberOfDevices; i++)
             {
-                _logger.LogTrace($"Your Midi Out {i} \"{MidiOut.DeviceInfo(i).ProductName}\"");
+                _logger.Trace($"Your Midi Out {i} \"{MidiOut.DeviceInfo(i).ProductName}\"");
             }
         }
         #endregion
