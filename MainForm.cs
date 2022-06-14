@@ -203,7 +203,7 @@ namespace MidiGenerator
         /// </summary>
         void Settings_Click(object? sender, EventArgs e)
         {
-            var changes = _settings.Edit("User Settings");
+            /*var changes =*/ _settings.Edit("User Settings");
 
             MessageBox.Show("Restart required for changes to take effect");
 
