@@ -57,7 +57,7 @@ namespace MidiGenerator
         #region Persisted Non-editable Properties
         /// <summary>Actual 1-based midi channel number.</summary>
         [Browsable(false)]
-        public int ChannelNumber { get; set; } = 0;
+        public int ChannelNumber { get; set; } = 1;
 
         /// <summary>Current patch.</summary>
         [Browsable(false)]

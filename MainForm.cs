@@ -46,7 +46,6 @@ namespace MidiGenerator
             // Get settings and set up paths.
             string appDir = MiscUtils.GetAppDataDir("MidiGenerator", "Ephemera");
             _settings = (UserSettings)Settings.Load(appDir, typeof(UserSettings));
-            LoadSettings();
 
             // Init logging.
             LogManager.MinLevelFile = LogLevel.Debug;
@@ -61,34 +60,49 @@ namespace MidiGenerator
             txtViewer.Colors.Add("WRN", Color.Plum);
 
             // Set up midi.
-            _sender = new(_settings.MidiOutDevice);
+            _sender = new(_settings.MidiOutDevice, "MidiOut1");
             btnLogMidi.Checked = _settings.LogMidi;
             LogMidi_Click(null, EventArgs.Empty);
             btnKillMidi.Click += (_, __) => { _sender?.KillAll(); };
 
-            // Init patches.
-            ccVkey.ChannelChangeEvent += Channel_ChannelChangeEvent;
-            _sender.SendPatch(ccVkey.ChannelNumber, ccVkey.Patch);
-            ccBingBong.ChannelChangeEvent += Channel_ChannelChangeEvent;
-            _sender.SendPatch(ccBingBong.ChannelNumber, ccBingBong.Patch);
+            // Init main form from settings.
+            Location = _settings.FormGeometry.Location;
+            Size = _settings.FormGeometry.Size;
 
             // Virtual device events.
-            bb.DeviceEvent += Virtual_DeviceEvent;
-            vkey.DeviceEvent += Virtual_DeviceEvent;
+            bb.InputEvent += Virtual_InputEvent;
+            vkey.InputEvent += Virtual_InputEvent;
 
             // Fast timer for future use.
             SetTimer(100);
         }
 
         /// <summary>
-        /// Form is legal now. Init things that want to log.
+        /// Form is legal now. Init things that want to log or play with controls..
         /// </summary>
         /// <param name="e"></param>
         protected override void OnLoad(EventArgs e)
         {
             _logger.Info($"Hello!");
 
-            DumpMidiDevices();
+            //DumpMidiDevices();
+
+            // The channel controls.
+            ccVkey.ChannelNumber = _settings.VkeyChannel.ChannelNumber;
+            ccVkey.Patch = _settings.VkeyChannel.Patch;
+            ccVkey.Volume = _settings.VkeyChannel.Volume;
+            ccVkey.ControlColor = _settings.ControlColor;
+
+            ccBingBong.ChannelNumber = _settings.BingBongChannel.ChannelNumber;
+            ccBingBong.Patch = _settings.BingBongChannel.Patch;
+            ccBingBong.Volume = _settings.BingBongChannel.Volume;
+            ccBingBong.ControlColor = _settings.ControlColor;
+
+            // Init patches.
+            ccVkey.ChannelChangeEvent += Channel_ChannelChangeEvent;
+            _sender.SendPatch(ccVkey.ChannelNumber, ccVkey.Patch);
+            ccBingBong.ChannelChangeEvent += Channel_ChannelChangeEvent;
+            _sender.SendPatch(ccBingBong.ChannelNumber, ccBingBong.Patch);
 
             if (!_sender.Valid)
             {
@@ -178,27 +192,6 @@ namespace MidiGenerator
         }
 
         /// <summary>
-        /// Init UI from settings.
-        /// </summary>
-        void LoadSettings()
-        {
-            // Init main form from settings.
-            Location = _settings.FormGeometry.Location;
-            Size = _settings.FormGeometry.Size;
-
-            // The channel controls.
-            ccVkey.ChannelNumber = _settings.VkeyChannel.ChannelNumber;
-            ccVkey.Patch = _settings.VkeyChannel.Patch;
-            ccVkey.Volume = _settings.VkeyChannel.Volume;
-            ccVkey.ControlColor = _settings.ControlColor;
-
-            ccBingBong.ChannelNumber = _settings.BingBongChannel.ChannelNumber;
-            ccBingBong.Patch = _settings.BingBongChannel.Patch;
-            ccBingBong.Volume = _settings.BingBongChannel.Volume;
-            ccBingBong.ControlColor = _settings.ControlColor;
-        }
-
-        /// <summary>
         /// Edit the common options in a property grid.
         /// </summary>
         void Settings_Click(object? sender, EventArgs e)
@@ -217,19 +210,19 @@ namespace MidiGenerator
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void Virtual_DeviceEvent(object? sender, DeviceEventArgs e)
+        void Virtual_InputEvent(object? sender, InputEventArgs e)
         {
-            _logger.Debug($"VirtDev N:{e.NoteId} V:{e.Velocity}");
+            _logger.Debug($"VirtDev N:{e.Note} V:{e.Value}");
 
             int chanNum = sender == vkey ?
                 ccVkey.ChannelNumber :
                 ccBingBong.ChannelNumber;
 
-            NoteEvent nevt = e.Velocity > 0 ?
-                new NoteOnEvent(0, chanNum, e.NoteId % MidiDefs.MAX_MIDI, e.Velocity % MidiDefs.MAX_MIDI, 0) :
-                new NoteEvent(0, chanNum, MidiCommandCode.NoteOff, e.NoteId, 0);
+            NoteEvent nevt = e.Value > 0 ?
+                new NoteOnEvent(0, chanNum, e.Note % MidiDefs.MAX_MIDI, e.Value % MidiDefs.MAX_MIDI, 0) :
+                new NoteEvent(0, chanNum, MidiCommandCode.NoteOff, e.Note, 0);
 
-            _sender.SendMidi(nevt);
+            _sender.SendEvent(nevt);
         }
 
         /// <summary>
@@ -268,7 +261,7 @@ namespace MidiGenerator
         void LogMidi_Click(object? sender, EventArgs e)
         {
             _settings.LogMidi = btnLogMidi.Checked;
-            _sender.LogMidi = _settings.LogMidi;
+            _sender.LogEnable = _settings.LogMidi;
         }
         #endregion
 

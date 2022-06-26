@@ -123,7 +123,6 @@ namespace MidiGenerator
             // ccVkey
             // 
             this.ccVkey.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.ccVkey.ChannelNumber = 1;
             this.ccVkey.ControlColor = System.Drawing.Color.MediumOrchid;
             this.ccVkey.Location = new System.Drawing.Point(22, 43);
             this.ccVkey.Name = "ccVkey";
@@ -135,7 +134,6 @@ namespace MidiGenerator
             // ccBingBong
             // 
             this.ccBingBong.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.ccBingBong.ChannelNumber = 1;
             this.ccBingBong.ControlColor = System.Drawing.Color.MediumOrchid;
             this.ccBingBong.Location = new System.Drawing.Point(22, 234);
             this.ccBingBong.Name = "ccBingBong";

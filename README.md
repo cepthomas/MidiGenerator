@@ -2,7 +2,7 @@
 
 Emulated midi controllers:
 - Virtual keyboard.
-- Coming soon - 2D touchpad.
+- 2D touchpad.
 - That's it for now.
 
 Can be used to drive external midi devices via USB or internal soft devices using
