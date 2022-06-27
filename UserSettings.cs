@@ -27,11 +27,11 @@ namespace MidiGenerator
         [JsonConverter(typeof(JsonColorConverter))]
         public Color ControlColor { get; set; } = Color.MediumOrchid;
 
-        [DisplayName("Midi Output Device")]
-        [Description("Who to talk to.")]
+        [DisplayName("Midi Settings")]
+        [Description("Edit midi settings.")]
         [Browsable(true)]
-        [TypeConverter(typeof(FixedListTypeConverter))]
-        public string MidiOutDevice { get; set; } = "NONE";
+        [TypeConverter(typeof(ExpandableObjectConverter))]
+        public MidiSettings MidiSettings { get; set; } = new();
         #endregion
 
         #region Persisted Non-editable Properties
@@ -65,35 +65,7 @@ namespace MidiGenerator
 
         /// <summary>Current volume.</summary>
         [Browsable(false)]
-        public double Volume { get; set; } = InternalDefs.VOLUME_DEFAULT;
+        public double Volume { get; set; } = VolumeDefs.DEFAULT;
         #endregion
     }
-
-    #region Editing helpers
-    /// <summary>Converter for selecting property value from known lists.</summary>
-    public class FixedListTypeConverter : TypeConverter
-    {
-        public override bool GetStandardValuesSupported(ITypeDescriptorContext context) { return true; }
-        public override bool GetStandardValuesExclusive(ITypeDescriptorContext context) { return true; }
-
-        // Get the specific list based on the property name.
-        public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context)
-        {
-            List<string>? rec = null;
-
-            switch (context.PropertyDescriptor.Name)
-            {
-                case "MidiOutDevice":
-                    rec = new List<string>() { "NONE" };
-                    for (int devindex = 0; devindex < MidiOut.NumberOfDevices; devindex++)
-                    {
-                        rec.Add(MidiOut.DeviceInfo(devindex).ProductName);
-                    }
-                    break;
-            }
-
-            return new StandardValuesCollection(rec);
-        }
-    }
-    #endregion
 }

@@ -46,6 +46,8 @@ namespace MidiGenerator
             // Get settings and set up paths.
             string appDir = MiscUtils.GetAppDataDir("MidiGenerator", "Ephemera");
             _settings = (UserSettings)Settings.Load(appDir, typeof(UserSettings));
+            // Tell the libs about their settings.
+            MidiSettings.LibSettings = _settings.MidiSettings;
 
             // Init logging.
             LogManager.MinLevelFile = LogLevel.Debug;
@@ -60,7 +62,7 @@ namespace MidiGenerator
             txtViewer.Colors.Add("WRN", Color.Plum);
 
             // Set up midi.
-            _sender = new(_settings.MidiOutDevice, "MidiOut1");
+            _sender = new(_settings.MidiSettings.MidiOutDevice, "MidiOutDevice");
             btnLogMidi.Checked = _settings.LogMidi;
             LogMidi_Click(null, EventArgs.Empty);
             btnKillMidi.Click += (_, __) => { _sender?.KillAll(); };
@@ -106,7 +108,7 @@ namespace MidiGenerator
 
             if (!_sender.Valid)
             {
-                _logger.Error($"Something wrong with your midi output device:{_settings.MidiOutDevice}");
+                _logger.Error($"Something wrong with your midi output device:{_settings.MidiSettings.MidiOutDevice}");
             }
         }
 
@@ -196,7 +198,7 @@ namespace MidiGenerator
         /// </summary>
         void Settings_Click(object? sender, EventArgs e)
         {
-            /*var changes =*/ _settings.Edit("User Settings");
+            _settings.Edit("User Settings", 400);
 
             MessageBox.Show("Restart required for changes to take effect");
 
