@@ -41,13 +41,13 @@ namespace MidiGenerator
         /// </summary>
         public MainForm()
         {
-            InitializeComponent();
-
-            // Get settings and set up paths.
+            // Must do this first before initializing.
             string appDir = MiscUtils.GetAppDataDir("MidiGenerator", "Ephemera");
             _settings = (UserSettings)Settings.Load(appDir, typeof(UserSettings));
             // Tell the libs about their settings.
             MidiSettings.LibSettings = _settings.MidiSettings;
+
+            InitializeComponent();
 
             // Init logging.
             LogManager.MinLevelFile = LogLevel.Debug;
@@ -62,7 +62,7 @@ namespace MidiGenerator
             txtViewer.Colors.Add("WRN", Color.Plum);
 
             // Set up midi.
-            _sender = new(_settings.MidiSettings.MidiOutDevice, "MidiOutDevice");
+            _sender = new(_settings.MidiSettings.MidiOutDevice);
             btnLogMidi.Checked = _settings.LogMidi;
             LogMidi_Click(null, EventArgs.Empty);
             btnKillMidi.Click += (_, __) => { _sender?.KillAll(); };
