@@ -133,6 +133,10 @@ namespace MidiGenerator
             // Resources.
             _mmTimer.Stop();
             _mmTimer.Dispose();
+
+            // Wait a bit in case there are some lingering events.
+            System.Threading.Thread.Sleep(100);
+
             _sender.Dispose();
 
             if (disposing && (components is not null))
@@ -271,7 +275,7 @@ namespace MidiGenerator
         /// <summary>
         /// Tell me what you have.
         /// </summary>
-        void DumpMidiDevices()
+        void DumpMidiDevices() //TODOX3 make this a common util.
         {
             for (int i = 0; i < MidiIn.NumberOfDevices; i++)
             {
