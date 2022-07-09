@@ -50,8 +50,8 @@ namespace MidiGenerator
             InitializeComponent();
 
             // Init logging.
-            LogManager.MinLevelFile = LogLevel.Trace;
-            LogManager.MinLevelNotif = LogLevel.Debug;
+            LogManager.MinLevelFile = _settings.FileLogLevel;
+            LogManager.MinLevelNotif = _settings.NotifLogLevel;
             LogManager.LogEvent += LogManager_LogEvent;
             LogManager.Run();
 

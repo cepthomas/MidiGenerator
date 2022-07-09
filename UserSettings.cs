@@ -11,6 +11,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using NAudio.Midi;
 using NBagOfTricks;
+using NBagOfTricks.Slog;
 using NBagOfUis;
 using MidiLib;
 
@@ -26,6 +27,16 @@ namespace MidiGenerator
         [Browsable(true)]
         [JsonConverter(typeof(JsonColorConverter))]
         public Color ControlColor { get; set; } = Color.MediumOrchid;
+
+        [DisplayName("File Log Level")]
+        [Description("Log level for file write.")]
+        [Browsable(true)]
+        public LogLevel FileLogLevel { get; set; } = LogLevel.Trace;
+
+        [DisplayName("File Log Level")]
+        [Description("Log level for UI notification.")]
+        [Browsable(true)]
+        public LogLevel NotifLogLevel { get; set; } = LogLevel.Debug;
 
         [DisplayName("Midi Settings")]
         [Description("Edit midi settings.")]
