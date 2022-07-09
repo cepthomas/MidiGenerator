@@ -18,6 +18,8 @@ namespace MidiGenerator
         /// </summary>
         private void InitializeComponent()
         {
+            MidiLib.Channel channel1 = new MidiLib.Channel();
+            MidiLib.Channel channel2 = new MidiLib.Channel();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.btnLogMidi = new System.Windows.Forms.ToolStripButton();
@@ -102,18 +104,21 @@ namespace MidiGenerator
             this.txtViewer.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
             this.txtViewer.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.txtViewer.Location = new System.Drawing.Point(504, 234);
+            this.txtViewer.Location = new System.Drawing.Point(354, 234);
             this.txtViewer.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.txtViewer.MaxText = 5000;
             this.txtViewer.Name = "txtViewer";
-            this.txtViewer.Size = new System.Drawing.Size(709, 368);
+            this.txtViewer.Size = new System.Drawing.Size(859, 306);
             this.txtViewer.TabIndex = 58;
             this.txtViewer.WordWrap = true;
             // 
             // vkey
             // 
+            this.vkey.CaptureEnable = false;
+            this.vkey.DeviceName = "VirtualKeyboard";
             this.vkey.KeySize = 14;
             this.vkey.Location = new System.Drawing.Point(22, 95);
+            this.vkey.LogEnable = false;
             this.vkey.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.vkey.Name = "vkey";
             this.vkey.ShowNoteNames = true;
@@ -123,28 +128,66 @@ namespace MidiGenerator
             // ccVkey
             // 
             this.ccVkey.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.ccVkey.ControlColor = System.Drawing.Color.MediumOrchid;
+            channel1.AddNoteOff = false;
+            channel1.ChannelName = "";
+            channel1.ChannelNumber = -1;
+            channel1.Device = null;
+            channel1.DeviceId = "";
+            channel1.IsDrums = false;
+            channel1.Patch = 0;
+            channel1.Selected = false;
+            channel1.State = MidiLib.ChannelState.Normal;
+            channel1.Volume = 0.8D;
+            this.ccVkey.BoundChannel = channel1;
+            this.ccVkey.IsDrums = false;
             this.ccVkey.Location = new System.Drawing.Point(22, 43);
             this.ccVkey.Name = "ccVkey";
             this.ccVkey.Patch = 0;
+            this.ccVkey.Selected = false;
+            this.ccVkey.SelectedColor = System.Drawing.Color.Aquamarine;
             this.ccVkey.Size = new System.Drawing.Size(292, 44);
+            this.ccVkey.State = MidiLib.ChannelState.Normal;
             this.ccVkey.TabIndex = 94;
+            this.ccVkey.UnselectedColor = System.Drawing.SystemColors.Control;
             this.ccVkey.Volume = 0.8D;
             // 
             // ccBingBong
             // 
             this.ccBingBong.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.ccBingBong.ControlColor = System.Drawing.Color.MediumOrchid;
+            channel2.AddNoteOff = false;
+            channel2.ChannelName = "";
+            channel2.ChannelNumber = -1;
+            channel2.Device = null;
+            channel2.DeviceId = "";
+            channel2.IsDrums = false;
+            channel2.Patch = 0;
+            channel2.Selected = false;
+            channel2.State = MidiLib.ChannelState.Normal;
+            channel2.Volume = 0.8D;
+            this.ccBingBong.BoundChannel = channel2;
+            this.ccBingBong.IsDrums = false;
             this.ccBingBong.Location = new System.Drawing.Point(22, 234);
             this.ccBingBong.Name = "ccBingBong";
             this.ccBingBong.Patch = 0;
+            this.ccBingBong.Selected = false;
+            this.ccBingBong.SelectedColor = System.Drawing.Color.Aquamarine;
             this.ccBingBong.Size = new System.Drawing.Size(292, 44);
+            this.ccBingBong.State = MidiLib.ChannelState.Normal;
             this.ccBingBong.TabIndex = 101;
+            this.ccBingBong.UnselectedColor = System.Drawing.SystemColors.Control;
             this.ccBingBong.Volume = 0.8D;
             // 
             // bb
             // 
+            this.bb.CaptureEnable = false;
+            this.bb.DeviceName = "BingBong";
+            this.bb.DrawNoteGrid = true;
             this.bb.Location = new System.Drawing.Point(22, 284);
+            this.bb.LogEnable = false;
+            this.bb.MaxControl = 127;
+            this.bb.MaxNote = 95;
+            this.bb.MinControl = 0;
+            this.bb.MinNote = 24;
             this.bb.Name = "bb";
             this.bb.Size = new System.Drawing.Size(256, 256);
             this.bb.TabIndex = 102;
@@ -153,7 +196,7 @@ namespace MidiGenerator
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1235, 622);
+            this.ClientSize = new System.Drawing.Size(1235, 560);
             this.Controls.Add(this.bb);
             this.Controls.Add(this.ccBingBong);
             this.Controls.Add(this.ccVkey);
