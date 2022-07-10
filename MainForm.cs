@@ -29,7 +29,7 @@ namespace MidiGenerator
         readonly UserSettings _settings;
 
         /// <summary>Midi output component.</summary>
-        readonly MidiOutput _outputDevice;
+        readonly IOutputDevice _outputDevice = new NullOutputDevice();
 
         /// <summary>The fast timer.</summary>
         readonly MmTimerEx _mmTimer = new();
@@ -62,7 +62,20 @@ namespace MidiGenerator
             txtViewer.Colors.Add("WRN", Color.Plum);
 
             // Set up midi.
-            _outputDevice = new(_settings.MidiSettings.OutputDevice);
+            // Set up output device.
+            foreach (var dev in _settings.MidiSettings.OutputDevices)
+            {
+                // Try midi.
+                _outputDevice = new MidiOutput(dev.DeviceName);
+                if (_outputDevice.Valid)
+                {
+                    break;
+                }
+            }
+            if (!_outputDevice.Valid)
+            {
+                _logger.Error($"Something wrong with your output device:{_outputDevice.DeviceName}");
+            }
 
             // Create the channels and controls.
             Channel chVkey = new()
@@ -124,39 +137,9 @@ namespace MidiGenerator
         {
             _logger.Info($"Hello!");
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            //ccVkey.ChannelNumber = _settings.VkeyChannel.ChannelNumber;
-            //ccVkey.Patch = _settings.VkeyChannel.Patch;
-            //ccVkey.Volume = _settings.VkeyChannel.Volume;
-            //ccVkey.ControlColor = _settings.ControlColor;
-
-            //ccBingBong.ChannelNumber = _settings.BingBongChannel.ChannelNumber;
-            //ccBingBong.Patch = _settings.BingBongChannel.Patch;
-            //ccBingBong.Volume = _settings.BingBongChannel.Volume;
-            //ccBingBong.ControlColor = _settings.ControlColor;
-
-            //// Init patches.
-            //ccVkey.ChannelChangeEvent += Channel_ChannelChangeEvent;
-            //_outputDevice.SendPatch(ccVkey.ChannelNumber, ccVkey.Patch);
-            //ccBingBong.ChannelChangeEvent += Channel_ChannelChangeEvent;
-            //_outputDevice.SendPatch(ccBingBong.ChannelNumber, ccBingBong.Patch);
-
             if (!_outputDevice.Valid)
             {
-                _logger.Error($"Something wrong with your midi output device:{_settings.MidiSettings.OutputDevice}");
+                _logger.Error($"Something wrong with your midi output device");
             }
         }
 
