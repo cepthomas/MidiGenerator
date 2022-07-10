@@ -29,7 +29,7 @@ namespace MidiGenerator
         readonly UserSettings _settings;
 
         /// <summary>Midi output component.</summary>
-        readonly MidiSender _outputDevice;
+        readonly MidiOutput _outputDevice;
 
         /// <summary>The fast timer.</summary>
         readonly MmTimerEx _mmTimer = new();
