@@ -76,7 +76,7 @@ namespace MidiGenerator
 
         /// <summary>Current volume.</summary>
         [Browsable(false)]
-        public double Volume { get; set; } = VolumeDefs.DEFAULT;
+        public double Volume { get; set; } = MidiLibDefs.VOLUME_DEFAULT;
         #endregion
     }
 }

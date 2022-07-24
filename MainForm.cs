@@ -84,7 +84,7 @@ namespace MidiGenerator
                 ChannelNumber = _settings.VkeyChannel.ChannelNumber,
                 Device = _outputDevice,
                 DeviceId = _outputDevice.DeviceName,
-                Volume = VolumeDefs.DEFAULT,
+                Volume = MidiLibDefs.VOLUME_DEFAULT,
                 State = ChannelState.Normal,
                 Patch = _settings.VkeyChannel.Patch,
                 IsDrums = false,
@@ -102,7 +102,7 @@ namespace MidiGenerator
                 ChannelNumber = _settings.BingBongChannel.ChannelNumber,
                 Device = _outputDevice,
                 DeviceId = _outputDevice.DeviceName,
-                Volume = VolumeDefs.DEFAULT,
+                Volume = MidiLibDefs.VOLUME_DEFAULT,
                 State = ChannelState.Normal,
                 Patch = _settings.BingBongChannel.Patch,
                 IsDrums = false,
@@ -200,7 +200,7 @@ namespace MidiGenerator
         {
             try
             {
-                //TODO some work?
+                // Could do some timed work here.
             }
             catch (Exception ex)
             {
