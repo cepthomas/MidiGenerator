@@ -58,8 +58,8 @@ namespace MidiGenerator
             // Configure UI.
             toolStrip1.Renderer = new NBagOfUis.CheckBoxRenderer() { SelectedColor = _settings.ControlColor };
             txtViewer.Font = Font;
-            txtViewer.Colors.Add("ERR", Color.LightPink);
-            txtViewer.Colors.Add("WRN", Color.Plum);
+            txtViewer.MatchColors.Add("ERR", Color.LightPink);
+            txtViewer.MatchColors.Add("WRN", Color.Plum);
 
             // Set up midi.
             // Set up output device.
