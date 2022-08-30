@@ -141,6 +141,8 @@ namespace MidiGenerator
             {
                 _logger.Error($"Something wrong with your midi output device");
             }
+
+            base.OnLoad(e);
         }
 
         /// <summary>
