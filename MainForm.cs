@@ -115,7 +115,11 @@ namespace MidiGenerator
 
             btnLogMidi.Checked = _settings.LogMidi;
             LogMidi_Click(null, EventArgs.Empty);
-            btnKillMidi.Click += (_, __) => { ccVkey.BoundChannel.Kill(); ccBingBong.BoundChannel.Kill(); };
+            btnKillMidi.Click += (_, __) =>
+            {
+                ccVkey.BoundChannel.Kill();
+                ccBingBong.BoundChannel.Kill();
+            };
 
             // Init main form from settings.
             Location = _settings.FormGeometry.Location;
