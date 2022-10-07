@@ -43,7 +43,7 @@ namespace MidiGenerator
         {
             // Must do this first before initializing.
             string appDir = MiscUtils.GetAppDataDir("MidiGenerator", "Ephemera");
-            _settings = (UserSettings)Settings.Load(appDir, typeof(UserSettings));
+            _settings = (UserSettings)SettingsCore.Load(appDir, typeof(UserSettings));
             // Tell the libs about their settings.
             MidiSettings.LibSettings = _settings.MidiSettings;
 
@@ -239,7 +239,7 @@ namespace MidiGenerator
         /// </summary>
         void Settings_Click(object? sender, EventArgs e)
         {
-            _settings.Edit("User Settings", 400);
+            SettingsEditor.Edit(_settings, "User Settings", 400);
 
             MessageBox.Show("Restart required for changes to take effect");
 
