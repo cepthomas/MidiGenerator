@@ -10,13 +10,13 @@ using System.Windows.Forms.Design;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using NAudio.Midi;
-using NBagOfTricks;
-using NBagOfTricks.Slog;
-using NBagOfUis;
-using MidiLib;
+using Ephemera.NBagOfTricks;
+using Ephemera.NBagOfTricks.Slog;
+using Ephemera.NBagOfUis;
+using Ephemera.MidiLib;
 
 
-namespace MidiGenerator
+namespace Ephemera.MidiGenerator
 {
     [Serializable]
     public sealed class UserSettings : SettingsCore

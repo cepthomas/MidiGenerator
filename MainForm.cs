@@ -9,15 +9,16 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
 using System.Diagnostics;
-using NAudio.Midi;
-using NBagOfTricks;
-using NBagOfTricks.Slog;
-using NBagOfUis;
-using MidiLib;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
+using NAudio.Midi;
+using Ephemera.NBagOfTricks;
+using Ephemera.NBagOfTricks.Slog;
+using Ephemera.NBagOfUis;
+using Ephemera.MidiLib;
 
-namespace MidiGenerator
+
+namespace Ephemera.MidiGenerator
 {
     public partial class MainForm : Form
     {

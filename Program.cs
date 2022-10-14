@@ -6,7 +6,7 @@ using System.Windows.Forms;
 using System.Resources;
 
 
-namespace MidiGenerator
+namespace Ephemera.MidiGenerator
 {
     static class Program
     {
