@@ -53,7 +53,7 @@ namespace Ephemera.MidiGenerator
             // Init logging.
             LogManager.MinLevelFile = _settings.FileLogLevel;
             LogManager.MinLevelNotif = _settings.NotifLogLevel;
-            LogManager.LogEvent += LogManager_LogEvent;
+            LogManager.LogMessage += LogManager_LogMessage;
             LogManager.Run();
 
             // Configure UI.
@@ -92,7 +92,7 @@ namespace Ephemera.MidiGenerator
                 Selected = false,
             };
             ccVkey.BoundChannel = chVkey;
-            ccVkey.ChannelChangeEvent += Channel_ChannelChangeEvent;
+            ccVkey.ChannelChange += Channel_ChannelChange;
             // Good time to send initial patch.
             chVkey.SendPatch();
 
@@ -110,7 +110,7 @@ namespace Ephemera.MidiGenerator
                 Selected = false,
             };
             ccBingBong.BoundChannel = chVBb;
-            ccBingBong.ChannelChangeEvent += Channel_ChannelChangeEvent;
+            ccBingBong.ChannelChange += Channel_ChannelChange;
             // Good time to send initial patch.
             chVBb.SendPatch();
 
@@ -127,8 +127,8 @@ namespace Ephemera.MidiGenerator
             Size = _settings.FormGeometry.Size;
 
             // Virtual device events.
-            bb.InputEvent += Device_InputEvent;
-            vkey.InputEvent += Device_InputEvent;
+            bb.InputReceive += Device_InputReceive;
+            vkey.InputReceive += Device_InputReceive;
 
             // Fast timer for future use.
             SetTimer(100);
@@ -254,7 +254,7 @@ namespace Ephemera.MidiGenerator
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void Device_InputEvent(object? sender, InputEventArgs e)
+        void Device_InputReceive(object? sender, InputReceiveEventArgs e)
         {
             _logger.Trace($"VirtDev N:{e.Note} V:{e.Value}");
 
@@ -274,7 +274,7 @@ namespace Ephemera.MidiGenerator
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void Channel_ChannelChangeEvent(object? sender, ChannelChangeEventArgs e)
+        void Channel_ChannelChange(object? sender, ChannelChangeEventArgs e)
         {
             var cc = sender as ChannelControl;
             if(e.PatchChange || e.ChannelNumberChange)
@@ -288,7 +288,7 @@ namespace Ephemera.MidiGenerator
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void LogManager_LogEvent(object? sender, LogEventArgs e)
+        void LogManager_LogMessage(object? sender, LogMessageEventArgs e)
         {
             // Usually come from a different thread.
             if (IsHandleCreated)
