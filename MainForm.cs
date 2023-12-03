@@ -75,7 +75,7 @@ namespace Ephemera.MidiGenerator
             }
             if (!_outputDevice.Valid)
             {
-                _logger.Error($"Something wrong with your output device:{_outputDevice.DeviceName}");
+                _logger.Error($"Invalid midi output device:{_outputDevice.DeviceName}");
             }
 
             // Create the channels and controls.
@@ -144,7 +144,7 @@ namespace Ephemera.MidiGenerator
 
             if (!_outputDevice.Valid)
             {
-                _logger.Error($"Something wrong with your midi output device");
+                _logger.Error($"Invalid midi output device");
             }
 
             base.OnLoad(e);
