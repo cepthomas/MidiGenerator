@@ -20,7 +20,7 @@ using Ephemera.MidiLib;
 
 namespace Ephemera.MidiGenerator
 {
-    public partial class MainForm : Form
+    public partial class MainForm : Form // TODO make into controls - midilib?
     {
         #region Fields
         /// <summary>My logger.</summary>
