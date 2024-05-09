@@ -57,7 +57,7 @@ namespace MidiGenerator
             LogManager.Run();
 
             // Configure UI.
-            toolStrip1.Renderer = new NBagOfUis.CheckBoxRenderer() { SelectedColor = _settings.ControlColor };
+            toolStrip1.Renderer = new Ephemera.NBagOfUis.CheckBoxRenderer() { SelectedColor = _settings.ControlColor };
             txtViewer.Font = Font;
             txtViewer.MatchColors.Add("ERR", Color.LightPink);
             txtViewer.MatchColors.Add("WRN", Color.Plum);

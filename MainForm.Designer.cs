@@ -1,4 +1,6 @@
 ﻿
+using Ephemera.MidiLib;
+
 namespace MidiGenerator
 {
     partial class MainForm
@@ -16,8 +18,8 @@ namespace MidiGenerator
         /// </summary>
         private void InitializeComponent()
         {
-            MidiLib.Channel channel1 = new MidiLib.Channel();
-            MidiLib.Channel channel2 = new MidiLib.Channel();
+            Ephemera.MidiLib.Channel channel1 = new Ephemera.MidiLib.Channel();
+            Ephemera.MidiLib.Channel channel2 = new Ephemera.MidiLib.Channel();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.btnLogMidi = new System.Windows.Forms.ToolStripButton();
@@ -26,11 +28,11 @@ namespace MidiGenerator
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.btnSettings = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
-            this.txtViewer = new NBagOfUis.TextViewer();
-            this.vkey = new MidiLib.VirtualKeyboard();
-            this.ccVkey = new MidiLib.ChannelControl();
-            this.ccBingBong = new MidiLib.ChannelControl();
-            this.bb = new MidiLib.BingBong();
+            this.txtViewer = new Ephemera.NBagOfUis.TextViewer();
+            this.vkey = new Ephemera.MidiLib.VirtualKeyboard();
+            this.ccVkey = new Ephemera.MidiLib.ChannelControl();
+            this.ccBingBong = new Ephemera.MidiLib.ChannelControl();
+            this.bb = new Ephemera.MidiLib.BingBong();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -134,7 +136,7 @@ namespace MidiGenerator
             channel1.IsDrums = false;
             channel1.Patch = 0;
             channel1.Selected = false;
-            channel1.State = MidiLib.ChannelState.Normal;
+            channel1.State = Ephemera.MidiLib.ChannelState.Normal;
             channel1.Volume = 0.8D;
             this.ccVkey.BoundChannel = channel1;
             this.ccVkey.IsDrums = false;
@@ -144,7 +146,7 @@ namespace MidiGenerator
             this.ccVkey.Selected = false;
             this.ccVkey.SelectedColor = System.Drawing.Color.Aquamarine;
             this.ccVkey.Size = new System.Drawing.Size(292, 44);
-            this.ccVkey.State = MidiLib.ChannelState.Normal;
+            this.ccVkey.State = Ephemera.MidiLib.ChannelState.Normal;
             this.ccVkey.TabIndex = 94;
             this.ccVkey.UnselectedColor = System.Drawing.SystemColors.Control;
             this.ccVkey.Volume = 0.8D;
@@ -160,7 +162,7 @@ namespace MidiGenerator
             channel2.IsDrums = false;
             channel2.Patch = 0;
             channel2.Selected = false;
-            channel2.State = MidiLib.ChannelState.Normal;
+            channel2.State = Ephemera.MidiLib.ChannelState.Normal;
             channel2.Volume = 0.8D;
             this.ccBingBong.BoundChannel = channel2;
             this.ccBingBong.IsDrums = false;
@@ -170,7 +172,7 @@ namespace MidiGenerator
             this.ccBingBong.Selected = false;
             this.ccBingBong.SelectedColor = System.Drawing.Color.Aquamarine;
             this.ccBingBong.Size = new System.Drawing.Size(292, 44);
-            this.ccBingBong.State = MidiLib.ChannelState.Normal;
+            this.ccBingBong.State = Ephemera.MidiLib.ChannelState.Normal;
             this.ccBingBong.TabIndex = 101;
             this.ccBingBong.UnselectedColor = System.Drawing.SystemColors.Control;
             this.ccBingBong.Volume = 0.8D;
@@ -217,7 +219,7 @@ namespace MidiGenerator
         #endregion
 
         private System.Windows.Forms.ToolStrip toolStrip1;
-        private NBagOfUis.TextViewer txtViewer;
+        private Ephemera.NBagOfUis.TextViewer txtViewer;
         private System.Windows.Forms.ToolStripButton btnLogMidi;
         private System.Windows.Forms.ToolStripButton btnKillMidi;
         private VirtualKeyboard vkey;
