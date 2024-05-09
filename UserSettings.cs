@@ -16,7 +16,7 @@ using Ephemera.NBagOfUis;
 using Ephemera.MidiLib;
 
 
-namespace Ephemera.MidiGenerator
+namespace MidiGenerator
 {
     [Serializable]
     public sealed class UserSettings : SettingsCore

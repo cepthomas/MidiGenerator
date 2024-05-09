@@ -1,7 +1,5 @@
 ﻿
-using Ephemera.MidiLib;
-
-namespace Ephemera.MidiGenerator
+namespace MidiGenerator
 {
     partial class MainForm
     {
@@ -56,7 +54,7 @@ namespace Ephemera.MidiGenerator
             // 
             this.btnLogMidi.CheckOnClick = true;
             this.btnLogMidi.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.btnLogMidi.Image = global::Ephemera.MidiGenerator.Properties.Resources.glyphicons_170_record;
+            this.btnLogMidi.Image = global::MidiGenerator.Properties.Resources.glyphicons_170_record;
             this.btnLogMidi.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.btnLogMidi.Name = "btnLogMidi";
             this.btnLogMidi.Size = new System.Drawing.Size(29, 24);
@@ -72,7 +70,7 @@ namespace Ephemera.MidiGenerator
             // btnKillMidi
             // 
             this.btnKillMidi.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.btnKillMidi.Image = global::Ephemera.MidiGenerator.Properties.Resources.glyphicons_242_flash;
+            this.btnKillMidi.Image = global::MidiGenerator.Properties.Resources.glyphicons_242_flash;
             this.btnKillMidi.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.btnKillMidi.Name = "btnKillMidi";
             this.btnKillMidi.Size = new System.Drawing.Size(29, 24);
@@ -87,7 +85,7 @@ namespace Ephemera.MidiGenerator
             // btnSettings
             // 
             this.btnSettings.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.btnSettings.Image = global::Ephemera.MidiGenerator.Properties.Resources.glyphicons_137_cogwheel;
+            this.btnSettings.Image = global::MidiGenerator.Properties.Resources.glyphicons_137_cogwheel;
             this.btnSettings.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.btnSettings.Name = "btnSettings";
             this.btnSettings.Size = new System.Drawing.Size(29, 24);

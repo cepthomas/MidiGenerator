@@ -2,8 +2,8 @@
 
     <PropertyGroup>
         <OutputType>WinExe</OutputType>
-        <RootNamespace>Ephemera.MidiGenerator</RootNamespace>
-        <AssemblyName>Ephemera.MidiGenerator</AssemblyName>
+        <RootNamespace>MidiGenerator</RootNamespace>
+        <AssemblyName>MidiGenerator</AssemblyName>
         <TargetFramework>net6.0-windows</TargetFramework>
         <UseWindowsForms>true</UseWindowsForms>
         <Deterministic>False</Deterministic>
