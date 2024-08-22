@@ -23,7 +23,7 @@ namespace MidiGenerator
     {
         #region Persisted editable properties
         [DisplayName("Control Color")]
-        [Description("Pick what you like.")]
+        [Description("The color used for active control surfaces.")]
         [Browsable(true)]
         [JsonConverter(typeof(JsonColorConverter))]
         public Color ControlColor { get; set; } = Color.MediumOrchid;
