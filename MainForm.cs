@@ -59,8 +59,8 @@ namespace MidiGenerator
             // Configure UI.
             toolStrip1.Renderer = new Ephemera.NBagOfUis.CheckBoxRenderer() { SelectedColor = _settings.ControlColor };
             txtViewer.Font = Font;
-            txtViewer.MatchColors.Add("ERR", Color.LightPink);
-            txtViewer.MatchColors.Add("WRN", Color.Plum);
+            txtViewer.MatchText.Add("ERR", Color.LightPink);
+            txtViewer.MatchText.Add("WRN", Color.Plum);
 
             // Set up midi.
             // Set up output device.
