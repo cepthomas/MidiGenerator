@@ -13,7 +13,6 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using NAudio.Midi;
 using Ephemera.NBagOfTricks;
-using Ephemera.NBagOfTricks.Slog;
 using Ephemera.NBagOfUis;
 using Ephemera.MidiLib;
 
@@ -57,7 +56,7 @@ namespace MidiGenerator
             LogManager.Run();
 
             // Configure UI.
-            toolStrip1.Renderer = new Ephemera.NBagOfUis.CheckBoxRenderer() { SelectedColor = _settings.ControlColor };
+            toolStrip1.Renderer = new GraphicsUtils.CheckBoxRenderer() { SelectedColor = _settings.ControlColor };
             txtViewer.Font = Font;
             txtViewer.MatchText.Add("ERR", Color.LightPink);
             txtViewer.MatchText.Add("WRN", Color.Plum);

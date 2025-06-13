@@ -5,14 +5,10 @@ using System.IO;
 using System.Windows.Forms;
 using System.Drawing;
 using System.Drawing.Design;
-using System.ComponentModel.Design;
-using System.Windows.Forms.Design;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using NAudio.Midi;
 using Ephemera.NBagOfTricks;
-using Ephemera.NBagOfTricks.Slog;
-using Ephemera.NBagOfUis;
 using Ephemera.MidiLib;
 
 
