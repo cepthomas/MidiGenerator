@@ -19,7 +19,7 @@ using Ephemera.MidiLib;
 
 namespace MidiGenerator
 {
-    public partial class MainForm : Form // TODO make into controls - midilib?
+    public partial class MainForm : Form // TODOX make into controls - midilib?
     {
         #region Fields
         /// <summary>My logger.</summary>
