@@ -56,7 +56,7 @@ namespace MidiGenerator
             LogManager.Run();
 
             // Configure UI.
-            toolStrip1.Renderer = new GraphicsUtils.CheckBoxRenderer() { SelectedColor = _settings.ControlColor };
+            toolStrip1.Renderer = new ToolStripCheckBoxRenderer() { SelectedColor = _settings.ControlColor };
             txtViewer.Font = Font;
             txtViewer.MatchText.Add("ERR", Color.LightPink);
             txtViewer.MatchText.Add("WRN", Color.Plum);
