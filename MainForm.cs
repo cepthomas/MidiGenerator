@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
+// using System.ComponentModel;
+// using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+// using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.IO;
+// using System.IO;
 using System.Diagnostics;
-using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
+// using System.Drawing.Drawing2D;
+// using System.Drawing.Imaging;
 using NAudio.Midi;
 using Ephemera.NBagOfTricks;
 using Ephemera.NBagOfUis;
@@ -55,17 +55,23 @@ namespace MidiGenerator
             LogManager.LogMessage += LogManager_LogMessage;
             LogManager.Run();
 
-            // Configure UI.
+            ///// Configure UI. /////
             toolStrip1.Renderer = new ToolStripCheckBoxRenderer() { SelectedColor = _settings.ControlColor };
             txtViewer.Font = Font;
             txtViewer.MatchText.Add("ERR", Color.LightPink);
             txtViewer.MatchText.Add("WRN", Color.Plum);
 
-            // Set up midi.
-            // Set up output device.
+            btnLogMidi.Checked = _settings.LogMidi;
+            _outputDevice.LogEnable = _settings.LogMidi;
+            btnKillMidi.Click += (_, __) =>
+            {
+                ctrlVkey.BoundChannel.Kill();
+                ctrlCc.BoundChannel.Kill();
+            };
+
+            ///// Set up midi device. /////
             foreach (var dev in _settings.MidiSettings.OutputDevices)
             {
-                // Try midi.
                 _outputDevice = new MidiOutput(dev.DeviceName);
                 if (_outputDevice.Valid)
                 {
@@ -77,7 +83,7 @@ namespace MidiGenerator
                 _logger.Error($"Invalid midi output device:{_outputDevice.DeviceName}");
             }
 
-            // Create the channels and controls.
+            ///// Create the channels and their corresponding controls. /////
             Channel chVkey = new()
             {
                 ChannelName = $"vkey",
@@ -90,45 +96,45 @@ namespace MidiGenerator
                 IsDrums = false,
                 Selected = false,
             };
-            ccVkey.BoundChannel = chVkey;
-            ccVkey.ChannelChange += Channel_ChannelChange;
+            ctrlVkey.BoundChannel = chVkey;
+            ctrlVkey.ChannelChange += Channel_ChannelChange;
             // Good time to send initial patch.
             chVkey.SendPatch();
 
-            // Make new channel and device.
-            Channel chVBb = new()
+            Channel chCc = new()
             {
-                ChannelName = $"bb",
-                ChannelNumber = _settings.BingBongChannel.ChannelNumber,
+                ChannelName = $"cc",
+                ChannelNumber = _settings.ClickClackChannel.ChannelNumber,
                 Device = _outputDevice,
                 DeviceId = _outputDevice.DeviceName,
                 Volume = MidiLibDefs.VOLUME_DEFAULT,
                 State = ChannelState.Normal,
-                Patch = _settings.BingBongChannel.Patch,
+                Patch = _settings.ClickClackChannel.Patch,
                 IsDrums = false,
                 Selected = false,
             };
-            ccBingBong.BoundChannel = chVBb;
-            ccBingBong.ChannelChange += Channel_ChannelChange;
+            ctrlCc.BoundChannel = chCc;
+            ctrlCc.ChannelChange += Channel_ChannelChange;
             // Good time to send initial patch.
-            chVBb.SendPatch();
+            chCc.SendPatch();
 
-            btnLogMidi.Checked = _settings.LogMidi;
-            LogMidi_Click(null, EventArgs.Empty);
-            btnKillMidi.Click += (_, __) =>
-            {
-                ccVkey.BoundChannel.Kill();
-                ccBingBong.BoundChannel.Kill();
-            };
+            ///// Init the fancy controls. /////
+            // cc.MinX = 24; // C0
+            // cc.MaxX = 96; // C6
+            // cc.GridX = [36, 48, 60, 72, 84];
+            // cc.MinY = 0; // min velocity == note off
+            // cc.MaxY = 127; // max velocity
+            // cc.GridY = [32, 64, 96]; //TODO1?? make these doubles
 
-            // Init main form from settings.
+            cc.CcClick += CcClickEvent;
+            cc.CcMove += CcMoveEvent;
+
+            vkey.Enabled = true;
+            vkey.VkeyClick += VkeyClickEvent;
+
+            ///// Finish up. /////
             Location = _settings.FormGeometry.Location;
             Size = _settings.FormGeometry.Size;
-
-            // Virtual device events.
-            bb.InputReceive += Device_InputReceive;
-            vkey.InputReceive += Device_InputReceive;
-
             // Fast timer for future use.
             SetTimer(100);
         }
@@ -185,6 +191,89 @@ namespace MidiGenerator
         }
         #endregion
 
+/*
+        /// <summary>
+        /// Create all I/O devices from user settings.
+        /// </summary>
+        /// <returns>Success</returns>
+        bool CreateDevices()
+        {
+            bool ok = true;
+
+            // First...
+            DestroyDevices();
+
+            // Set up input device.
+            foreach (var dev in _settings.MidiSettings.InputDevices)
+            {
+                switch (dev.DeviceName)
+                {
+                    case nameof(VirtualKeyboard):
+                        vkey.InputReceive += Listener_InputReceive;
+                        _inputDevice = vkey;
+                        break;
+
+                    case nameof(BingBong):
+                        bb.InputReceive += Listener_InputReceive;
+                        _inputDevice = bb;
+                        break;
+
+                    default:
+                        // Should be a real device.
+                        _inputDevice = new MidiInput(dev.DeviceName);
+
+                        if (!_inputDevice.Valid)
+                        {
+                            _logger.Error($"Something wrong with your input device:{dev.DeviceName}");
+                            ok = false;
+                        }
+                        else
+                        {
+                            _inputDevice.CaptureEnable = true;
+                            _inputDevice.InputReceive += Listener_InputReceive;
+                        }
+                        break;
+                }
+            }
+
+            // Set up output device.
+            foreach (var dev in _settings.MidiSettings.OutputDevices)
+            {
+                switch (dev.DeviceName)
+                {
+                    default:
+                        // Try midi.
+                        _outputDevice = new MidiOutput(dev.DeviceName);
+                        if (!_outputDevice.Valid)
+                        {
+                            _logger.Error($"Something wrong with your output device:{_outputDevice.DeviceName}");
+                            ok = false;
+                        }
+                        else
+                        {
+                            _outputDevice.LogEnable = btnLogMidi.Checked;
+                        }
+                        break;
+                }
+            }
+
+            return ok;
+        }
+
+
+        /// <summary>
+        /// Clean up.
+        /// </summary>
+        void DestroyDevices()
+        {
+            _inputDevice?.Dispose();
+            _outputDevice?.Dispose();
+        }
+*/
+
+
+
+
         #region MM timer
         /// <summary>
         /// 
@@ -223,13 +312,13 @@ namespace MidiGenerator
         {
             _settings.FormGeometry = new Rectangle(Location, Size);
 
-            _settings.VkeyChannel.ChannelNumber = ccVkey.ChannelNumber;
-            _settings.VkeyChannel.Patch = ccVkey.Patch;
-            _settings.VkeyChannel.Volume = ccVkey.Volume;
+            _settings.VkeyChannel.ChannelNumber = ctrlVkey.ChannelNumber;
+            _settings.VkeyChannel.Patch = ctrlVkey.Patch;
+            _settings.VkeyChannel.Volume = ctrlVkey.Volume;
 
-            _settings.BingBongChannel.ChannelNumber = ccBingBong.ChannelNumber;
-            _settings.BingBongChannel.Patch = ccBingBong.Patch;
-            _settings.BingBongChannel.Volume = ccBingBong.Volume;
+            _settings.ClickClackChannel.ChannelNumber = ctrlCc.ChannelNumber;
+            _settings.ClickClackChannel.Patch = ctrlCc.Patch;
+            _settings.ClickClackChannel.Volume = ctrlCc.Volume;
 
             _settings.Save();
         }
@@ -247,25 +336,108 @@ namespace MidiGenerator
         }
         #endregion
 
+
+
+
+        //private void Send(MidiGenEventArgs e)
+        //{
+        //    _logger.Trace($"VirtDev N:{e.Note} V:{e.Value}");
+
+        //    int chanNum = sender == vkey ?
+        //        ctrlVkey.ChannelNumber :
+        //        ctrlCc.ChannelNumber;
+
+        //    NoteEvent nevt = e.Value > 0 ?
+        //        new NoteOnEvent(0, chanNum, e.Note % MidiDefs.MAX_MIDI, e.Value % MidiDefs.MAX_MIDI, 0) :
+        //        new NoteEvent(0, chanNum, MidiCommandCode.NoteOff, e.Note, 0);
+
+        //    _outputDevice.SendEvent(nevt);
+
+        //    //  .InputReceive += Device_InputReceive;
+        //}
+
+
+
+
         #region Event handlers
-        /// <summary>
-        /// Do something with events.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        void Device_InputReceive(object? sender, InputReceiveEventArgs e)
+
+        void VkeyClickEvent(object? sender, MidiGenEventArgs e) // TODO1 consolidate both of these
         {
-            _logger.Trace($"VirtDev N:{e.Note} V:{e.Value}");
+            _logger.Trace($"Vkey N:{e.Note} V:{e.Value}");
 
             int chanNum = sender == vkey ?
-                ccVkey.ChannelNumber :
-                ccBingBong.ChannelNumber;
+                ctrlVkey.ChannelNumber :
+                ctrlCc.ChannelNumber;
 
             NoteEvent nevt = e.Value > 0 ?
                 new NoteOnEvent(0, chanNum, e.Note % MidiDefs.MAX_MIDI, e.Value % MidiDefs.MAX_MIDI, 0) :
                 new NoteEvent(0, chanNum, MidiCommandCode.NoteOff, e.Note, 0);
 
             _outputDevice.SendEvent(nevt);
+
+            //  .InputReceive += Device_InputReceive;
+        }
+
+        ///// <summary>
+        ///// Do something with events.
+        ///// </summary>
+        ///// <param name="sender"></param>
+        ///// <param name="e"></param>
+        //void Device_InputReceive(object? sender, InputReceiveEventArgs e)
+        //{
+        //    _logger.Trace($"VirtDev N:{e.Note} V:{e.Value}");
+
+        //    int chanNum = sender == vkey ?
+        //        ctrlVkey.ChannelNumber :
+        //        ctrlCc.ChannelNumber;
+
+        //    NoteEvent nevt = e.Value > 0 ?
+        //        new NoteOnEvent(0, chanNum, e.Note % MidiDefs.MAX_MIDI, e.Value % MidiDefs.MAX_MIDI, 0) :
+        //        new NoteEvent(0, chanNum, MidiCommandCode.NoteOff, e.Note, 0);
+
+        //    _outputDevice.SendEvent(nevt);
+        //}
+
+
+
+
+        /// <summary>
+        /// User clicked something. Send some midi.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void CcClickEvent(object? sender, MidiGenEventArgs e)
+        {
+            if (e.X is not null && e.Y is not null)
+            {
+                string name = ((ClickClack)sender!).Name;
+                int x = (int)e.X; // note
+                int y = (int)e.Y; // velocity
+
+               // InjectMidiInEvent(name, 1, x, y);
+
+                _logger.Trace($"Vkey N:{e.Note} V:{e.Value}");
+
+                int chanNum = sender == vkey ?
+                    ctrlVkey.ChannelNumber :
+                    ctrlCc.ChannelNumber;
+
+                NoteEvent nevt = e.Value > 0 ?
+                    new NoteOnEvent(0, chanNum, e.Note % MidiDefs.MAX_MIDI, e.Value % MidiDefs.MAX_MIDI, 0) :
+                    new NoteEvent(0, chanNum, MidiCommandCode.NoteOff, e.Note, 0);
+
+                _outputDevice.SendEvent(nevt);
+            }
+        }
+
+        /// <summary>
+        /// Provide tool tip text to control.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void CcMoveEvent(object? sender, MidiGenEventArgs e)
+        {
+            e.Text = $"{MusicDefinitions.NoteNumberToName((int)e.X!)} V:{e.Y}";
         }
 
         /// <summary>

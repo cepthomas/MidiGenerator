@@ -8,6 +8,14 @@ Emulated midi controllers:
 - Requires VS2022 and .NET8.
 
 
+VirtualKeyboard
+- Piano control based loosely on Leslie Sanford's [Midi Toolkit](https://github.com/tebjan/Sanford.Multimedia.Midi).
+
+ClickClack
+- Experimental UI component.
+
+
+
 # External Components
 
 - [NAudio](https://github.com/naudio/NAudio) (Microsoft Public License).

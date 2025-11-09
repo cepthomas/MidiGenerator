@@ -48,7 +48,7 @@ namespace MidiGenerator
         public ChannelSettings VkeyChannel { get; set; } = new();
 
         [Browsable(false)]
-        public ChannelSettings BingBongChannel { get; set; } = new();
+        public ChannelSettings ClickClackChannel { get; set; } = new();
 
         [Browsable(false)]
         public bool LogMidi { get; set; } = false;
