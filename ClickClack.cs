@@ -20,13 +20,25 @@ namespace MidiGenerator
         PixelBitmap? _bmp;
 
         /// <summary>Last key down position in client coordinates.</summary>
-        int? _lastClickX = null;
+        int _lastNote = -1;
 
         /// <summary>The grid pen.</summary>
         readonly Pen _pen = new(Color.WhiteSmoke, 1);
 
         /// <summary>Tool tip.</summary>
         readonly ToolTip _toolTip = new();
+
+
+        // octaves
+        List<int> GridX = [36, 48, 60, 72, 84];
+        List<int> GridY = [];
+
+        int MinX = 24; // C0
+        int MaxX = 96; // C6
+
+        int MinY = 0;
+        int MaxY = 127;
+
         #endregion
 
         // #region Properties
@@ -54,18 +66,15 @@ namespace MidiGenerator
         // #endregion
 
         #region Events
-        /// <summary>Click (including drag) info.</summary>
-        public event EventHandler<NoteEventArgs>? CcClick;
+        /// <summary>Click/ drag info.</summary>
+        public event EventHandler<NoteEventArgs>? UserClick;
 
-        // /// <summary>Mouse move info for client tooltip.</summary>
-        // public event EventHandler<MidiGenEventArgs>? CcMove;
+        /// <summary>Mouse move info for client tooltip.</summary>
+//        public event EventHandler<MidiGenEventArgs>? CcMove;
 
         #endregion
 
 
-// cc.MinX = 24; // C0
-// cc.MaxX = 96; // C6
-// cc.GridX = [36, 48, 60, 72, 84];
 
 
         #region Lifecycle
@@ -143,30 +152,52 @@ namespace MidiGenerator
         protected override void OnMouseMove(MouseEventArgs e)
         {
             var (ux, uy) = MouseToUser();
+            NoteEventArgs args = new() { Note = ux, Velocity = uy };
+            _toolTip.SetToolTip(this, args.ToString());
 
-            if (CcMove is not null)
-            {
-                MidiGenEventArgs args = new() { X = ux, Y = uy };
-                CcMove?.Invoke(this, args);
-                _toolTip.SetToolTip(this, args.Text);
-            }
-
+            // Also gen click?
             if (e.Button == MouseButtons.Left)
             {
                 // Dragging. Did it change?
-                if (_lastClickX != ux)
+                if (_lastNote != ux)
                 {
-                    if (_lastClickX is not null)
+                    if (_lastNote != -1)
                     {
-                        // Turn off last click.
-                        CcClick?.Invoke(this, new() { X = _lastClickX, Y = 0 });
+                        // Turn off last note.
+                        UserClick?.Invoke(this, new() { Note = _lastNote, Velocity = 0 });
                     }
 
-                    // Start the new click.
-                    _lastClickX = ux;
-                    CcClick?.Invoke(this, new() { X = ux, Y = uy });
+                    // Start the new note.
+                    _lastNote = ux;
+                    UserClick?.Invoke(this, new() { Note = ux, Velocity = uy });
                 }
             }
+
+
+
+            // if (CcMove is not null)
+            // {
+            //     NoteEventArgs args = new(ux, uy);// { X = ux, Y = uy };
+            //     CcMove?.Invoke(this, args);
+            //     _toolTip.SetToolTip(this, args.Text);
+            // }
+
+            // if (e.Button == MouseButtons.Left)
+            // {
+            //     // Dragging. Did it change?
+            //     if (_lastClickX != ux)
+            //     {
+            //         if (_lastClickX is not null)
+            //         {
+            //             // Turn off last click.
+            //             Click?.Invoke(this, new() { X = _lastClickX, Y = 0 });
+            //         }
+
+            //         // Start the new click.
+            //         _lastClickX = ux;
+            //         Click?.Invoke(this, new() { X = ux, Y = uy });
+            //     }
+            // }
 
             base.OnMouseMove(e);
         }
@@ -178,8 +209,8 @@ namespace MidiGenerator
         protected override void OnMouseDown(MouseEventArgs e)
         {
             var (ux, uy) = MouseToUser();
-            _lastClickX = ux;
-            CcClick?.Invoke(this, new() { X = ux, Y = uy });
+            _lastNote = ux;
+            UserClick?.Invoke(this, new() { Note = ux, Velocity = uy });
 
             base.OnMouseDown(e);
         }
@@ -190,11 +221,11 @@ namespace MidiGenerator
         /// <param name="e"></param>
         protected override void OnMouseUp(MouseEventArgs e)
         {
-            if (_lastClickX is not null)
+            if (_lastNote != -1)
             {
-                CcClick?.Invoke(this, new() { X = _lastClickX, Y = 0 });
+                UserClick?.Invoke(this, new() { Note = _lastNote, Velocity = 0 });
+                _lastNote = -1;
             }
-            _lastClickX = null;
 
             base.OnMouseUp(e);
         }
@@ -206,14 +237,14 @@ namespace MidiGenerator
         protected override void OnMouseLeave(EventArgs e)
         {
             // Turn off last click.
-            if (_lastClickX is not null)
+            if (_lastNote != -1)
             {
-                CcClick?.Invoke(this, new() { X = _lastClickX, Y = 0 });
+                UserClick?.Invoke(this, new() { Note = _lastNote, Velocity = 0 });
             }
 
             // Reset and tell client.
-            _lastClickX = null;
-            CcClick?.Invoke(this, new() { X = null, Y = null });
+            _lastNote = -1;
+            UserClick?.Invoke(this, new() { Note = -1, Velocity = -1 });
 
             _toolTip.SetToolTip(this, "");
 
@@ -256,15 +287,15 @@ namespace MidiGenerator
         /// Get mouse x and y mapped to user coordinates.
         /// </summary>
         /// <returns>Tuple of x and y.</returns>
-        (int? ux, int? uy) MouseToUser()
+        (int ux, int uy) MouseToUser()
         {
             var mp = PointToClient(MousePosition);
 
             // Map and check.
             int x = MathUtils.Map(mp.X, 0, Width, MinX, MaxX);
-            int? ux = x >= 0 && x < Width ? x : null;
+            int ux = x >= 0 && x < Width ? x : -1;
             int y = MathUtils.Map(mp.Y, Height, 0, MinY, MaxY);
-            int? uy = y >= 0 && y < Height ? y : null;
+            int uy = y >= 0 && y < Height ? y : -1;
 
             return (ux, uy);
         }

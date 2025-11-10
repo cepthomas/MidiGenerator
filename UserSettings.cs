@@ -9,7 +9,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using NAudio.Midi;
 using Ephemera.NBagOfTricks;
-using Ephemera.MidiLib;
+//using Ephemera.MidiLib;
 
 
 namespace MidiGenerator
@@ -36,11 +36,11 @@ namespace MidiGenerator
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public LogLevel NotifLogLevel { get; set; } = LogLevel.Debug;
 
-        [DisplayName("Midi Settings")]
-        [Description("Edit midi settings.")]
-        [Browsable(true)]
-        [TypeConverter(typeof(ExpandableObjectConverter))]
-        public MidiSettings MidiSettings { get; set; } = new();
+        //[DisplayName("Midi Settings")]
+        //[Description("Edit midi settings.")]
+        //[Browsable(true)]
+        //[TypeConverter(typeof(ExpandableObjectConverter))]
+        //public MidiSettings MidiSettings { get; set; } = new();
         #endregion
 
         #region Persisted Non-editable Properties
@@ -74,7 +74,7 @@ namespace MidiGenerator
 
         /// <summary>Current volume.</summary>
         [Browsable(false)]
-        public double Volume { get; set; } = MidiLibDefs.VOLUME_DEFAULT;
+        public double Volume { get; set; } = MidiDefs.VOLUME_DEFAULT;
         #endregion
     }
 }

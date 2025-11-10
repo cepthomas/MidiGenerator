@@ -5,7 +5,7 @@ using System.Windows.Forms;
 using System.Linq;
 using System.ComponentModel;
 using Ephemera.NBagOfTricks;
-using Ephemera.MidiLib;
+//using Ephemera.MidiLib;
 
 
 // TODO slow startup - too many sub controls?
@@ -46,7 +46,7 @@ namespace MidiGenerator
 
         #region Events
         /// <summary>Click (including drag) info.</summary>
-        public event EventHandler<NoteEventArgs>? VkeyClick;
+        public event EventHandler<NoteEventArgs>? UserClick;
         #endregion
 
 
@@ -60,8 +60,8 @@ namespace MidiGenerator
 // 21      1   A0
 
         #region Constants
-        const int LOW_NOTE = 21;
-        const int HIGH_NOTE = 109;
+        const int LOW_NOTE = 21; // key 1, A0, midi 1
+        const int HIGH_NOTE = 108; // key 88, C8, midi 108
         const int MIDDLE_C = 60;
         #endregion
 
@@ -142,7 +142,7 @@ namespace MidiGenerator
 
             int indexOfMiddleC = _keys.IndexOf(_keys.Where(k => k.NoteId == MIDDLE_C).First());
 
-            string[] keyDefs =
+            string[] keyDefs = //TODO1 redo this.
             {
                     "Z  -12  ;  C-3",
                     "S  -11  ;  C#",
@@ -263,10 +263,11 @@ namespace MidiGenerator
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void Keyboard_InputReceive(object? sender, MidiGenEventArgs e)
+        void HandleKeyClick(object? sender, NoteEventArgs e)
         {
-            //VkeyClickEvent?.Invoke(this, new() { Channel = Channel, Note = e.Note, Value = e.Value });
-            VkeyClick?.Invoke(this, new() { Note = e.Note, Value = e.Value });
+            //ClickEvent?.Invoke(this, new() { Channel = Channel, Note = e.Note, Value = e.Value });
+            // Click?.Invoke(this, new() { Note = e.Note, Velocity = e.Value });
+            UserClick?.Invoke(this, e);
         }
         #endregion
 
@@ -292,7 +293,10 @@ namespace MidiGenerator
                     pk.BringToFront();
                 }
 
-                pk.KeyClickEvent += Keyboard_InputReceive;
+                // Pass along an event from a virtual key.
+                pk.KeyClickEvent += HandleKeyClick;
+
+
                 _keys.Add(pk);
                 Controls.Add(pk);
             }
@@ -362,7 +366,7 @@ namespace MidiGenerator
 
         #region Events
         /// <summary>Notify handlers of key change.</summary>
-        public event EventHandler<MidiGenEventArgs>? KeyClickEvent;
+        public event EventHandler<NoteEventArgs>? KeyClickEvent;
         #endregion
 
         #region Lifecycle
@@ -391,7 +395,7 @@ namespace MidiGenerator
         {
             IsPressed = true;
             Invalidate();
-            KeyClickEvent?.Invoke(this, new() { Note = NoteId, Value = velocity });
+            KeyClickEvent?.Invoke(this, new() { Note = NoteId, Velocity = velocity });
         }
 
         /// <summary>
@@ -401,7 +405,7 @@ namespace MidiGenerator
         {
             IsPressed = false;
             Invalidate();
-            KeyClickEvent?.Invoke(this, new() { Note = NoteId, Value = 0 });
+            KeyClickEvent?.Invoke(this, new() { Note = NoteId, Velocity = 0 });
         }
         #endregion
 

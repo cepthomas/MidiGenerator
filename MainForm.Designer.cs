@@ -119,29 +119,25 @@ namespace MidiGenerator
             ctrlVkey.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             ctrlVkey.Location = new System.Drawing.Point(22, 41);
             ctrlVkey.Name = "ccVkey";
-            ctrlVkey.SelectedColor = System.Drawing.Color.Aquamarine;
+            //ctrlVkey.SelectedColor = System.Drawing.Color.Aquamarine;
             ctrlVkey.Size = new System.Drawing.Size(351, 42);
             ctrlVkey.TabIndex = 94;
-            ctrlVkey.UnselectedColor = System.Drawing.SystemColors.Control;
+            //ctrlVkey.UnselectedColor = System.Drawing.SystemColors.Control;
             // 
             // ctrlCc
             // 
             ctrlCc.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             ctrlCc.Location = new System.Drawing.Point(399, 40);
             ctrlCc.Name = "ctrlCc";
-            ctrlCc.SelectedColor = System.Drawing.Color.Aquamarine;
+            //ctrlCc.SelectedColor = System.Drawing.Color.Aquamarine;
             ctrlCc.Size = new System.Drawing.Size(351, 42);
             ctrlCc.TabIndex = 101;
-            ctrlCc.UnselectedColor = System.Drawing.SystemColors.Control;
+            //ctrlCc.UnselectedColor = System.Drawing.SystemColors.Control;
             // 
             // cc
             // 
             cc.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left;
             cc.Location = new System.Drawing.Point(22, 222);
-            cc.MaxX = 100;
-            cc.MaxY = 100;
-            cc.MinX = 0;
-            cc.MinY = 0;
             cc.Name = "cc";
             cc.Size = new System.Drawing.Size(351, 291);
             cc.TabIndex = 102;
