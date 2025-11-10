@@ -1,48 +1,41 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using Ephemera.NBagOfTricks;
 using Ephemera.NBagOfUis;
 
 
 namespace MidiGenerator
 {
-    /// <summary>Channel events and other properties.</summary>  // TODO1 needs channel/patch selectors.
+    /// <summary>Channel events and other properties.</summary>
     public class ChannelControl : UserControl
     {
-        #region Events
-        /// <summary>Notify host of asynchronous changes from user.</summary>
-        public event EventHandler<ChannelChangeEventArgs>? ChannelChange;
+        #region Designer variables
+        IContainer components = null;
+        Label lblChannelNumber;
+        Label lblPatch;
+        Slider sldVolume;
         #endregion
 
         #region Properties
-
         /// <summary>Actual 1-based midi channel number for UI.</summary>
         public int ChannelNumber { get; set; }
 
         /// <summary>Current patch.</summary>
-        public int Patch { get; set; } // UpdateUi()
+        public int Patch { get; set; } // UpdateUi() ???
 
         /// <summary>Current volume. Channel.Volume performs the constraints.</summary>
         public double Volume { get; set; }
 
-        /// <summary>Drum channel changed.</summary>
+        /// <summary>Drum channel.</summary>
         public bool IsDrums { get; set; }
 
-        /// <summary>User has selected this channel.</summary>
-        public bool Selected { get; set; }
+        public Color ControlColor { get; set; } = Color.Orange;
+        #endregion
 
-        /// <summary>Indicate user selected.</summary>
-        public Color SelectedColor { get; set; } = Color.Aquamarine;
-
-        /// <summary>Indicate user not selected.</summary>
-        public Color UnselectedColor { get; set; } = DefaultBackColor;
+        #region Events
+        /// <summary>Notify host of asynchronous changes from user.</summary>
+        public event EventHandler<ChannelChangeEventArgs>? ChannelChange;
         #endregion
 
         #region Lifecycle
@@ -52,10 +45,6 @@ namespace MidiGenerator
         public ChannelControl()
         {
             InitializeComponent();
-            sldVolume.ValueChanged += Volume_ValueChanged;
-            // lblSolo.Click += SoloMute_Click;
-            // lblMute.Click += SoloMute_Click;
-            lblChannelNumber.Click += ChannelNumber_Click;
         }
 
         /// <summary>
@@ -64,15 +53,34 @@ namespace MidiGenerator
         /// <param name="e"></param>
         protected override void OnLoad(EventArgs e)
         {
+            sldVolume.Value = Defs.VOLUME_DEFAULT;// BoundChannel.Volume;
+            sldVolume.DrawColor = ControlColor;
+            sldVolume.Minimum = Defs.VOLUME_MIN;
+            sldVolume.Maximum = Defs.MAX_GAIN;
 
-            sldVolume.Value = 0.8;// BoundChannel.Volume;
-            sldVolume.DrawColor = SelectedColor;
-            sldVolume.Minimum = MidiDefs.VOLUME_MIN;
-            sldVolume.Maximum = MidiDefs.MAX_GAIN;
+            sldVolume.ValueChanged += Volume_ValueChanged;
+
+            lblPatch.Click += Patch_Click;
+            lblChannelNumber.Click += ChannelNumber_Click;
 
             UpdateUi();
 
             base.OnLoad(e);
+        }
+
+        /// <summary> 
+        /// Required designer variable.
+        /// </summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && (components != null))
+            {
+                components.Dispose();
+            }
+            base.Dispose(disposing);
         }
         #endregion
 
@@ -95,7 +103,7 @@ namespace MidiGenerator
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void Patch_Click(object sender, EventArgs e) // TODO1
+        void Patch_Click(object? sender, EventArgs e) // TODO1
         {
             // PatchPicker pp = new();
             // pp.ShowDialog();
@@ -112,9 +120,15 @@ namespace MidiGenerator
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void ChannelNumber_Click(object? sender, EventArgs e)
+        void ChannelNumber_Click(object? sender, EventArgs e) // TODO1
         {
-            Selected = !Selected;
+            // for (int i = 0; i < Defs.NUM_CHANNELS; i++)
+            // {
+            //     cmbChannel.Items.Add($"{i + 1}");
+            // }
+            // cmbChannel.SelectedIndex = ChannelNumber - 1;
+            // cmbChannel.SelectedIndexChanged += (_, __) => _channelNumber = cmbChannel.SelectedIndex + 1;
+
             UpdateUi();
         }
         #endregion
@@ -127,8 +141,8 @@ namespace MidiGenerator
         {
             // General.
             lblChannelNumber.Text = $"Ch{ChannelNumber}";
-            lblChannelNumber.BackColor = Selected ? SelectedColor : UnselectedColor;
- //           lblPatch.Text = IsDrums ? "Drums" : MidiDefs.GetInstrumentName(BoundChannel.Patch);
+            //lblChannelNumber.BackColor = Selected ? SelectedColor : UnselectedColor;
+            //lblPatch.Text = IsDrums ? "Drums" : MidiDefs.GetInstrumentName(BoundChannel.Patch);
         }
 
         /// <summary>
@@ -141,99 +155,42 @@ namespace MidiGenerator
         }
         #endregion
 
-/////////////////////// designer /////////////////////
-
-        /// <summary> 
-        /// Required designer variable.
-        /// </summary>
-        private System.ComponentModel.IContainer components = null;
-
-        /// <summary> 
-        /// Clean up any resources being used.
-        /// </summary>
-        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing && (components != null))
-            {
-                components.Dispose();
-            }
-            base.Dispose(disposing);
-        }
-
-        #region Component Designer generated code
-
         /// <summary> 
         /// Required method for Designer support - do not modify 
         /// the contents of this method with the code editor.
         /// </summary>
-        private void InitializeComponent()
+        void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
-            this.lblChannelNumber = new System.Windows.Forms.Label();
-            this.lblPatch = new System.Windows.Forms.Label();
-            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-            this.sldVolume = new Slider();
-            this.SuspendLayout();
-            // 
-            // lblChannelNumber
-            // 
-            this.lblChannelNumber.AutoSize = true;
-            this.lblChannelNumber.Location = new System.Drawing.Point(2, 8);
-            this.lblChannelNumber.Name = "lblChannelNumber";
-            this.lblChannelNumber.Size = new System.Drawing.Size(18, 20);
-            this.lblChannelNumber.TabIndex = 3;
-            this.lblChannelNumber.Text = "#";
-            this.toolTip1.SetToolTip(this.lblChannelNumber, "Select channel");
-            // 
-            // lblPatch
-            // 
-            this.lblPatch.Location = new System.Drawing.Point(44, 7);
-            this.lblPatch.Name = "lblPatch";
-            this.lblPatch.Size = new System.Drawing.Size(144, 25);
-            this.lblPatch.TabIndex = 44;
-            this.lblPatch.Text = "?????";
-            this.lblPatch.Click += new System.EventHandler(this.Patch_Click);
-            // 
-            // 
-            // 
-            // 
-            // 
-            // sldVolume
-            // 
-            this.sldVolume.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.sldVolume.DrawColor = System.Drawing.Color.White;
-            this.sldVolume.Label = "";
-            this.sldVolume.Location = new System.Drawing.Point(194, 3);
-            this.sldVolume.Maximum = 10D;
-            this.sldVolume.Minimum = 0D;
-            this.sldVolume.Name = "sldVolume";
-            this.sldVolume.Orientation = System.Windows.Forms.Orientation.Horizontal;
-            this.sldVolume.Resolution = 0.1D;
-            this.sldVolume.Size = new System.Drawing.Size(83, 30);
-            this.sldVolume.TabIndex = 47;
-            this.sldVolume.Value = 5D;
-            // 
-            // ChannelControl
-            // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.sldVolume);
-            this.Controls.Add(this.lblPatch);
-            this.Controls.Add(this.lblChannelNumber);
-            this.Name = "ChannelControl";
-            this.Size = new System.Drawing.Size(345, 38);
-            this.ResumeLayout(false);
-            this.PerformLayout();
+            components = new Container();
 
+            lblChannelNumber = new Label();
+            lblPatch = new Label();
+            sldVolume = new Slider();
+
+            SuspendLayout();
+
+            lblChannelNumber.Location = new Point(2, 8);
+            lblChannelNumber.Size = new Size(48, 20);
+            //lblChannelNumber.BackColor = Color.LightBlue;
+
+            lblPatch.Location = new Point(48, 8);
+            lblPatch.Size = new Size(144, 20);
+            lblPatch.Text = "WTF?";
+            //lblPatch.BackColor = Color.LightBlue;
+
+            sldVolume.BorderStyle = BorderStyle.FixedSingle;
+            sldVolume.Location = new Point(194, 3);
+            sldVolume.Orientation = Orientation.Horizontal;
+            sldVolume.Size = new Size(83, 30);
+
+            Controls.Add(sldVolume);
+            Controls.Add(lblPatch);
+            Controls.Add(lblChannelNumber);
+
+            Size = new Size(345, 38);
+
+            ResumeLayout(false);
+            PerformLayout();
         }
-
-        #endregion
-        private System.Windows.Forms.Label lblChannelNumber;
-        private System.Windows.Forms.Label lblPatch;
-        private System.Windows.Forms.ToolTip toolTip1;
-        private Slider sldVolume;
-
-
     }
 }

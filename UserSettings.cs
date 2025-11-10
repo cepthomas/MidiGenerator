@@ -1,15 +1,9 @@
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.IO;
-using System.Windows.Forms;
 using System.Drawing;
 using System.Drawing.Design;
-using System.Text.Json;
 using System.Text.Json.Serialization;
-using NAudio.Midi;
 using Ephemera.NBagOfTricks;
-//using Ephemera.MidiLib;
 
 
 namespace MidiGenerator
@@ -36,11 +30,11 @@ namespace MidiGenerator
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public LogLevel NotifLogLevel { get; set; } = LogLevel.Debug;
 
-        //[DisplayName("Midi Settings")]
-        //[Description("Edit midi settings.")]
-        //[Browsable(true)]
-        //[TypeConverter(typeof(ExpandableObjectConverter))]
-        //public MidiSettings MidiSettings { get; set; } = new();
+        [DisplayName("Output Device")]
+        [Description("Valid output device.")]
+        [Browsable(true)]
+        [Editor(typeof(DevicesTypeEditor), typeof(UITypeEditor))]
+        public string OutputDevice { get; set; } = "???";
         #endregion
 
         #region Persisted Non-editable Properties
@@ -55,8 +49,6 @@ namespace MidiGenerator
         #endregion
 
         #region Non-persisted Properties
-        //[Browsable(false)]
-        //public bool Valid { get; set; } = false;
         #endregion
     }
 
@@ -74,7 +66,7 @@ namespace MidiGenerator
 
         /// <summary>Current volume.</summary>
         [Browsable(false)]
-        public double Volume { get; set; } = MidiDefs.VOLUME_DEFAULT;
+        public double Volume { get; set; } = Defs.VOLUME_DEFAULT;
         #endregion
     }
 }

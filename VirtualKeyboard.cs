@@ -8,41 +8,20 @@ using Ephemera.NBagOfTricks;
 //using Ephemera.MidiLib;
 
 
-// TODO slow startup - too many sub controls?
-
-
 namespace MidiGenerator
 {
-    /// <summary>
-    /// Virtual keyboard control borrowed from Leslie Sanford with extras.
-    /// </summary>
+    /// <summary>Virtual keyboard control borrowed from Leslie Sanford with extras.</summary>
     public class VirtualKeyboard : UserControl
     {
         #region Properties
-        /// <summary>Channel number 1-based.</summary>
-        // public int Channel { get; set; } = 1;
-
         /// <summary>Draw the names on the keys.</summary>
         public bool ShowNoteNames { get; set; } = false;
 
         /// <summary>Determines the overall size.</summary>
         public int KeySize { get; set; } = 14;
 
-        // /// <inheritdoc />
-        // public bool CaptureEnable { get; set; }
-
-        // /// <inheritdoc />
-        // [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden), Browsable(false)]
-        // public string DeviceName { get; set; }
-
-        // /// <inheritdoc />
-        // [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden), Browsable(false)]
-        // public bool Valid { get { return true; } }
-
-        // /// <inheritdoc />
-        // public bool LogEnable { get; set; }
+        public Color ControlColor { get; set; } = Color.Orange;
         #endregion
-
 
         #region Events
         /// <summary>Click (including drag) info.</summary>
@@ -76,6 +55,7 @@ namespace MidiGenerator
         bool _keyDown = false;
         #endregion
 
+
         #region Lifecycle
         /// <summary>
         /// Normal constructor.
@@ -105,6 +85,7 @@ namespace MidiGenerator
         {
             DrawKeys();
             Invalidate();
+
             base.OnResize(e);
         }
 
@@ -265,8 +246,6 @@ namespace MidiGenerator
         /// <param name="e"></param>
         void HandleKeyClick(object? sender, NoteEventArgs e)
         {
-            //ClickEvent?.Invoke(this, new() { Channel = Channel, Note = e.Note, Value = e.Value });
-            // Click?.Invoke(this, new() { Note = e.Note, Velocity = e.Value });
             UserClick?.Invoke(this, e);
         }
         #endregion
@@ -292,10 +271,10 @@ namespace MidiGenerator
                     pk = new VirtualKey(this, false, noteId);
                     pk.BringToFront();
                 }
+                pk.ControlColor = ControlColor;
 
                 // Pass along an event from a virtual key.
                 pk.KeyClickEvent += HandleKeyClick;
-
 
                 _keys.Add(pk);
                 Controls.Add(pk);
@@ -352,6 +331,8 @@ namespace MidiGenerator
         /// <summary>For showing names.</summary>  TODO1 from midi defs???
         static readonly string[] _noteNames = { "C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B" };
         #endregion
+
+        public Color ControlColor { get; set; } = Color.Orange;
 
         #region Properties
         /// <summary>Key status.</summary>
@@ -497,7 +478,7 @@ namespace MidiGenerator
         {
             if (IsPressed)
             {
-                e.Graphics.FillRectangle(new SolidBrush(Color.SkyBlue), 0, 0, Size.Width, Size.Height);
+                e.Graphics.FillRectangle(new SolidBrush(ControlColor), 0, 0, Size.Width, Size.Height);
             }
             else
             {

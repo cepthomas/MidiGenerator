@@ -1,25 +1,14 @@
 using System;
 using System.Collections.Generic;
-// using System.ComponentModel;
-// using System.Data;
-// using System.Drawing;
-// using System.Drawing.Imaging;
 using System.Linq;
-// using System.Runtime.InteropServices;
 using System.Text;
-// using System.Threading.Tasks;
-// using System.Windows.Forms;
-// using Ephemera.NBagOfTricks;
-// using Ephemera.NBagOfUis;
-//using Ephemera.MidiLib;
 
 
 namespace MidiGenerator
 {
 
-    public class MidiDefs
+    public class Defs
     {
-     //   #region Constants - midi spec
         /// <summary>Midi caps.</summary>
         public const int MIN_MIDI = 0;
 
@@ -44,7 +33,8 @@ namespace MidiGenerator
         /// <summary>Allow UI controls some more headroom.</summary>
         public const double MAX_GAIN = 2.0;
 
-
+        // /// <summary>Special controller id to carry pitch info.</summary>
+        // public const int PITCH_CONTROL = 1000;
 
         #region All the names
         /// <summary>The GM midi instrument definitions.</summary>
@@ -100,26 +90,13 @@ namespace MidiGenerator
             { 121, "ResetAllControllers" }, { 122, "LocalKeyboard" }, { 123, "AllNotesOff" }
         };
         #endregion
-
-
-
-        
     }
-
-    //     /// <summary>Special controller id to carry pitch info.</summary>
-    //     public const int PITCH_CONTROL = 1000;
-    // }
-
-
 
     #region Events
     public class NoteEventArgs : EventArgs
     {
         /// <summary>The note number to play.</summary>
         public int Note { get; set; }
-
-        // /// <summary>0.0 to 1.0.</summary>
-        // public double Volume { get; set; }
 
         /// <summary>0 to 127.</summary>
         public int Velocity { get; set; }

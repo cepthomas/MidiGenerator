@@ -7,12 +7,9 @@ using System.Text;
 using System.Windows.Forms;
 using Ephemera.NBagOfTricks;
 
+
 namespace MidiGenerator
 {
-    /// <summary>
-    /// Generates events on mouse clicks in the client area with horizontal and vertical values
-    /// from user supplied ranges.
-    /// </summary>
     public class ClickClack : UserControl
     {
         #region Fields
@@ -28,54 +25,26 @@ namespace MidiGenerator
         /// <summary>Tool tip.</summary>
         readonly ToolTip _toolTip = new();
 
-
         // octaves
         List<int> GridX = [36, 48, 60, 72, 84];
-        List<int> GridY = [];
+        //List<int> GridY = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120];
+        List<int> GridY = [20, 40, 60, 80, 100, 120];
 
         int MinX = 24; // C0
         int MaxX = 96; // C6
 
         int MinY = 0;
-        int MaxY = 127;
-
+        int MaxY = 128;
         #endregion
 
-        // #region Properties
-        // /// <summary>Lowest X value of interest.</summary>
-        // public int MinX { get; set; } = 0;
-
-        // /// <summary>Highest X value of interest.</summary>
-        // public int MaxX { get; set; } = 100;
-
-        // /// <summary>Min Y value.</summary>
-        // public int MinY { get; set; } = 0;
-
-        // /// <summary>Max Y value.</summary>
-        // public int MaxY { get; set; } = 100;
-
-        // /// <summary>Visibility.</summary>
-        // [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        // [Browsable(false)]
-        // public List<int> GridX { get; set; } = [];
-
-        // /// <summary>Visibility.</summary>
-        // [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        // [Browsable(false)]
-        // public List<int> GridY { get; set; } = [];
-        // #endregion
+        #region Properties
+        public Color ControlColor { get; set; } = Color.Orange;
+        #endregion
 
         #region Events
         /// <summary>Click/ drag info.</summary>
         public event EventHandler<NoteEventArgs>? UserClick;
-
-        /// <summary>Mouse move info for client tooltip.</summary>
-//        public event EventHandler<MidiGenEventArgs>? CcMove;
-
         #endregion
-
-
-
 
         #region Lifecycle
         /// <summary>
@@ -153,7 +122,7 @@ namespace MidiGenerator
         {
             var (ux, uy) = MouseToUser();
             NoteEventArgs args = new() { Note = ux, Velocity = uy };
-            _toolTip.SetToolTip(this, args.ToString());
+            _toolTip.SetToolTip(this, args.ToString()); //TODO1 needss note name
 
             // Also gen click?
             if (e.Button == MouseButtons.Left)
@@ -172,32 +141,6 @@ namespace MidiGenerator
                     UserClick?.Invoke(this, new() { Note = ux, Velocity = uy });
                 }
             }
-
-
-
-            // if (CcMove is not null)
-            // {
-            //     NoteEventArgs args = new(ux, uy);// { X = ux, Y = uy };
-            //     CcMove?.Invoke(this, args);
-            //     _toolTip.SetToolTip(this, args.Text);
-            // }
-
-            // if (e.Button == MouseButtons.Left)
-            // {
-            //     // Dragging. Did it change?
-            //     if (_lastClickX != ux)
-            //     {
-            //         if (_lastClickX is not null)
-            //         {
-            //             // Turn off last click.
-            //             Click?.Invoke(this, new() { X = _lastClickX, Y = 0 });
-            //         }
-
-            //         // Start the new click.
-            //         _lastClickX = ux;
-            //         Click?.Invoke(this, new() { X = ux, Y = uy });
-            //     }
-            // }
 
             base.OnMouseMove(e);
         }
@@ -259,6 +202,7 @@ namespace MidiGenerator
         {
             DrawBitmap();
             Invalidate();
+
             base.OnResize(e);
         }
         #endregion
