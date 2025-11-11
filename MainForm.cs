@@ -77,14 +77,14 @@ namespace MidiGenerator
 
             ///// Create the channels and their corresponding controls. /////
             ctrlVkey.ControlColor = _settings.ControlColor;
-            ctrlVkey.Volume = _settings.VkeyChannel.Volume;
+            ctrlVkey.Gain = _settings.VkeyChannel.Gain;
             ctrlVkey.ChannelNumber = _settings.VkeyChannel.ChannelNumber;
             ctrlVkey.Patch = _settings.VkeyChannel.Patch;
             ctrlVkey.ChannelChange += Channel_ChannelChange;
             SendPatch(ctrlVkey.ChannelNumber, ctrlVkey.Patch);
 
             ctrlCc.ControlColor = _settings.ControlColor;
-            ctrlVkey.Volume = _settings.VkeyChannel.Volume;
+            ctrlVkey.Gain = _settings.VkeyChannel.Gain;
             ctrlCc.ChannelNumber = _settings.ClickClackChannel.ChannelNumber;
             ctrlCc.Patch = _settings.ClickClackChannel.Patch;
             ctrlCc.ChannelChange += Channel_ChannelChange;
@@ -167,11 +167,11 @@ namespace MidiGenerator
 
             _settings.VkeyChannel.ChannelNumber = ctrlVkey.ChannelNumber;
             _settings.VkeyChannel.Patch = ctrlVkey.Patch;
-            _settings.VkeyChannel.Volume = ctrlVkey.Volume;
+            _settings.VkeyChannel.Gain = ctrlVkey.Gain;
 
             _settings.ClickClackChannel.ChannelNumber = ctrlCc.ChannelNumber;
             _settings.ClickClackChannel.Patch = ctrlCc.Patch;
-            _settings.ClickClackChannel.Volume = ctrlCc.Volume;
+            _settings.ClickClackChannel.Gain = ctrlCc.Gain;
 
             _settings.Save();
         }

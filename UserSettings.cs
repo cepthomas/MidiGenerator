@@ -66,7 +66,7 @@ namespace MidiGenerator
 
         /// <summary>Current volume.</summary>
         [Browsable(false)]
-        public double Volume { get; set; } = Defs.VOLUME_DEFAULT;
+        public double Gain { get; set; } = Defs.DEFAULT_GAIN;
         #endregion
     }
 }

@@ -21,14 +21,20 @@ namespace MidiGenerator
         /// <summary>The normal drum channel.</summary>
         public const int DEFAULT_DRUM_CHANNEL = 10;
 
-        /// <summary>Corresponds to midi velocity = 0.</summary>
-        public const double VOLUME_MIN = 0.0;
+        // /// <summary>Corresponds to midi velocity = 0.</summary>
+        // public const double VOLUME_MIN = 0.0;
 
-        /// <summary>Corresponds to midi velocity = 127.</summary>
-        public const double VOLUME_MAX = 1.0;
+        // /// <summary>Corresponds to midi velocity = 127.</summary>
+        // public const double VOLUME_MAX = 1.0;
+
+        // /// <summary>Default value.</summary>
+        // public const double VOLUME_DEFAULT = 0.8;
+
+        // /// <summary>Allow UI controls some more headroom.</summary>
+        // public const double MAX_GAIN = 2.0;
 
         /// <summary>Default value.</summary>
-        public const double VOLUME_DEFAULT = 0.8;
+        public const double DEFAULT_GAIN = 0.8;
 
         /// <summary>Allow UI controls some more headroom.</summary>
         public const double MAX_GAIN = 2.0;
@@ -127,7 +133,7 @@ namespace MidiGenerator
     public class ChannelChangeEventArgs : EventArgs
     {
         public bool PatchChange { get; set; } = false;
-        public bool StateChange { get; set; } = false;
+      // public bool StateChange { get; set; } = false;
         public bool ChannelNumberChange { get; set; } = false;
     }
 
