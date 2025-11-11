@@ -7,31 +7,22 @@ using Ephemera.NBagOfUis;
 
 namespace MidiGenerator
 {
-    /// <summary>Channel events and other properties.</summary>
+    /// <summary>Properties for a midi channel.</summary>
     public class ChannelControl : UserControl
     {
         #region Designer variables
-        IContainer components = null;
-        Label lblChannelInfo;
-        // Label lblPatch;
-        Slider sldGain;
+        readonly Container? components = null;
+        readonly Label lblChannelInfo;
+        readonly Slider sldGain;
         readonly ToolTip toolTip;
         #endregion
 
         #region Properties
-        /// <summary>Actual 1-based midi channel number for UI.</summary>
-        public int ChannelNumber { get; set; }
+        /// <summary>Everything about me.</summary>
+        public ChannelSettings Settings { get; set; } = new();
 
-        /// <summary>Current patch.</summary>
-        public int Patch { get; set; } // UpdateUi() ???
-
-        /// <summary>Current gain.</summary>
-        public double Gain { get; set; }
-
-        /// <summary>Drum channel.</summary>
-        public bool IsDrums { get; set; }
-
-        public Color ControlColor { get; set; } = Color.Orange;
+        /// <summary>Cosmetics.</summary>
+        public Color ControlColor { get; set; } = Color.Red;
         #endregion
 
         #region Events
@@ -41,30 +32,52 @@ namespace MidiGenerator
 
         #region Lifecycle
         /// <summary>
-        /// Normal constructor.
+        /// Constructor. Create controls.
         /// </summary>
         public ChannelControl()
         {
-            InitializeComponent();
+            components = new Container();
+            SuspendLayout();
+
+            lblChannelInfo = new()
+            {
+                Location = new(2, 8),
+                Size = new(48, 20)
+            };
+            Controls.Add(lblChannelInfo);
+
+            sldGain = new()
+            {
+                Location = new(194, 3),
+                Size = new(83, 30),
+                BorderStyle = BorderStyle.FixedSingle,
+                Orientation = Orientation.Horizontal,
+                Minimum = 0.0,
+                Maximum = Defs.MAX_GAIN,
+                Resolution = 0.05,
+            };
+            Controls.Add(sldGain);
+
+            toolTip = new ToolTip(components);
+
+            Size = new Size(345, 38);
+
+            ResumeLayout(false);
+            PerformLayout();
         }
 
         /// <summary>
-        /// 
+        /// Apply customization. Settings should be valid now.
         /// </summary>
         /// <param name="e"></param>
         protected override void OnLoad(EventArgs e)
         {
-            sldGain.Value = Defs.DEFAULT_GAIN;
+            sldGain.Value = Settings.Gain;
             sldGain.DrawColor = ControlColor;
-            sldGain.Minimum = 0.0;
-            sldGain.Maximum = Defs.MAX_GAIN;
-
             sldGain.ValueChanged += Gain_ValueChanged;
 
-            // lblPatch.Click += Patch_Click;
-            lblChannelInfo.Click += ChannelInfo_Click;
-
-            toolTip.SetToolTip(this, string.Join(Environment.NewLine, "Info"));
+            lblChannelInfo.Click += ChannelEd_Click;
+            lblChannelInfo.BackColor = Color.LightBlue;
 
             UpdateUi();
 
@@ -72,8 +85,6 @@ namespace MidiGenerator
         }
 
         /// <summary> 
-        /// Required designer variable.
-        /// </summary>
         /// Clean up any resources being used.
         /// </summary>
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
@@ -97,7 +108,7 @@ namespace MidiGenerator
         {
             if (sender is not null)
             {
-                Gain = (sender as Slider)!.Value;
+                Settings.Gain = (sender as Slider)!.Value;
             }
         }
 
@@ -106,40 +117,34 @@ namespace MidiGenerator
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void ChannelInfo_Click(object? sender, EventArgs e)
+        void ChannelEd_Click(object? sender, EventArgs e)
         {
-            // TODO1 user selects channum and patch.
+            //var ed = new ChannelEd(Settings);
+            //ed.ShowDialog();
 
-            
-            // for (int i = 0; i < Defs.NUM_CHANNELS; i++)
-            // {
-            //     cmbChannel.Items.Add($"{i + 1}");
-            // }
-            // cmbChannel.SelectedIndex = ChannelNumber - 1;
-            // cmbChannel.SelectedIndexChanged += (_, __) => _channelNumber = cmbChannel.SelectedIndex + 1;
-
-
-            // PatchPicker pp = new();
-            // pp.ShowDialog();
-            // if (pp.PatchNumber != -1)
-            // {
-            //     BoundChannel.Patch = pp.PatchNumber;
-            //     UpdateUi();
-            //     ChannelChange?.Invoke(this, new() { PatchChange = true });
-            // }
+            SettingsEditor.Edit(Settings, "User Settings", 400);
 
             UpdateUi();
         }
         #endregion
 
-        #region Misc
+
+
+
+
+
+
+
         /// <summary>
         /// Draw mode checkboxes etc.
         /// </summary>
         void UpdateUi()
         {
             // General.
-            lblChannelInfo.Text = $"Ch{ChannelNumber}";
+            lblChannelInfo.Text = $"Ch{Settings.ChannelNumber}";
+
+            toolTip.SetToolTip(this, string.Join(Environment.NewLine, "Info"));
+
             //lblChannelInfo.BackColor = Selected ? SelectedColor : UnselectedColor;
             //lblPatch.Text = IsDrums ? "Drums" : MidiDefs.GetInstrumentName(BoundChannel.Patch);
         }
@@ -150,46 +155,7 @@ namespace MidiGenerator
         /// <returns></returns>
         public override string ToString()
         {
-            return $"ChannelControl: Ch:{ChannelNumber} Patch:{Patch}";
-        }
-        #endregion
-
-        /// <summary> 
-        /// Required method for Designer support - do not modify 
-        /// the contents of this method with the code editor.
-        /// </summary>
-        void InitializeComponent()
-        {
-            components = new Container();
-
-            lblChannelInfo = new Label();
-            // lblPatch = new Label();
-            sldGain = new Slider();
-
-            SuspendLayout();
-
-            lblChannelInfo.Location = new Point(2, 8);
-            lblChannelInfo.Size = new Size(48, 20);
-            //lblChannelInfo.BackColor = Color.LightBlue;
-
-            // lblPatch.Location = new Point(48, 8);
-            // lblPatch.Size = new Size(144, 20);
-            // lblPatch.Text = "WTF?";
-            //lblPatch.BackColor = Color.LightBlue;
-
-            sldGain.BorderStyle = BorderStyle.FixedSingle;
-            sldGain.Location = new Point(194, 3);
-            sldGain.Orientation = Orientation.Horizontal;
-            sldGain.Size = new Size(83, 30);
-
-            Controls.Add(sldGain);
-   //         Controls.Add(lblPatch);
-            Controls.Add(lblChannelInfo);
-
-            Size = new Size(345, 38);
-
-            ResumeLayout(false);
-            PerformLayout();
+            return $"Ch:{Settings.ChannelNumber} Patch:{Settings.Patch}"; // TODO1 patch name
         }
     }
 }

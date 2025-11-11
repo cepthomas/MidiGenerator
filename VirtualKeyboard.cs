@@ -5,7 +5,6 @@ using System.Windows.Forms;
 using System.Linq;
 using System.ComponentModel;
 using Ephemera.NBagOfTricks;
-//using Ephemera.MidiLib;
 
 
 namespace MidiGenerator
@@ -20,7 +19,7 @@ namespace MidiGenerator
         /// <summary>Determines the overall size.</summary>
         public int KeySize { get; set; } = 14;
 
-        public Color ControlColor { get; set; } = Color.Orange;
+        public Color ControlColor { get; set; } = Color.Red;
         #endregion
 
         #region Events
@@ -332,7 +331,7 @@ namespace MidiGenerator
         static readonly string[] _noteNames = { "C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B" };
         #endregion
 
-        public Color ControlColor { get; set; } = Color.Orange;
+        public Color ControlColor { get; set; } = Color.Red;
 
         #region Properties
         /// <summary>Key status.</summary>

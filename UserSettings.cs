@@ -1,9 +1,11 @@
 using System;
 using System.ComponentModel;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Design;
 using System.Text.Json.Serialization;
 using Ephemera.NBagOfTricks;
+using System.Windows.Forms.Design;
 
 
 namespace MidiGenerator
@@ -11,6 +13,9 @@ namespace MidiGenerator
     [Serializable]
     public sealed class UserSettings : SettingsCore
     {
+        // /// <summary>The current settings.</summary>
+        // public static UserSettings Current { get; set; } = new();
+
         #region Persisted editable properties
         [DisplayName("Control Color")]
         [Description("The color used for active control surfaces.")]
@@ -57,16 +62,28 @@ namespace MidiGenerator
     {
         #region Persisted Non-editable Properties
         /// <summary>Actual 1-based midi channel number.</summary>
-        [Browsable(false)]
+        [Browsable(true)]
+        [Editor(typeof(ListSelectorTypeEditor), typeof(UITypeEditor))]
         public int ChannelNumber { get; set; } = 1;
 
+        /// <summary>Current midi presets file.</summary>
+        [Browsable(true)]
+        [Editor(typeof(FileNameEditor), typeof(UITypeEditor))]
+        public string PresetFile { get; set; } = "";
+
         /// <summary>Current patch.</summary>
-        [Browsable(false)]
+        [Browsable(true)]
+        [Editor(typeof(ListSelectorTypeEditor), typeof(UITypeEditor))]
         public int Patch { get; set; } = 0;
 
         /// <summary>Current volume.</summary>
         [Browsable(false)]
         public double Gain { get; set; } = Defs.DEFAULT_GAIN;
+
+        [Browsable(false)]
+        [JsonIgnore]
+        public Dictionary<int, string> CurrentPresets { get; }
+
         #endregion
     }
 }

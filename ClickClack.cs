@@ -38,7 +38,7 @@ namespace MidiGenerator
         #endregion
 
         #region Properties
-        public Color ControlColor { get; set; } = Color.Orange;
+        public Color ControlColor { get; set; } = Color.Red;
         #endregion
 
         #region Events

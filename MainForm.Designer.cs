@@ -1,6 +1,4 @@
 ﻿
-using Ephemera.MidiLib;
-
 namespace MidiGenerator
 {
     partial class MainForm
@@ -28,9 +26,9 @@ namespace MidiGenerator
             toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             txtViewer = new Ephemera.NBagOfUis.TextViewer();
             vkey = new VirtualKeyboard();
+            cc = new ClickClack();
             ctrlVkey = new ChannelControl();
             ctrlCc = new ChannelControl();
-            cc = new ClickClack();
             toolStrip1.SuspendLayout();
             SuspendLayout();
             // 
