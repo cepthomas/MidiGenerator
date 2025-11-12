@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Design;
 using System.Text.Json.Serialization;
-using Ephemera.NBagOfTricks;
 using System.Windows.Forms.Design;
+using Ephemera.NBagOfTricks;
 
 
 namespace MidiGenerator
@@ -63,7 +63,7 @@ namespace MidiGenerator
         #region Persisted Non-editable Properties
         /// <summary>Actual 1-based midi channel number.</summary>
         [Browsable(true)]
-        [Editor(typeof(ListSelectorTypeEditor), typeof(UITypeEditor))]
+        [Editor(typeof(ChannelSelectorTypeEditor), typeof(UITypeEditor))]
         public int ChannelNumber { get; set; } = 1;
 
         /// <summary>Current midi presets file.</summary>
@@ -73,7 +73,7 @@ namespace MidiGenerator
 
         /// <summary>Current patch.</summary>
         [Browsable(true)]
-        [Editor(typeof(ListSelectorTypeEditor), typeof(UITypeEditor))]
+        [Editor(typeof(PatchSelectorTypeEditor), typeof(UITypeEditor))]
         public int Patch { get; set; } = 0;
 
         /// <summary>Current volume.</summary>
@@ -82,8 +82,15 @@ namespace MidiGenerator
 
         [Browsable(false)]
         [JsonIgnore]
-        public Dictionary<int, string> CurrentPresets { get; }
+        public Dictionary<int, string> CurrentPresets { get; } = [];
 
         #endregion
+
+        // public ChannelSettings() //TODO1 remove
+        // {
+        //     CurrentPresets[30] = "pre1";
+        //     CurrentPresets[40] = "pre2";
+        //     CurrentPresets[50] = "pre3";
+        // }
     }
 }

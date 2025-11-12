@@ -6,30 +6,7 @@ using System.Text;
 
 namespace MidiGenerator
 {
-
-    public class Defs
-    {
-        /// <summary>Midi caps.</summary>
-        public const int MIN_MIDI = 0;
-
-        /// <summary>Midi caps.</summary>
-        public const int MAX_MIDI = 127;
-
-        /// <summary>Midi caps.</summary>
-        public const int NUM_CHANNELS = 16;
-
-        /// <summary>The normal drum channel.</summary>
-        public const int DEFAULT_DRUM_CHANNEL = 10;
-
-        /// <summary>Default value.</summary>
-        public const double DEFAULT_GAIN = 0.8;
-
-        /// <summary>Allow UI controls some more headroom.</summary>
-        public const double MAX_GAIN = 2.0;
-    }
-
-
-    #region Events
+    #region Events - prob just this app?
     public class NoteEventArgs : EventArgs
     {
         /// <summary>The note number to play.</summary>

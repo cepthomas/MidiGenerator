@@ -5,152 +5,88 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Diagnostics;
-using NAudio.Midi;
-using Ephemera.NBagOfTricks;
-using Ephemera.NBagOfUis;
 using System.Drawing.Design;
 using System.ComponentModel;
 using System.Windows.Forms.Design;
+using System.Reflection;
+using NAudio.Midi;
+using Ephemera.NBagOfTricks;
+using Ephemera.NBagOfUis;
 
 
 namespace MidiGenerator
 {
-
-
-    /// <summary>
-    /// Plug in to property grid.
-    /// </summary>
-    public class DevicesTypeEditor : UITypeEditor // TODO1
+    public class PatchSelectorTypeEditor : ListSelectorTypeEditor
     {
-        /// <summary>
-        /// Do the work.
-        /// </summary>
-        /// <param name="context"></param>
-        /// <param name="provider"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public override object EditValue(ITypeDescriptorContext? context, IServiceProvider provider, object? value)
+        protected override List<string>? ProvideValues(ITypeDescriptorContext context)
         {
-            IWindowsFormsEditorService? editorService = provider.GetService(typeof(IWindowsFormsEditorService)) as IWindowsFormsEditorService;
+            // Dig out from context.
+            List<string>? vals = null;
 
-            if (editorService is not null && context is not null && value is not null && value is string)
+            Type t = context.Instance.GetType();
+            PropertyInfo prop = t.GetProperty("CurrentPresets");
+            if (prop != null)
             {
-               //DevicesEditor ed = new();
-
-               //switch (context.PropertyDescriptor!.Name)
-               //{
-               //    case "InputDevices":
-               //        ed.Text = "Edit Input Devices";
-               //        ed.Devices = MidiSettings.LibSettings.InputDevices;
-               //        break;
-
-               //    case "OutputDevices":
-               //        ed.Text = "Edit Output Devices";
-               //        ed.Devices = MidiSettings.LibSettings.OutputDevices;
-               //        break;
-
-               //    default:
-               //        throw new InvalidOperationException("This should never happen!");
-               //}
-
-               //editorService.ShowDialog(ed);
-
-               //value = ed.Devices;
+                var names = prop.GetValue(context.Instance, null);
+                if (names != null && names is List<string>)
+                {
+                    vals = names as List<string>;
+                }
             }
 
-            return value!;
-        }
-
-        public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext? context)
-        {
-            return UITypeEditorEditStyle.Modal;
+            return vals;
         }
     }
 
+    public class ChannelSelectorTypeEditor : ListSelectorTypeEditor
+    {
+        protected override List<string>? ProvideValues(ITypeDescriptorContext context)
+        {
+            List<string> vals = [];
+            Range[1..Defs.NUM_CHANNELS].ForEach(v => vals.Add(v));
+            return vals;
+        }
+    }
 
+    public class DevicesTypeEditor : ListSelectorTypeEditor
+    {
+        protected override List<string>? ProvideValues(ITypeDescriptorContext context)
+        {
+            List<string> vals = [];
+            for (int i = 0; i < MidiOut.NumberOfDevices; i++)
+            {
+                vals.Add(MidiOut.DeviceInfo(i).ProductName));
+            }
+            return vals;
+        }
+    }
 
     /// <summary>
-    /// Property editor for a single column name. The source is typically a custom collection editor supplied elsewhere.
-    /// TODO-F This is a bit klunky because it is difficult to locate the property grid editor the collection editor uses.
+    /// Generic property editor for selection from a list.
     /// </summary>
-    public class ListSelectorTypeEditor : UITypeEditor
+    public abstract class ListSelectorTypeEditor : UITypeEditor
     {
-        /// <summary>
-        /// System provided editor hosting.
-        /// </summary>
-       // private IWindowsFormsEditorService _service = null;
+        /// <summary>This is provided by the derived class.</summary>
+        protected abstract List<string>? ProvideValues(ITypeDescriptorContext context);
 
-        /// <summary>
-        /// This gets set by the client.
-        /// </summary>
-        public static List<string> Values = ["aaa", "bbb", "ccc"];// new List<string>();
-
-        /// <summary>
-        /// The user wants to edit something.
-        /// </summary>
-        public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
+        /// <summary>The user wants to edit something.</summary>
+        public override object? EditValue(ITypeDescriptorContext? context, IServiceProvider provider, object? value)
         {
-            // If you need to access something about the context of the property (the parent object etc), that is what the 
-            // ITypeDescriptorContext (in EditValue) provides; it tells you the PropertyDescriptor and Instance (the MyType) that is involved.
+            IWindowsFormsEditorService? _service = provider.GetService(typeof(IWindowsFormsEditorService)) as IWindowsFormsEditorService;
 
-            IWindowsFormsEditorService _service = provider.GetService(typeof(IWindowsFormsEditorService)) as IWindowsFormsEditorService;
-
-            string selval = value == null ? "Definitions.UNKNOWN_STRING" : value.ToString(); // the editor contents
-
-            // Determine explicit or implicit mode.
-            List<string> vals = null;
-
-            if (Values != null && Values.Count > 0)
+            // Fill the selector.
+            var lb = new ListBox
             {
-                vals = Values;
-            }
-            else
-            {
-                //// Dig out from context.
-                //Type t = context.Instance.GetType();
-                //PropertyInfo prop = t.GetProperty("ColumnNames");
-                //if (prop != null)
-                //{
-                //    var names = prop.GetValue(context.Instance, null);
-                //    if(names != null && names is List<string>)
-                //    {
-                //        vals = names as List<string>;
-                //    }
-                //}
-            }
+                Width = 250,
+                SelectionMode = SelectionMode.One
+            };
+            lb.Click += (_, __) => _service.CloseDropDown();
+            var vals = ProvideValues(context);
+            vals.ForEach(v => lb.Items.Add(v));
+            _service.DropDownControl(lb);
 
-            if (vals != null)
-            {
-                ListBox lb = new ListBox();
-                lb.Width = 250;
-                lb.SelectionMode = SelectionMode.One;
-                lb.Click += (object sender, EventArgs e) => _service.CloseDropDown();
-
-                // Fill the list box.
-                foreach (string s in vals)
-                {
-                    int i = lb.Items.Add(s);
-                }
-
-                _service.DropDownControl(lb);
-
-                if (lb.SelectedItem != null)
-                {
-                    selval = lb.SelectedItem.ToString();
-                }
-            }
-
-            return selval;
+            return lb.SelectedItem is null ? value : lb.SelectedItem.ToString();
         }
-
-
-        // private void ListBox_Click(object sender, EventArgs e)
-        // {
-        //     if (_service != null)
-        //     {
-        //         _service.CloseDropDown();
-        //     }
-        // }
 
         public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext context)
         {

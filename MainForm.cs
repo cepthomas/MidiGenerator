@@ -10,41 +10,6 @@ using Ephemera.NBagOfTricks;
 using Ephemera.NBagOfUis;
 
 
-// TODO1 Get midi defs from ???\gm_instruments.txt:
-// => C:\Dev\Apps\Nebulua\lua\midi_defs.lua:
-// => C:\Dev\Libs\MidiLib\MidiDefs.cs:
-// int GetControllerNumber(string which)
-// int GetDrumKitNumber(string which)
-// int GetDrumNumber(string which)
-// int GetInstrumentNumber(string which)
-// int GetInstrumentOrDrumKitNumber(string which)
-// string GetControllerName(int which)
-// string GetDrumKitName(int which)
-// string GetDrumName(int which)
-// string GetInstrumentName(int which)
-
-//TODO1 most volume should be gain.
-// C:\Dev\Apps\Nebulua\ChannelControl.cs:
-//   124:                 Minimum = MidiDefs.VOLUME_MIN,
-// C:\Dev\Apps\Nebulua\Midi.cs:
-//    23:         public const double VOLUME_MIN = 0.0;
-// C:\Dev\Libs\AudioLib\AudioCommon.cs:
-//    72:         public const float VOLUME_MIN = 0.0f;
-// C:\Dev\Libs\AudioLib\AudioPlayer.cs:
-//    48:                 _volume = (float)MathUtils.Constrain(value, AudioLibDefs.VOLUME_MIN, AudioLibDefs.VOLUME_MAX);
-// C:\Dev\Libs\MidiLib\Channel.cs:
-//    40:             set { _volume = MathUtils.Constrain(value, MidiLibDefs.VOLUME_MIN, MidiLibDefs.VOLUME_MAX); }
-// C:\Dev\Libs\MidiLib\ChannelControl.cs:
-//   111:             sldVolume.Minimum = MidiLibDefs.VOLUME_MIN;
-// C:\Dev\Libs\MidiLib\MidiCommon.cs:
-//    30:         public const double VOLUME_MIN = 0.0;
-// C:\Dev\Libs\MidiLib\SimpleChannelControl.cs:
-//    70:             sldVolume.Minimum = MidiLibDefs.VOLUME_MIN;
-// C:\Dev\Libs\MidiLib\Test\MainForm.cs:
-//    93:             sldVolume.Minimum = MidiLibDefs.VOLUME_MIN;
-
-
-
 namespace MidiGenerator
 {
     public partial class MainForm : Form
@@ -204,9 +169,30 @@ namespace MidiGenerator
         /// </summary>
         void Settings_Click(object? sender, EventArgs e)
         {
-            SettingsEditor.Edit(_settings, "User Settings", 400);
-            // TODO1 check for changes of interest
-            MessageBox.Show("Restart required for changes to take effect");
+            var changes = SettingsEditor.Edit(_settings, "User Settings", 400);
+
+            // Detect changes of interest.
+            bool restart = false;
+
+            foreach (var (name, cat) in changes)
+            {
+                switch (name)
+                {
+                    case "MidiInDevice":
+                    case "MidiOutDevice":
+                    case "InternalPPQ":
+                    case "ControlColor":
+                    case "SelectedColor":
+                    case "BackColor":
+                        restart = true;
+                        break;
+                }
+            }
+
+            if (restart)
+            {
+                MessageBox.Show("Restart required for device changes to take effect");
+            }
 
             SaveSettings();
         }
