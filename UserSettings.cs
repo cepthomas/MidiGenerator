@@ -8,6 +8,9 @@ using System.Windows.Forms.Design;
 using Ephemera.NBagOfTricks;
 
 
+using MidiLibNew;
+
+
 namespace MidiGenerator
 {
     [Serializable]
@@ -41,6 +44,40 @@ namespace MidiGenerator
         [Editor(typeof(DevicesTypeEditor), typeof(UITypeEditor))]
         public string OutputDevice { get; set; } = "???";
         #endregion
+
+
+
+
+    // [Serializable]
+    // public class DeviceSpec
+    // {
+    //     [DisplayName("Device Id")]
+    //     [Description("User supplied id for use in client.")]
+    //     [Browsable(true)]
+    //     public string DeviceId { get; set; } = "";
+
+    //     [DisplayName("Device Name")]
+    //     [Description("System device name.")]
+    //     [Browsable(true)]
+    //     public string DeviceName { get; set; } = "";
+    // }
+
+        // [DisplayName("Input Devices")]
+        // [Description("Valid devices if handling input.")]
+        // [Browsable(true)]
+        // [Editor(typeof(DevicesTypeEditor), typeof(UITypeEditor))]
+        // public List<DeviceSpec> InputDevices { get; set; } = new();
+
+        // [DisplayName("Output Devices")]
+        // [Description("Valid devices if sending output.")]
+        // [Browsable(true)]
+        // [Editor(typeof(DevicesTypeEditor), typeof(UITypeEditor))]
+        // public List<DeviceSpec> OutputDevices { get; set; } = new();
+
+
+
+
+
 
         #region Persisted Non-editable Properties
         [Browsable(false)]
@@ -78,19 +115,7 @@ namespace MidiGenerator
 
         /// <summary>Current volume.</summary>
         [Browsable(false)]
-        public double Gain { get; set; } = Defs.DEFAULT_GAIN;
-
-        [Browsable(false)]
-        [JsonIgnore]
-        public Dictionary<int, string> CurrentPresets { get; } = [];
-
+        public double Volume { get; set; } = Defs.DEFAULT_VOLUME;
         #endregion
-
-        // public ChannelSettings() //TODO1 remove
-        // {
-        //     CurrentPresets[30] = "pre1";
-        //     CurrentPresets[40] = "pre2";
-        //     CurrentPresets[50] = "pre3";
-        // }
     }
 }

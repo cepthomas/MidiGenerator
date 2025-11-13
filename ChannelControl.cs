@@ -5,6 +5,9 @@ using System.Windows.Forms;
 using Ephemera.NBagOfUis;
 
 
+using MidiLibNew;
+
+
 namespace MidiGenerator
 {
     /// <summary>Properties for a midi channel.</summary>
@@ -13,7 +16,7 @@ namespace MidiGenerator
         #region Designer variables
         readonly Container? components = null;
         readonly Label lblChannelInfo;
-        readonly Slider sldGain;
+        readonly Slider sldVolume;
         readonly ToolTip toolTip;
         #endregion
 
@@ -24,6 +27,8 @@ namespace MidiGenerator
         /// <summary>Cosmetics.</summary>
         public Color ControlColor { get; set; } = Color.Red;
         #endregion
+
+
 
         #region Events
         /// <summary>Notify host of asynchronous changes from user.</summary>
@@ -46,17 +51,17 @@ namespace MidiGenerator
             };
             Controls.Add(lblChannelInfo);
 
-            sldGain = new()
+            sldVolume = new()
             {
                 Location = new(194, 3),
                 Size = new(83, 30),
                 BorderStyle = BorderStyle.FixedSingle,
                 Orientation = Orientation.Horizontal,
                 Minimum = 0.0,
-                Maximum = Defs.MAX_GAIN,
+                Maximum = Defs.MAX_VOLUME,
                 Resolution = 0.05,
             };
-            Controls.Add(sldGain);
+            Controls.Add(sldVolume);
 
             toolTip = new ToolTip(components);
 
@@ -72,9 +77,9 @@ namespace MidiGenerator
         /// <param name="e"></param>
         protected override void OnLoad(EventArgs e)
         {
-            sldGain.Value = Settings.Gain;
-            sldGain.DrawColor = ControlColor;
-            sldGain.ValueChanged += Gain_ValueChanged;
+            sldVolume.Value = Settings.Volume;
+            sldVolume.DrawColor = ControlColor;
+            sldVolume.ValueChanged += Volume_ValueChanged;
 
             lblChannelInfo.Click += ChannelEd_Click;
             lblChannelInfo.BackColor = Color.LightBlue;
@@ -104,11 +109,11 @@ namespace MidiGenerator
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void Gain_ValueChanged(object? sender, EventArgs e)
+        void Volume_ValueChanged(object? sender, EventArgs e)
         {
             if (sender is not null)
             {
-                Settings.Gain = (sender as Slider)!.Value;
+                Settings.Volume = (sender as Slider)!.Value;
             }
         }
 

@@ -6,7 +6,7 @@ using System.Text;
 
 namespace MidiGenerator
 {
-    #region Events - prob just this app?
+    #region Events - prob just this app? TODO1
     public class NoteEventArgs : EventArgs
     {
         /// <summary>The note number to play.</summary>
@@ -47,3 +47,35 @@ namespace MidiGenerator
 
     #endregion
 }
+
+
+
+    // /// <summary>Notify host of asynchronous changes from user.</summary>
+    // public class ChannelChangeEventArgs : EventArgs
+    // {
+    // }
+
+    // /// <summary>
+    // /// Midi (real or sim) has received something. It's up to the client to make sense of it.
+    // /// Property value of -1 indicates invalid or not pertinent e.g a controller event doesn't have velocity.
+    // /// </summary>
+    // public class InputReceiveEventArgs : EventArgs
+    // {
+    //     /// <summary>Channel number 1-based. Required.</summary>
+    //     public int Channel { get; set; } = 0;
+
+    //     /// <summary>The note number to play. NoteOn/Off only.</summary>
+    //     public int Note { get; set; } = -1;
+
+    //     /// <summary>Specific controller id.</summary>
+    //     public int Controller { get; set; } = -1;
+
+    //     /// <summary>For Note = velocity. For controller = payload.</summary>
+    //     public int Value { get; set; } = -1;
+
+    //     /// <summary>Something to tell the client.</summary>
+    //     public string ErrorInfo { get; set; } = "";
+
+    //     /// <summary>Special controller id to carry pitch info.</summary>
+    //     public const int PITCH_CONTROL = 1000;
+    // }

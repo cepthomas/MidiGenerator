@@ -5,9 +5,12 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Diagnostics;
-using NAudio.Midi;
+using NAudio.Midi; // TODO1 hide?
 using Ephemera.NBagOfTricks;
 using Ephemera.NBagOfUis;
+
+
+using MidiLibNew;
 
 
 namespace MidiGenerator
@@ -22,7 +25,8 @@ namespace MidiGenerator
         readonly UserSettings _settings;
 
         /// <summary>Midi output device.</summary>
-        MidiOut? _midiOut = null;
+        //        MidiOut? _midiOut = null;
+        MidiOutput? _midiOut = null;
 
         /// <summary>The fast timer.</summary>
         readonly MmTimerEx _mmTimer = new();
@@ -61,14 +65,15 @@ namespace MidiGenerator
 
             // Figure out which midi output device. TODO1
             string deviceName = "VirtualMIDISynth #1";
-            for (int i = 0; i < MidiOut.NumberOfDevices; i++)
-            {
-                if (deviceName == MidiOut.DeviceInfo(i).ProductName)
-                {
-                    _midiOut = new MidiOut(i);
-                    break;
-                }
-            }
+            _midiOut = new MidiOutput(deviceName);
+            //for (int i = 0; i < MidiOut.NumberOfDevices; i++)
+            //{
+            //    if (deviceName == MidiOut.DeviceInfo(i).ProductName)
+            //    {
+            //        _midiOut = new MidiOutput(i);
+            //        break;
+            //    }
+            //}
 
             if (_midiOut is null)
             {
@@ -218,7 +223,7 @@ namespace MidiGenerator
                         new NoteOnEvent(0, chanNum, e.Note, e.Velocity, 0) :
                         new NoteEvent(0, chanNum, MidiCommandCode.NoteOff, e.Note, 0);
 
-                    SendEvent(nevt);
+                    _midiOut.SendEvent(nevt);
                 }
                 catch (Exception ex)
                 {
@@ -265,21 +270,21 @@ namespace MidiGenerator
             _settings.LogMidi = btnLogMidi.Checked;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="evt"></param>
-        public void SendEvent(MidiEvent evt)
-        {
-            //if(patch >= Defs.MIN_MIDI && patch <= Defs.MAX_MIDI) TODO1 check everywhere?
+        ///// <summary>
+        ///// 
+        ///// </summary>
+        ///// <param name="evt"></param>
+        //public void SendEvent(MidiEvent evt)
+        //{
+        //    //if(patch >= Defs.MIN_MIDI && patch <= Defs.MAX_MIDI) TODO1 check everywhere?
 
-            _midiOut?.Send(evt.GetAsShortMessage());
-            if (_settings.LogMidi)
-            {
-                _logger.Trace(evt.ToString());
-                //_logger.Trace($"Send {evt.GetType()} N:{e.Note} V:{e.Value}");
-            }
-        }
+        //    _midiOut?.Send(evt.GetAsShortMessage());
+        //    if (_settings.LogMidi)
+        //    {
+        //        _logger.Trace(evt.ToString());
+        //        //_logger.Trace($"Send {evt.GetType()} N:{e.Note} V:{e.Value}");
+        //    }
+        //}
 
         /// <summary>
         /// 
@@ -293,7 +298,7 @@ namespace MidiGenerator
             NoteEvent evt = velocity > 0 ?
                 new NoteOnEvent(0, chan, note, velocity, 0) :
                 new NoteEvent(0, chan, MidiCommandCode.NoteOff, note, 0);
-            SendEvent(evt);
+            _midiOut.SendEvent(evt);
         }
 
         /// <summary>
@@ -302,7 +307,7 @@ namespace MidiGenerator
         public void SendPatch(int chan, int patch)
         {
             PatchChangeEvent evt = new(0, chan, patch);
-            SendEvent(evt);
+            _midiOut.SendEvent(evt);
         }
 
         /// <summary>
@@ -313,7 +318,7 @@ namespace MidiGenerator
         public void SendController(int chan, MidiController controller, int val)
         {
             ControlChangeEvent evt = new(0, chan, controller, val);
-            SendEvent(evt);
+            _midiOut.SendEvent(evt);
         }
 
         /// <summary>
@@ -322,7 +327,7 @@ namespace MidiGenerator
         public void Kill(int chan)
         {
             ControlChangeEvent evt = new(0, chan, MidiController.AllNotesOff, 0);
-            SendEvent(evt);
+            _midiOut.SendEvent(evt);
         }
         #endregion
 
