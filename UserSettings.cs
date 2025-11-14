@@ -5,10 +5,8 @@ using System.Drawing;
 using System.Drawing.Design;
 using System.Text.Json.Serialization;
 using System.Windows.Forms.Design;
-using Ephemera.NBagOfTricks;
-
-
 using MidiLibNew;
+using Ephemera.NBagOfTricks;
 
 
 namespace MidiGenerator

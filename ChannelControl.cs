@@ -28,8 +28,6 @@ namespace MidiGenerator
         public Color ControlColor { get; set; } = Color.Red;
         #endregion
 
-
-
         #region Events
         /// <summary>Notify host of asynchronous changes from user.</summary>
         public event EventHandler<ChannelChangeEventArgs>? ChannelChange;
@@ -124,20 +122,31 @@ namespace MidiGenerator
         /// <param name="e"></param>
         void ChannelEd_Click(object? sender, EventArgs e)
         {
-            //var ed = new ChannelEd(Settings);
-            //ed.ShowDialog();
+            var changes = SettingsEditor.Edit(Settings, "User Settings", 400);
 
-            SettingsEditor.Edit(Settings, "User Settings", 400);
+            // Detect changes of interest.
+            bool restart = false;
+
+            foreach (var (name, cat) in changes)
+            {
+                switch (name)
+                {
+                    case "ChannelNumber":  // TODO1??
+                    case "Patch": // TODO1 send patch?
+                    case "PresetFile":
+                        restart = true;
+                        break;
+                }
+            }
+
+            if (restart)
+            {
+                MessageBox.Show("Restart required for device changes to take effect");
+            }
 
             UpdateUi();
         }
         #endregion
-
-
-
-
-
-
 
 
         /// <summary>
@@ -147,15 +156,11 @@ namespace MidiGenerator
         {
             // General.
             lblChannelInfo.Text = $"Ch{Settings.ChannelNumber}";
-
             toolTip.SetToolTip(this, string.Join(Environment.NewLine, "Info"));
-
-            //lblChannelInfo.BackColor = Selected ? SelectedColor : UnselectedColor;
-            //lblPatch.Text = IsDrums ? "Drums" : MidiDefs.GetInstrumentName(BoundChannel.Patch);
         }
 
         /// <summary>
-        /// 
+        /// Read me.
         /// </summary>
         /// <returns></returns>
         public override string ToString()

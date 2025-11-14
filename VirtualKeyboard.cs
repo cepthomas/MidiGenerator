@@ -5,6 +5,7 @@ using System.Windows.Forms;
 using System.Linq;
 using System.ComponentModel;
 using Ephemera.NBagOfTricks;
+using System.DirectoryServices.ActiveDirectory;
 
 
 namespace MidiGenerator
@@ -24,7 +25,7 @@ namespace MidiGenerator
 
         #region Events
         /// <summary>Click (including drag) info.</summary>
-        public event EventHandler<NoteEventArgs>? UserClick;
+        public event EventHandler<SendNoteEventArgs>? UserClick;
         #endregion
 
         #region Constants
@@ -69,7 +70,10 @@ namespace MidiGenerator
             ClientSize = new Size(1200, 140);
 
             CreateKeys();
-            CreateKeyMap();
+            if (!CreateKeyMap())
+            {
+                //TODO1 notify
+            }
             DrawKeys();
         }
 
@@ -102,130 +106,54 @@ namespace MidiGenerator
         /// <summary>
         /// Create the midi note/keyboard mapping.
         /// </summary>
-        void CreateKeyMap()
+        bool CreateKeyMap()
         {
             _keyMap.Clear();
+            bool valid = true;
 
-            int indexOfMiddleC = _keys.IndexOf(_keys.Where(k => k.NoteId == MIDDLE_C).First());
 
-            var ls = Utils.LoadDefFile(@"C:\Dev\Apps\MidiGenerator\def_keymap.txt");
-
-            foreach (var l in ls)
+            try
             {
-                var parts = l;// Z  C3
+                var ls = Utils.LoadDefFile(@"C:\Dev\Apps\MidiGenerator\def_keymap.txt");
 
-
-                if (parts.Count >= 2)
+                foreach (var parts in ls)
                 {
-                    char ch = parts[0];
+                    // Z  C3
 
-                    MusicDefinitions.NoteNameToNumber(parts[1]);
-
-                    //        public static List<int> GetNotesFromString(string noteString)
-
-
-                    int offset = int.Parse(parts[1]); // -12
-                    int note = indexOfMiddleC + offset;
-
-                    switch (key)
+                    if (parts.Count != 2)
                     {
-                        case ",": _keyMap.Add(Keys.Oemcomma, note); break;
-                        case "=": _keyMap.Add(Keys.Oemplus, note); break;
-                        case "-": _keyMap.Add(Keys.OemMinus, note); break;
-                        case "/": _keyMap.Add(Keys.OemQuestion, note); break;
-                        case ".": _keyMap.Add(Keys.OemPeriod, note); break;
-                        case "\'": _keyMap.Add(Keys.OemQuotes, note); break;
-                        case "\\": _keyMap.Add(Keys.OemPipe, note); break;
-                        case "]": _keyMap.Add(Keys.OemCloseBrackets, note); break;
-                        case "[": _keyMap.Add(Keys.OemOpenBrackets, note); break;
-                        case "`": _keyMap.Add(Keys.Oemtilde, note); break;
-                        case ";": _keyMap.Add(Keys.OemSemicolon, note); break;
-
-                        default:
-                            if ((ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9'))
-                            {
-                                _keyMap.Add((Keys)ch, note);
-                            }
-                            break;
+                        throw new Exception();
                     }
+
+
+                    if (parts[0].Length != 1)
+                    {
+                        throw new Exception();
+                    }
+
+                    var key = Utils.TranslateKey(parts[0][0]);
+                    if (key == Keys.None)
+                    {
+                        throw new Exception();
+                    }
+
+
+                    var notes = MusicDefinitions.GetNotesFromString(parts[1]);
+                    if (notes.Count != 1)
+                    {
+                        throw new Exception();
+                    }
+
+                    var note = notes[0];
+                    _keyMap.Add(key, note);
                 }
             }
-
-
-            //
-
-            string[] keyDefs = // TODO1 redo this.
-            [
-                "Z  -12  ;  C3",
-                "S  -11  ;  C#3",
-                "X  -10  ;  D3",
-                "D  -9   ;  D#3",
-                "C  -8   ;  E3",
-                "V  -7   ;  F3",
-                "G  -6   ;  F#3",
-                "B  -5   ;  G3",
-                "H  -4   ;  G#3",
-                "N  -3   ;  A3",
-                "J  -2   ;  A#3",
-                "M  -1   ;  B3",
-                ",   0   ;  C4",
-                "L  +1   ;  C#4",
-                ".  +2   ;  D4",
-                ";  +3   ;  D#4",
-                "/  +4   ;  E4",
-                "Q   0   ;  C4",
-                "2  +1   ;  C#4",
-                "W  +2   ;  D4",
-                "3  +3   ;  D#",
-                "E  +4   ;  E4",
-                "R  +5   ;  F4",
-                "5  +6   ;  F#4",
-                "T  +7   ;  G4",
-                "6  +8   ;  G#4",
-                "Y  +9   ;  A4",
-                "7  +10  ;  A#4",
-                "U  +11  ;  B4",
-                "I  +12  ;  C5",
-                "9  +13  ;  C#5",
-                "O  +14  ;  D5",
-                "0  +15  ;  D#5",
-                "P  +16  ;  E5"
-            ];
-
-            foreach (string l in keyDefs)
+            catch (Exception)
             {
-                var parts = l.SplitByToken(" ");
-
-                if (parts.Count >= 2 && parts[0] != ";")
-                {
-                    string key = parts[0];
-                    char ch = key[0]; // 'Z'
-                    int offset = int.Parse(parts[1]); // -12
-                    int note = indexOfMiddleC + offset;
-
-                    switch (key)
-                    {
-                        case ",":  _keyMap.Add(Keys.Oemcomma, note); break;
-                        case "=":  _keyMap.Add(Keys.Oemplus, note); break;
-                        case "-":  _keyMap.Add(Keys.OemMinus, note); break;
-                        case "/":  _keyMap.Add(Keys.OemQuestion, note); break;
-                        case ".":  _keyMap.Add(Keys.OemPeriod, note); break;
-                        case "\'": _keyMap.Add(Keys.OemQuotes, note); break;
-                        case "\\": _keyMap.Add(Keys.OemPipe, note); break;
-                        case "]":  _keyMap.Add(Keys.OemCloseBrackets, note); break;
-                        case "[":  _keyMap.Add(Keys.OemOpenBrackets, note); break;
-                        case "`":  _keyMap.Add(Keys.Oemtilde, note); break;
-                        case ";":  _keyMap.Add(Keys.OemSemicolon, note); break;
-
-                        default:
-                            if ((ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9'))
-                            {
-                                _keyMap.Add((Keys)ch, note);
-                            }
-                            break;
-                    }
-                }
+                valid = false;
             }
+
+            return valid;
         }
         #endregion
 
@@ -275,7 +203,7 @@ namespace MidiGenerator
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void HandleKeyClick(object? sender, NoteEventArgs e)
+        void HandleKeyClick(object? sender, SendNoteEventArgs e)
         {
             UserClick?.Invoke(this, e);
         }
@@ -370,7 +298,7 @@ namespace MidiGenerator
 
         #region Events
         /// <summary>Notify handlers of key change.</summary>
-        public event EventHandler<NoteEventArgs>? KeyClickEvent;
+        public event EventHandler<SendNoteEventArgs>? KeyClickEvent;
         #endregion
 
         #region Lifecycle

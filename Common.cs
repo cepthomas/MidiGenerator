@@ -10,7 +10,7 @@ using Ephemera.NBagOfTricks;
 namespace MidiGenerator
 {
     #region Events - prob just this app? TODO1
-    public class NoteEventArgs : EventArgs
+    public class SendNoteEventArgs : EventArgs
     {
         /// <summary>The note number to play.</summary>
         public int Note { get; set; }
@@ -53,6 +53,11 @@ namespace MidiGenerator
 
     public class Utils
     {
+        /// <summary>
+        /// Load a standard def file.
+        /// </summary>
+        /// <param name="fn"></param>
+        /// <returns></returns>
         public static List<List<string>> LoadDefFile(string fn)
         {
             List<List<string>> res = [];
@@ -79,8 +84,12 @@ namespace MidiGenerator
             return res;
         }
 
-
-        public static Keys Translate(char ch)
+        /// <summary>
+        /// Translate ascii char to Keys.
+        /// </summary>
+        /// <param name="ch"></param>
+        /// <returns></returns>
+        public static Keys TranslateKey(char ch)
         {
             Keys xlat = Keys.None;
 
@@ -97,13 +106,7 @@ namespace MidiGenerator
                 case '[':  xlat = Keys.OemOpenBrackets; break;
                 case '`':  xlat = Keys.Oemtilde; break;
                 case ';':  xlat = Keys.OemSemicolon; break;
-
-                default:
-                    if ((ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9'))
-                    {
-                        xlat = (Keys)ch;
-                    }
-                    break;
+                case (>= 'A' and <= 'Z') or (>= '0' and <= '9'): xlat = (Keys)ch; break;
             }
 
             return xlat;

@@ -5,12 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Diagnostics;
-using NAudio.Midi; // TODO1 hide?
+using NAudio.Midi;
+using MidiLibNew;
 using Ephemera.NBagOfTricks;
 using Ephemera.NBagOfUis;
-
-
-using MidiLibNew;
 
 
 namespace MidiGenerator
@@ -27,9 +25,6 @@ namespace MidiGenerator
         /// <summary>Midi output device.</summary>
         //        MidiOut? _midiOut = null;
         MidiOutput? _midiOut = null;
-
-        /// <summary>The fast timer.</summary>
-        readonly MmTimerEx _mmTimer = new();
         #endregion
 
         #region Lifecycle
@@ -183,12 +178,8 @@ namespace MidiGenerator
             {
                 switch (name)
                 {
-                    case "MidiInDevice":
-                    case "MidiOutDevice":
-                    case "InternalPPQ":
                     case "ControlColor":
-                    case "SelectedColor":
-                    case "BackColor":
+                    case "OutputDevice":
                         restart = true;
                         break;
                 }
@@ -209,7 +200,7 @@ namespace MidiGenerator
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void UserClickEvent(object? sender, NoteEventArgs e)
+        void UserClickEvent(object? sender, SendNoteEventArgs e)
         {
             if (e.Note != -1 && e.Velocity != -1)
             {
@@ -269,22 +260,6 @@ namespace MidiGenerator
         {
             _settings.LogMidi = btnLogMidi.Checked;
         }
-
-        ///// <summary>
-        ///// 
-        ///// </summary>
-        ///// <param name="evt"></param>
-        //public void SendEvent(MidiEvent evt)
-        //{
-        //    //if(patch >= Defs.MIN_MIDI && patch <= Defs.MAX_MIDI) TODO1 check everywhere?
-
-        //    _midiOut?.Send(evt.GetAsShortMessage());
-        //    if (_settings.LogMidi)
-        //    {
-        //        _logger.Trace(evt.ToString());
-        //        //_logger.Trace($"Send {evt.GetType()} N:{e.Note} V:{e.Value}");
-        //    }
-        //}
 
         /// <summary>
         /// 
@@ -361,39 +336,5 @@ namespace MidiGenerator
 
             MessageBox.Show(string.Join(Environment.NewLine, ls));
         }
-
-        //#region MM timer TODO?
-        // /// <summary>
-        // /// 
-        // /// </summary>
-        // /// <param name="tempo"></param>
-        // void SetTimer(double tempo)
-        // {
-        //     MidiTimeConverter mt = new(0, tempo);
-        //     double period = mt.RoundedInternalPeriod();
-        //     _mmTimer.SetTimer((int)Math.Round(period), MmTimerCallback);
-        // }
-
-        // /// <summary>
-        // /// 
-        // /// </summary>
-        // /// <param name="totalElapsed"></param>
-        // /// <param name="periodElapsed"></param>
-        // void MmTimerCallback(double totalElapsed, double periodElapsed)
-        // {
-        //     try
-        //     {
-        //         // Could do some timed work here.
-        //     }
-        //     catch (Exception ex)
-        //     {
-        //         MessageBox.Show(ex.Message);
-        //     }
-        // }
-        //#endregion
     }
-
-
-
-
 }

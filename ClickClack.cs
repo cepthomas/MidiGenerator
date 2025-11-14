@@ -24,6 +24,8 @@ namespace MidiGenerator
 
         /// <summary>Tool tip.</summary>
         readonly ToolTip _toolTip = new();
+        #endregion
+
 
         // octaves
         List<int> GridX = [36, 48, 60, 72, 84];
@@ -35,15 +37,15 @@ namespace MidiGenerator
 
         int MinY = 0;
         int MaxY = 128;
-        #endregion
+
 
         #region Properties
         public Color ControlColor { get; set; } = Color.Red;
         #endregion
 
         #region Events
-        /// <summary>Click/ drag info.</summary>
-        public event EventHandler<NoteEventArgs>? UserClick;
+        /// <summary>Click/drag info.</summary>
+        public event EventHandler<SendNoteEventArgs>? UserClick;
         #endregion
 
         #region Lifecycle
@@ -121,8 +123,8 @@ namespace MidiGenerator
         protected override void OnMouseMove(MouseEventArgs e)
         {
             var (ux, uy) = MouseToUser();
-            NoteEventArgs args = new() { Note = ux, Velocity = uy };
-            _toolTip.SetToolTip(this, args.ToString()); //TODO1 needss note name
+            SendNoteEventArgs args = new() { Note = ux, Velocity = uy };
+            _toolTip.SetToolTip(this, args.ToString()); //TODO1 needs note name
 
             // Also gen click?
             if (e.Button == MouseButtons.Left)
