@@ -1,6 +1,3 @@
-
-#define _NNNNN
-
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -15,7 +12,7 @@ using System.Reflection;
 using Ephemera.NBagOfTricks;
 using Ephemera.NBagOfUis;
 
-using NAudio.Midi; // TODO1 hide?
+using NAudio.Midi;
 
 using MidiLibNew;
 
@@ -23,7 +20,6 @@ using MidiLibNew;
 namespace MidiGenerator
 {
 
-#if _NNNNN
     public class PatchSelectorTypeEditor : UITypeEditor
     {
         public override object? EditValue(ITypeDescriptorContext? context, IServiceProvider provider, object? value)
@@ -157,91 +153,86 @@ namespace MidiGenerator
         }
     }
 
-#else
 
+    // old style:
+    // public class PatchSelectorTypeEditor : ListSelectorTypeEditor
+    // {
+    //     protected override List<string> ProvideValues(ITypeDescriptorContext? context)
+    //     {
+    //         // Dig out from context.
+    //         List<string>? vals = null;
 
-    public class PatchSelectorTypeEditor : ListSelectorTypeEditor
-    {
-        protected override List<string> ProvideValues(ITypeDescriptorContext? context)
-        {
-            // Dig out from context.
-            List<string>? vals = null;
+    //         if (context is not null && context.Instance is not null)
+    //         {
+    //             Type t = context!.Instance!.GetType();
+    //             PropertyInfo? prop = t.GetProperty("CurrentPresets");
+    //             if (prop != null)
+    //             {
+    //                 var names = prop.GetValue(context.Instance, null);
+    //                 if (names != null && names is List<string>)
+    //                 {
+    //                     vals = names as List<string>;
+    //                 }
+    //             }
+    //         }
 
-            if (context is not null && context.Instance is not null)
-            {
-                Type t = context!.Instance!.GetType();
-                PropertyInfo? prop = t.GetProperty("CurrentPresets");
-                if (prop != null)
-                {
-                    var names = prop.GetValue(context.Instance, null);
-                    if (names != null && names is List<string>)
-                    {
-                        vals = names as List<string>;
-                    }
-                }
-            }
+    //         return vals ?? ["No presets specified"];
+    //     }
+    // }
 
-            return vals ?? ["No presets specified"];
-        }
-    }
+    // public class ChannelSelectorTypeEditor : ListSelectorTypeEditor
+    // {
+    //     protected override List<string> ProvideValues(ITypeDescriptorContext? context)
+    //     {
+    //         List<string> vals = [];
+    //         Enumerable.Range(1, Defs.NUM_CHANNELS).ForEach(v => vals.Add(v.ToString()));
+    //         return vals;
+    //     }
+    // }
 
-    public class ChannelSelectorTypeEditor : ListSelectorTypeEditor
-    {
-        protected override List<string> ProvideValues(ITypeDescriptorContext? context)
-        {
-            List<string> vals = [];
-            Enumerable.Range(1, Defs.NUM_CHANNELS).ForEach(v => vals.Add(v.ToString()));
-            return vals;
-        }
-    }
+    // public class DevicesTypeEditor : ListSelectorTypeEditor
+    // {
+    //     protected override List<string> ProvideValues(ITypeDescriptorContext? context)
+    //     {
+    //         List<string> vals = [];
+    //         for (int i = 0; i < MidiOut.NumberOfDevices; i++)
+    //         {
+    //             vals.Add(MidiOut.DeviceInfo(i).ProductName);
+    //         }
+    //         return vals;
+    //     }
+    // }
 
-    public class DevicesTypeEditor : ListSelectorTypeEditor
-    {
-        protected override List<string> ProvideValues(ITypeDescriptorContext? context)
-        {
-            List<string> vals = [];
-            for (int i = 0; i < MidiOut.NumberOfDevices; i++)
-            {
-                vals.Add(MidiOut.DeviceInfo(i).ProductName);
-            }
-            return vals;
-        }
-    }
+    // /// <summary>
+    // /// Generic property editor for selection from a list. TODO1 put in nbui.
+    // /// </summary>
+    // public abstract class ListSelectorTypeEditor : UITypeEditor
+    // {
+    //     /// <summary>This is provided by the derived class.</summary>
+    //     protected abstract List<string> ProvideValues(ITypeDescriptorContext? context);
 
-    /// <summary>
-    /// Generic property editor for selection from a list. TODO1 put in nbui.
-    /// </summary>
-    public abstract class ListSelectorTypeEditor : UITypeEditor
-    {
-        /// <summary>This is provided by the derived class.</summary>
-        protected abstract List<string> ProvideValues(ITypeDescriptorContext? context);
+    //     /// <summary>The user wants to edit something.</summary>
+    //     public override object? EditValue(ITypeDescriptorContext? context, IServiceProvider provider, object? value)
+    //     {
+    //         IWindowsFormsEditorService? _service = provider.GetService(typeof(IWindowsFormsEditorService)) as IWindowsFormsEditorService;
 
-        /// <summary>The user wants to edit something.</summary>
-        public override object? EditValue(ITypeDescriptorContext? context, IServiceProvider provider, object? value)
-        {
-            IWindowsFormsEditorService? _service = provider.GetService(typeof(IWindowsFormsEditorService)) as IWindowsFormsEditorService;
+    //         // Fill the selector.
+    //         var lb = new ListBox
+    //         {
+    //             Width = 250,
+    //             SelectionMode = SelectionMode.One
+    //         };
+    //         lb.Click += (_, __) => _service!.CloseDropDown();
+    //         var vals = ProvideValues(context);
+    //         vals.ForEach(v => lb.Items.Add(v));
+    //         _service!.DropDownControl(lb);
 
-            // Fill the selector.
-            var lb = new ListBox
-            {
-                Width = 250,
-                SelectionMode = SelectionMode.One
-            };
-            lb.Click += (_, __) => _service!.CloseDropDown();
-            var vals = ProvideValues(context);
-            vals.ForEach(v => lb.Items.Add(v));
-            _service!.DropDownControl(lb);
+    //         return lb.SelectedItem is null ? value : lb.SelectedItem.ToString();
+    //     }
 
-            return lb.SelectedItem is null ? value : lb.SelectedItem.ToString();
-        }
-
-        public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext? context)
-        {
-            return UITypeEditorEditStyle.DropDown;
-        }
-    }
-
-
-#endif
-
+    //     public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext? context)
+    //     {
+    //         return UITypeEditorEditStyle.DropDown;
+    //     }
+    // }
 }

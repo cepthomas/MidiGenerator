@@ -108,42 +108,88 @@ namespace MidiGenerator
 
             int indexOfMiddleC = _keys.IndexOf(_keys.Where(k => k.NoteId == MIDDLE_C).First());
 
+            var ls = Utils.LoadDefFile(@"C:\Dev\Apps\MidiGenerator\def_keymap.txt");
+
+            foreach (var l in ls)
+            {
+                var parts = l;// Z  C3
+
+
+                if (parts.Count >= 2)
+                {
+                    char ch = parts[0];
+
+                    MusicDefinitions.NoteNameToNumber(parts[1]);
+
+                    //        public static List<int> GetNotesFromString(string noteString)
+
+
+                    int offset = int.Parse(parts[1]); // -12
+                    int note = indexOfMiddleC + offset;
+
+                    switch (key)
+                    {
+                        case ",": _keyMap.Add(Keys.Oemcomma, note); break;
+                        case "=": _keyMap.Add(Keys.Oemplus, note); break;
+                        case "-": _keyMap.Add(Keys.OemMinus, note); break;
+                        case "/": _keyMap.Add(Keys.OemQuestion, note); break;
+                        case ".": _keyMap.Add(Keys.OemPeriod, note); break;
+                        case "\'": _keyMap.Add(Keys.OemQuotes, note); break;
+                        case "\\": _keyMap.Add(Keys.OemPipe, note); break;
+                        case "]": _keyMap.Add(Keys.OemCloseBrackets, note); break;
+                        case "[": _keyMap.Add(Keys.OemOpenBrackets, note); break;
+                        case "`": _keyMap.Add(Keys.Oemtilde, note); break;
+                        case ";": _keyMap.Add(Keys.OemSemicolon, note); break;
+
+                        default:
+                            if ((ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9'))
+                            {
+                                _keyMap.Add((Keys)ch, note);
+                            }
+                            break;
+                    }
+                }
+            }
+
+
+            //
+
             string[] keyDefs = // TODO1 redo this.
             [
-                "Z  -12  ;  C-3",
-                "S  -11  ;  C#",
-                "X  -10  ;  D",
-                "D  -9   ;  D#",
-                "C  -8   ;  E",
-                "V  -7   ;  F",
-                "G  -6   ;  F#",
-                "B  -5   ;  G",
-                "H  -4   ;  G#",
-                "N  -3   ;  A",
-                "J  -2   ;  A#",
-                "M  -1   ;  B",
-                ",   0   ;  C-4",
-                "L  +1   ;  C#-4",
-                ".  +2   ;  D",
-                ";  +3   ;  D#",
-                "/  +4   ;  E-4",
-                "Q   0   ;  C-4",
-                "2  +1   ;  C#",
-                "W  +2   ;  D",
+                "Z  -12  ;  C3",
+                "S  -11  ;  C#3",
+                "X  -10  ;  D3",
+                "D  -9   ;  D#3",
+                "C  -8   ;  E3",
+                "V  -7   ;  F3",
+                "G  -6   ;  F#3",
+                "B  -5   ;  G3",
+                "H  -4   ;  G#3",
+                "N  -3   ;  A3",
+                "J  -2   ;  A#3",
+                "M  -1   ;  B3",
+                ",   0   ;  C4",
+                "L  +1   ;  C#4",
+                ".  +2   ;  D4",
+                ";  +3   ;  D#4",
+                "/  +4   ;  E4",
+                "Q   0   ;  C4",
+                "2  +1   ;  C#4",
+                "W  +2   ;  D4",
                 "3  +3   ;  D#",
-                "E  +4   ;  E",
-                "R  +5   ;  F",
-                "5  +6   ;  F#",
-                "T  +7   ;  G",
-                "6  +8   ;  G#",
-                "Y  +9   ;  A",
-                "7  +10  ;  A#",
-                "U  +11  ;  B",
-                "I  +12  ;  C-5",
-                "9  +13  ;  C#-5",
-                "O  +14  ;  D",
-                "0  +15  ;  D#",
-                "P  +16  ;  E-5"
+                "E  +4   ;  E4",
+                "R  +5   ;  F4",
+                "5  +6   ;  F#4",
+                "T  +7   ;  G4",
+                "6  +8   ;  G#4",
+                "Y  +9   ;  A4",
+                "7  +10  ;  A#4",
+                "U  +11  ;  B4",
+                "I  +12  ;  C5",
+                "9  +13  ;  C#5",
+                "O  +14  ;  D5",
+                "0  +15  ;  D#5",
+                "P  +16  ;  E5"
             ];
 
             foreach (string l in keyDefs)
@@ -153,8 +199,8 @@ namespace MidiGenerator
                 if (parts.Count >= 2 && parts[0] != ";")
                 {
                     string key = parts[0];
-                    char ch = key[0];
-                    int offset = int.Parse(parts[1]);
+                    char ch = key[0]; // 'Z'
+                    int offset = int.Parse(parts[1]); // -12
                     int note = indexOfMiddleC + offset;
 
                     switch (key)

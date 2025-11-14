@@ -1,4 +1,4 @@
-# The GM midi drum note definitions.
+; The GM midi drum note definitions.
 
 035 AcousticBassDrum
 036 BassDrum1

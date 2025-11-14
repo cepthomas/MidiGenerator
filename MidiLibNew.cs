@@ -30,30 +30,26 @@ namespace MidiLibNew
     }
 
 
-    // TODO1 Get midi presets defs from e.g. ???\gm_instruments.txt - one per channel/ChannelSettings
-    // => C:\Dev\Apps\Nebulua\lua\midi_defs.lua:
-    // => C:\Dev\Libs\MidiLib\MidiDefs.cs:
-    // migrate MidiSettings.cs???
+
     public class Presets
     {
         public static string[] Load(string fn)
         {
-            // TODO1 read file lines: 011 GlassFlute
+            // TODO1 read file lines: 011 GlassFlute using LoadDefFile()
             var vals = new string[Defs.MAX_MIDI + 1];
             for (int i = 0; i < vals.Length; i++)
             {
-                vals[i] = $"Patch{i} {i}";
+                vals[i] = $"Patch{i} {i}"; // fake for now
             }
             return vals;
         }
 
-        // TODO1 needed? MidiDefs.cs* string to int - script parsing  Nebulator  (not Nebulua  MidiGenerator)
+        // TODO1 these needed? MidiDefs.cs* string to int - script parsing  Nebulator  (not Nebulua  MidiGenerator)
         public int GetControllerNumber(string which) { return 9999; }
         public int GetDrumKitNumber(string which) { return 9999; }
         public int GetDrumNumber(string which) { return 9999; }
         public int GetInstrumentNumber(string which) { return 9999; }
         public int GetInstrumentOrDrumKitNumber(string which) { return 9999; }
-
         // MidiDefs.cs* int to string - MidiExport
         public string GetControllerName(int which) { return "9999"; }
         public string GetDrumKitName(int which) { return "9999"; }

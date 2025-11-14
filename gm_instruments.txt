@@ -1,4 +1,4 @@
-# The GM instrument patches.
+; The GM instrument patches.
 
 001 AcousticGrandPiano
 002 BrightAcousticPiano

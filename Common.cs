@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.IO;
+using System.Windows.Forms;
+using Ephemera.NBagOfTricks;
 
 
 namespace MidiGenerator
@@ -46,36 +49,64 @@ namespace MidiGenerator
     }
 
     #endregion
+
+
+    public class Utils
+    {
+        public static List<List<string>> LoadDefFile(string fn)
+        {
+            List<List<string>> res = [];
+
+            foreach (var inline in File.ReadAllLines(fn))
+            {
+                // Clean up line, strip comments.
+                var cmt = inline.IndexOf(';');
+                var line = cmt >= 0 ? inline[0..cmt] : inline;
+
+                line = line.Trim();
+
+                // Ignore empty lines.
+                if (line.Length > 0)
+                {
+                    List<string> resParts = [];
+
+                    var parts = line.SplitByToken(" ");
+                    parts.ForEach(p => resParts.Add(p.Trim()));
+                    res.Add(resParts);
+                }
+            }
+
+            return res;
+        }
+
+
+        public static Keys Translate(char ch)
+        {
+            Keys xlat = Keys.None;
+
+            switch (ch)
+            {
+                case ',':  xlat = Keys.Oemcomma; break;
+                case '=':  xlat = Keys.Oemplus; break;
+                case '-':  xlat = Keys.OemMinus; break;
+                case '/':  xlat = Keys.OemQuestion; break;
+                case '.':  xlat = Keys.OemPeriod; break;
+                case '\'': xlat = Keys.OemQuotes; break;
+                case '\\': xlat = Keys.OemPipe; break;
+                case ']':  xlat = Keys.OemCloseBrackets; break;
+                case '[':  xlat = Keys.OemOpenBrackets; break;
+                case '`':  xlat = Keys.Oemtilde; break;
+                case ';':  xlat = Keys.OemSemicolon; break;
+
+                default:
+                    if ((ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9'))
+                    {
+                        xlat = (Keys)ch;
+                    }
+                    break;
+            }
+
+            return xlat;
+        }
+    }
 }
-
-
-
-    // /// <summary>Notify host of asynchronous changes from user.</summary>
-    // public class ChannelChangeEventArgs : EventArgs
-    // {
-    // }
-
-    // /// <summary>
-    // /// Midi (real or sim) has received something. It's up to the client to make sense of it.
-    // /// Property value of -1 indicates invalid or not pertinent e.g a controller event doesn't have velocity.
-    // /// </summary>
-    // public class InputReceiveEventArgs : EventArgs
-    // {
-    //     /// <summary>Channel number 1-based. Required.</summary>
-    //     public int Channel { get; set; } = 0;
-
-    //     /// <summary>The note number to play. NoteOn/Off only.</summary>
-    //     public int Note { get; set; } = -1;
-
-    //     /// <summary>Specific controller id.</summary>
-    //     public int Controller { get; set; } = -1;
-
-    //     /// <summary>For Note = velocity. For controller = payload.</summary>
-    //     public int Value { get; set; } = -1;
-
-    //     /// <summary>Something to tell the client.</summary>
-    //     public string ErrorInfo { get; set; } = "";
-
-    //     /// <summary>Special controller id to carry pitch info.</summary>
-    //     public const int PITCH_CONTROL = 1000;
-    // }

@@ -45,40 +45,6 @@ namespace MidiGenerator
         public string OutputDevice { get; set; } = "???";
         #endregion
 
-
-
-
-    // [Serializable]
-    // public class DeviceSpec
-    // {
-    //     [DisplayName("Device Id")]
-    //     [Description("User supplied id for use in client.")]
-    //     [Browsable(true)]
-    //     public string DeviceId { get; set; } = "";
-
-    //     [DisplayName("Device Name")]
-    //     [Description("System device name.")]
-    //     [Browsable(true)]
-    //     public string DeviceName { get; set; } = "";
-    // }
-
-        // [DisplayName("Input Devices")]
-        // [Description("Valid devices if handling input.")]
-        // [Browsable(true)]
-        // [Editor(typeof(DevicesTypeEditor), typeof(UITypeEditor))]
-        // public List<DeviceSpec> InputDevices { get; set; } = new();
-
-        // [DisplayName("Output Devices")]
-        // [Description("Valid devices if sending output.")]
-        // [Browsable(true)]
-        // [Editor(typeof(DevicesTypeEditor), typeof(UITypeEditor))]
-        // public List<DeviceSpec> OutputDevices { get; set; } = new();
-
-
-
-
-
-
         #region Persisted Non-editable Properties
         [Browsable(false)]
         public ChannelSettings VkeyChannel { get; set; } = new();
@@ -89,15 +55,12 @@ namespace MidiGenerator
         [Browsable(false)]
         public bool LogMidi { get; set; } = false;
         #endregion
-
-        #region Non-persisted Properties
-        #endregion
     }
 
     [Serializable]
     public class ChannelSettings
     {
-        #region Persisted Non-editable Properties
+        #region Persisted Non-editable Properties TODO1 test ranges all
         /// <summary>Actual 1-based midi channel number.</summary>
         [Browsable(true)]
         [Editor(typeof(ChannelSelectorTypeEditor), typeof(UITypeEditor))]

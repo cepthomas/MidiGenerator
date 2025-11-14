@@ -1,4 +1,4 @@
-# Acoustica Expanded Instruments patches.
+; Acoustica Expanded Instruments patches.
 
 000 AmbientWind
 001 AmbientWind2

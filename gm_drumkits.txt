@@ -1,4 +1,4 @@
-# The GM midi drum kit patches.
+; The GM midi drum kit patches.
 
 000 Standard
 008 Room

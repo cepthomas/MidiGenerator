@@ -1,4 +1,4 @@
-# The GM midi controller definitions.
+; The GM midi controller definitions.
 
 000 BankSelect
 001 Modulation
