@@ -27,28 +27,25 @@ namespace MidiGenerator
         public event EventHandler<NoteEventArgs>? UserClick;
         #endregion
 
-
-
-// cc.MinX = 24; // C0
-// cc.MaxX = 96; // C6
-
-
-//https://studiocode.dev/resources/midi-middle-c/
-// 108     88  C8
-// 21      1   A0
-
         #region Constants
-        const int LOW_NOTE = 21; // key 1, A0, midi 1
-        const int HIGH_NOTE = 108; // key 88, C8, midi 108
+        //https://studiocode.dev/resources/midi-middle-c/
+
+        /// <summary>Standard 88 keyboard - lowest note A0.</summary>
+        const int LOW_NOTE = 21; // A0
+
+        /// <summary>Standard 88 keyboard - highest note C8.</summary>
+        const int HIGH_NOTE = 108; // C88
+
+        /// <summary>Standard 88 keyboard - reference C4.</summary>
         const int MIDDLE_C = 60;
         #endregion
 
         #region Fields
         /// <summary>All the created piano keys.</summary>
-        readonly List<VirtualKey> _keys = new();
+        readonly List<VirtualKey> _keys = [];
 
         /// <summary>Map from Keys value to the index in _keys.</summary>
-        readonly Dictionary<Keys, int> _keyMap = new();
+        readonly Dictionary<Keys, int> _keyMap = [];
 
         /// <summary>Known bug?</summary>
         bool _keyDown = false;
@@ -103,17 +100,6 @@ namespace MidiGenerator
 
         #region Private functions
         /// <summary>
-        /// Is it a white key?
-        /// </summary>
-        /// <param name="notenum">Which note</param>
-        /// <returns>True/false</returns>
-        bool IsNatural(int notenum)
-        {
-            int[] naturals = { 0, 2, 4, 5, 7, 9, 11 };
-            return naturals.Contains(notenum % 12);
-        }
-
-        /// <summary>
         /// Create the midi note/keyboard mapping.
         /// </summary>
         void CreateKeyMap()
@@ -122,43 +108,43 @@ namespace MidiGenerator
 
             int indexOfMiddleC = _keys.IndexOf(_keys.Where(k => k.NoteId == MIDDLE_C).First());
 
-            string[] keyDefs = //TODO1 redo this.
-            {
-                    "Z  -12  ;  C-3",
-                    "S  -11  ;  C#",
-                    "X  -10  ;  D",
-                    "D  -9   ;  D#",
-                    "C  -8   ;  E",
-                    "V  -7   ;  F",
-                    "G  -6   ;  F#",
-                    "B  -5   ;  G",
-                    "H  -4   ;  G#",
-                    "N  -3   ;  A",
-                    "J  -2   ;  A#",
-                    "M  -1   ;  B",
-                    ",   0   ;  C-4",
-                    "L  +1   ;  C#-4",
-                    ".  +2   ;  D",
-                    ";  +3   ;  D#",
-                    "/  +4   ;  E-4",
-                    "Q   0   ;  C-4",
-                    "2  +1   ;  C#",
-                    "W  +2   ;  D",
-                    "3  +3   ;  D#",
-                    "E  +4   ;  E",
-                    "R  +5   ;  F",
-                    "5  +6   ;  F#",
-                    "T  +7   ;  G",
-                    "6  +8   ;  G#",
-                    "Y  +9   ;  A",
-                    "7  +10  ;  A#",
-                    "U  +11  ;  B",
-                    "I  +12  ;  C-5",
-                    "9  +13  ;  C#-5",
-                    "O  +14  ;  D",
-                    "0  +15  ;  D#",
-                    "P  +16  ;  E-5"
-                };
+            string[] keyDefs = // TODO1 redo this.
+            [
+                "Z  -12  ;  C-3",
+                "S  -11  ;  C#",
+                "X  -10  ;  D",
+                "D  -9   ;  D#",
+                "C  -8   ;  E",
+                "V  -7   ;  F",
+                "G  -6   ;  F#",
+                "B  -5   ;  G",
+                "H  -4   ;  G#",
+                "N  -3   ;  A",
+                "J  -2   ;  A#",
+                "M  -1   ;  B",
+                ",   0   ;  C-4",
+                "L  +1   ;  C#-4",
+                ".  +2   ;  D",
+                ";  +3   ;  D#",
+                "/  +4   ;  E-4",
+                "Q   0   ;  C-4",
+                "2  +1   ;  C#",
+                "W  +2   ;  D",
+                "3  +3   ;  D#",
+                "E  +4   ;  E",
+                "R  +5   ;  F",
+                "5  +6   ;  F#",
+                "T  +7   ;  G",
+                "6  +8   ;  G#",
+                "Y  +9   ;  A",
+                "7  +10  ;  A#",
+                "U  +11  ;  B",
+                "I  +12  ;  C-5",
+                "9  +13  ;  C#-5",
+                "O  +14  ;  D",
+                "0  +15  ;  D#",
+                "P  +16  ;  E-5"
+            ];
 
             foreach (string l in keyDefs)
             {
@@ -173,17 +159,17 @@ namespace MidiGenerator
 
                     switch (key)
                     {
-                        case ",": _keyMap.Add(Keys.Oemcomma, note); break;
-                        case "=": _keyMap.Add(Keys.Oemplus, note); break;
-                        case "-": _keyMap.Add(Keys.OemMinus, note); break;
-                        case "/": _keyMap.Add(Keys.OemQuestion, note); break;
-                        case ".": _keyMap.Add(Keys.OemPeriod, note); break;
+                        case ",":  _keyMap.Add(Keys.Oemcomma, note); break;
+                        case "=":  _keyMap.Add(Keys.Oemplus, note); break;
+                        case "-":  _keyMap.Add(Keys.OemMinus, note); break;
+                        case "/":  _keyMap.Add(Keys.OemQuestion, note); break;
+                        case ".":  _keyMap.Add(Keys.OemPeriod, note); break;
                         case "\'": _keyMap.Add(Keys.OemQuotes, note); break;
                         case "\\": _keyMap.Add(Keys.OemPipe, note); break;
-                        case "]": _keyMap.Add(Keys.OemCloseBrackets, note); break;
-                        case "[": _keyMap.Add(Keys.OemOpenBrackets, note); break;
-                        case "`": _keyMap.Add(Keys.Oemtilde, note); break;
-                        case ";": _keyMap.Add(Keys.OemSemicolon, note); break;
+                        case "]":  _keyMap.Add(Keys.OemCloseBrackets, note); break;
+                        case "[":  _keyMap.Add(Keys.OemOpenBrackets, note); break;
+                        case "`":  _keyMap.Add(Keys.Oemtilde, note); break;
+                        case ";":  _keyMap.Add(Keys.OemSemicolon, note); break;
 
                         default:
                             if ((ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9'))
@@ -206,9 +192,9 @@ namespace MidiGenerator
         {
             if (!_keyDown)
             {
-                if (_keyMap.ContainsKey(e.KeyCode))
+                if (_keyMap.TryGetValue(e.KeyCode, out int value))
                 {
-                    VirtualKey pk = _keys[_keyMap[e.KeyCode]];
+                    VirtualKey pk = _keys[value];
                     if (!pk.IsPressed)
                     {
                         pk.PressVKey(100);
@@ -229,9 +215,9 @@ namespace MidiGenerator
         {
             _keyDown = false;
 
-            if (_keyMap.ContainsKey(e.KeyCode))
+            if (_keyMap.TryGetValue(e.KeyCode, out int value))
             {
-                VirtualKey pk = _keys[_keyMap[e.KeyCode]];
+                VirtualKey pk = _keys[value];
                 pk.ReleaseVKey();
                 e.Handled = true;
             }
@@ -260,23 +246,20 @@ namespace MidiGenerator
             for (int i = 0; i < HIGH_NOTE - LOW_NOTE; i++)
             {
                 int noteId = i + LOW_NOTE;
-                VirtualKey pk;
-                if (IsNatural(noteId))
+                VirtualKey pk = new(this, noteId)
                 {
-                    pk = new VirtualKey(this, true, noteId);
-                }
-                else
-                {
-                    pk = new VirtualKey(this, false, noteId);
-                    pk.BringToFront();
-                }
-                pk.ControlColor = ControlColor;
-
+                    ControlColor = ControlColor
+                };
                 // Pass along an event from a virtual key.
                 pk.KeyClickEvent += HandleKeyClick;
 
                 _keys.Add(pk);
                 Controls.Add(pk);
+
+                if (!MusicDefinitions.IsNatural(noteId))
+                {
+                    pk.BringToFront();
+                }
             }
         }
 
@@ -287,9 +270,9 @@ namespace MidiGenerator
         {
             if(_keys.Count > 0)
             {
-                int whiteKeyWidth = _keys.Count * KeySize / _keys.Count(k => k.IsNatural);
+                int whiteKeyWidth = _keys.Count * KeySize / _keys.Count(k => MusicDefinitions.IsNatural(k.NoteId));
                 int blackKeyWidth = (int)(whiteKeyWidth * 0.6);
-                int whiteKeyHeight = (int)(Height); // KeyHeight
+                int whiteKeyHeight = Height; // KeyHeight
                 int blackKeyHeight = (int)(whiteKeyHeight * 0.65);
                 int offset = whiteKeyWidth - blackKeyWidth / 2;
 
@@ -300,7 +283,7 @@ namespace MidiGenerator
                     VirtualKey pk = _keys[i];
 
                     // Note that controls have to have integer width so resizing is a bit lumpy.
-                    if (pk.IsNatural)
+                    if (MusicDefinitions.IsNatural(pk.NoteId))
                     {
                         pk.Height = whiteKeyHeight;
                         pk.Width = whiteKeyWidth;
@@ -326,19 +309,14 @@ namespace MidiGenerator
         #region Fields
         /// <summary>Hook to owner.</summary>
         readonly VirtualKeyboard _owner;
-
-        /// <summary>For showing names.</summary>  TODO1 from midi defs???
-        static readonly string[] _noteNames = { "C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B" };
         #endregion
 
+        #region Properties
+        /// <summary>Make user pick a good color.</summary>
         public Color ControlColor { get; set; } = Color.Red;
 
-        #region Properties
         /// <summary>Key status.</summary>
         public bool IsPressed { get; private set; } = false;
-
-        /// <summary>Key status.</summary>
-        public bool IsNatural { get; private set; } = false;
 
         /// <summary>Associated midi note.</summary>
         public int NoteId { get; private set; } = 0;
@@ -354,13 +332,11 @@ namespace MidiGenerator
         /// Normal constructor.
         /// </summary>
         /// <param name="owner"></param>
-        /// <param name="isNatural"></param>
         /// <param name="noteId"></param>
-        public VirtualKey(VirtualKeyboard owner, bool isNatural, int noteId)
+        public VirtualKey(VirtualKeyboard owner, int noteId)
         {
             _owner = owner;
             TabStop = false;
-            IsNatural = isNatural;
             NoteId = noteId;
             Font = new Font("Consolas", 8F, FontStyle.Regular, GraphicsUnit.Point, 0);
         }
@@ -481,20 +457,24 @@ namespace MidiGenerator
             }
             else
             {
-                e.Graphics.FillRectangle(IsNatural ? new SolidBrush(Color.White) : new SolidBrush(Color.Black), 0, 0, Size.Width, Size.Height);
+                e.Graphics.FillRectangle(MusicDefinitions.IsNatural(NoteId) ? new SolidBrush(Color.White) : new SolidBrush(Color.Black), 0, 0, Size.Width, Size.Height);
             }
 
             // Outline.
             e.Graphics.DrawRectangle(Pens.Black, 0, 0, Size.Width - 1, Size.Height - 1);
 
-            // Note name.
+            // Note name. TODO just C to minimize clutter.
             if(_owner.ShowNoteNames)
             {
                 int root = NoteId % 12;
                 int octave = (NoteId / 12) - 1;
-                int x = IsNatural ? 3 : 0;
-                e.Graphics.DrawString($"{_noteNames[root]}", Font, Brushes.Black, x, 3);
-                e.Graphics.DrawString($"{octave}", Font, Brushes.Black, x, 13);
+
+                if (root == 0)
+                {
+                    int x = MusicDefinitions.IsNatural(NoteId) ? 3 : 0;
+                    e.Graphics.DrawString($"{MusicDefinitions.NoteNumberToName(root, false)}", Font, Brushes.Black, x, 3);
+                    e.Graphics.DrawString($"{octave}", Font, Brushes.Black, x, 13);
+                }
             }
         }
         #endregion

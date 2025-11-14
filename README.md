@@ -14,6 +14,12 @@ VirtualKeyboard
 ClickClack
 - Experimental UI component.
 
+terminology - see midilib
+
+- note_num: Note number 0 -> 127.
+- velocity: 0 -> 127.
+- volume: Volume 0.0 -> 1.0/2.0.
+- also gain sometimes appears.
 
 
 # External Components
