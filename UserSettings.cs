@@ -5,8 +5,9 @@ using System.Drawing;
 using System.Drawing.Design;
 using System.Text.Json.Serialization;
 using System.Windows.Forms.Design;
-using MidiLibNew;
+using System.IO;
 using Ephemera.NBagOfTricks;
+using Ephemera.MidiLib;
 
 
 namespace MidiGenerator
@@ -58,25 +59,96 @@ namespace MidiGenerator
     [Serializable]
     public class ChannelSettings
     {
-        #region Persisted Non-editable Properties TODO1 test ranges all
+        #region Persisted Non-editable Properties
         /// <summary>Actual 1-based midi channel number.</summary>
         [Browsable(true)]
         [Editor(typeof(ChannelSelectorTypeEditor), typeof(UITypeEditor))]
-        public int ChannelNumber { get; set; } = 1;
+        public int ChannelNumber
+        {
+            get { return _channelNumber; }
+            set { _channelNumber = MathUtils.Constrain(value, 1, MidiDefs.NUM_CHANNELS); }
+        }
+        int _channelNumber = 1;
 
-        /// <summary>Current midi presets file.</summary>
-        [Browsable(true)]
-        [Editor(typeof(FileNameEditor), typeof(UITypeEditor))]
-        public string PresetFile { get; set; } = "";
-
-        /// <summary>Current patch.</summary>
-        [Browsable(true)]
-        [Editor(typeof(PatchSelectorTypeEditor), typeof(UITypeEditor))]
-        public int Patch { get; set; } = 0;
 
         /// <summary>Current volume.</summary>
         [Browsable(false)]
-        public double Volume { get; set; } = Defs.DEFAULT_VOLUME;
+        public double Volume
+        {
+            get { return _volume; }
+            set { _volume = MathUtils.Constrain(value, 0.0, MidiLibDefs.MAX_VOLUME); }
+        }
+        double _volume = MidiLibDefs.DEFAULT_VOLUME;
+
+
+
+
+
+
+
+
+        /// <summary>All possible instrument/patch.</summary>
+        [Browsable(false)]
+        [JsonIgnore]
+        public string[] Instruments { get; set; }// = new string[MidiDefs.MAX_MIDI + 1];
+
+
+        /// <summary>Override default instrument presets.</summary>
+        [Browsable(true)]
+        [Editor(typeof(FileNameEditor), typeof(UITypeEditor))]
+        public string PresetFile
+        {
+            get { return _presetFile; }
+            //set { _presetFile = value; }
+            
+            set
+            {
+                if (value == "") // use defaults
+                {
+                    MidiDefs.Load(MidiDefs.DefType.Instrument, @"C:\Dev\Apps\MidiGenerator\gm_instruments.ini");
+                }
+                else // load override
+                {
+                    if (!File.Exists(value)) throw new FileNotFoundException();
+                    Instruments = MidiDefs.Load(MidiDefs.DefType.Instrument, value);
+                }
+                _presetFile = value;
+            }
+
+
+
+            //TODO1 >>> MidiDefs.Load(MidiDefs.DefType.Instrument, @"C:\Dev\Apps\MidiGenerator\exp_instruments.txt");
+            // or reset to original
+        }
+        string _presetFile = "";
+
+
+        /// <summary>Edit current instrument/patch number.</summary>
+        [Browsable(true)]
+        [Editor(typeof(InstrumentTypeEditor), typeof(UITypeEditor))]
+        [TypeConverter(typeof(InstrumentConverter))]
+        public int Instrument { get; set; } = 0;
+
+
+        public static string GetInstrumentName(int which)
+        {
+            return $"Inst{which}";
+        }
+
+        public static int GetInstrumentNumber(string which)
+        {
+            return 8888;
+        }
+
+
+
+
+
+
         #endregion
+
+
+        //[Browsable(false)]
+        //public Presets Presets { get; set; } = new();
     }
 }

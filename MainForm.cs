@@ -6,9 +6,9 @@ using System.Text;
 using System.Windows.Forms;
 using System.Diagnostics;
 using NAudio.Midi;
-using MidiLibNew;
 using Ephemera.NBagOfTricks;
 using Ephemera.NBagOfUis;
+using Ephemera.MidiLib;
 
 
 namespace MidiGenerator
@@ -17,7 +17,7 @@ namespace MidiGenerator
     {
         #region Fields
         /// <summary>My logger.</summary>
-        readonly Logger _logger = LogManager.CreateLogger("MainForm");
+        readonly Logger _logger = LogManager.CreateLogger("Main");
 
         /// <summary>User settings.</summary>
         readonly UserSettings _settings;
@@ -44,6 +44,16 @@ namespace MidiGenerator
             LogManager.MinLevelNotif = _settings.NotifLogLevel;
             LogManager.LogMessage += LogManager_LogMessage;
             LogManager.Run();
+
+            // Load defs.
+            // MidiDefs.Load(MidiDefs.DefType.Instrument, @"C:\Dev\Apps\MidiGenerator\gm_instruments.ini");
+
+            // MidiDefs.Load(MidiDefs.DefType.Controller, @"C:\Dev\Apps\MidiGenerator\gm_controllers.txt");
+
+            // MidiDefs.Load(MidiDefs.DefType.Drum, @"C:\Dev\Apps\MidiGenerator\gm_drums.txt");
+
+            // MidiDefs.Load(MidiDefs.DefType.DrumKit, @"C:\Dev\Apps\MidiGenerator\gm_drumkits.txt");
+
 
             ///// Configure UI. /////
             toolStrip1.Renderer = new ToolStripCheckBoxRenderer() { SelectedColor = _settings.ControlColor };
@@ -79,12 +89,12 @@ namespace MidiGenerator
             ctrlVkey.ControlColor = _settings.ControlColor;
             ctrlVkey.Settings = _settings.VkeyChannel;
             ctrlVkey.ChannelChange += Channel_ChannelChange;
-            SendPatch(_settings.VkeyChannel.ChannelNumber, _settings.VkeyChannel.Patch);
+//            SendPatch(_settings.VkeyChannel.ChannelNumber, _settings.VkeyChannel.Patch);
 
             ctrlCc.ControlColor = _settings.ControlColor;
             ctrlCc.Settings = _settings.ClickClackChannel;
             ctrlCc.ChannelChange += Channel_ChannelChange;
-            SendPatch(_settings.ClickClackChannel.ChannelNumber, _settings.ClickClackChannel.Patch);
+//            SendPatch(_settings.ClickClackChannel.ChannelNumber, _settings.ClickClackChannel.Patch);
 
             cc.UserClick += UserClickEvent;
             vkey.UserClick += UserClickEvent;
@@ -134,8 +144,8 @@ namespace MidiGenerator
         protected override void Dispose(bool disposing)
         {
             // Resources.
-            _mmTimer.Stop();
-            _mmTimer.Dispose();
+            //_mmTimer.Stop();
+            //_mmTimer.Dispose();
 
             _midiOut?.Dispose();
 
@@ -200,7 +210,7 @@ namespace MidiGenerator
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void UserClickEvent(object? sender, SendNoteEventArgs e)
+        void UserClickEvent(object? sender, UserClickNoteEventArgs e)
         {
             if (e.Note != -1 && e.Velocity != -1)
             {
@@ -228,7 +238,7 @@ namespace MidiGenerator
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void Channel_ChannelChange(object? sender, ChannelChangeEventArgs e) // TODO1
+        void Channel_ChannelChange(object? sender, User_ChannelChangeEventArgs e) // TODO1
         {
             var cc = sender as ChannelControl;
             if(e.PatchChange || e.ChannelNumberChange)

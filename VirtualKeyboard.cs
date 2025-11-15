@@ -25,7 +25,7 @@ namespace MidiGenerator
 
         #region Events
         /// <summary>Click (including drag) info.</summary>
-        public event EventHandler<SendNoteEventArgs>? UserClick;
+        public event EventHandler<UserClickNoteEventArgs>? UserClick;
         #endregion
 
         #region Constants
@@ -52,7 +52,6 @@ namespace MidiGenerator
         bool _keyDown = false;
         #endregion
 
-
         #region Lifecycle
         /// <summary>
         /// Normal constructor.
@@ -72,7 +71,7 @@ namespace MidiGenerator
             CreateKeys();
             if (!CreateKeyMap())
             {
-                //TODO1 notify
+                //TODO1 notify?
             }
             DrawKeys();
         }
@@ -114,39 +113,60 @@ namespace MidiGenerator
 
             try
             {
-                var ls = Utils.LoadDefFile(@"C:\Dev\Apps\MidiGenerator\def_keymap.txt");
+                var ir = new IniReader(@"C:\Dev\Apps\MidiGenerator\def_keymap.ini");
 
-                foreach (var parts in ls)
+                var defs = ir.Contents["keymap"];
+
+                defs.Values.ForEach(kv => 
                 {
-                    // Z  C3
-
-                    if (parts.Count != 2)
-                    {
-                        throw new Exception();
-                    }
-
-
-                    if (parts[0].Length != 1)
-                    {
-                        throw new Exception();
-                    }
-
-                    var key = Utils.TranslateKey(parts[0][0]);
-                    if (key == Keys.None)
-                    {
-                        throw new Exception();
-                    }
-
-
-                    var notes = MusicDefinitions.GetNotesFromString(parts[1]);
-                    if (notes.Count != 1)
-                    {
-                        throw new Exception();
-                    }
-
+                    // Z = C3
+                    if (kv.Key.Length != 1) { throw new Exception(); }
+                    var chkey = Utils.TranslateKey(kv.Key[0]);
+                    if (chkey == Keys.None) { throw new Exception(); }
+                    var notes = MusicDefinitions.GetNotesFromString(kv.Value);
+                    if (notes.Count != 1) { throw new Exception(); }
                     var note = notes[0];
-                    _keyMap.Add(key, note);
-                }
+                    _keyMap.Add(chkey, note);
+                });
+
+
+
+
+
+
+                //var ls = Utils.LoadDefFile(@"C:\Dev\Apps\MidiGenerator\def_keymap.txt");
+
+                //foreach (var parts in ls)
+                //{
+                //    // Z  C3
+
+                //    if (parts.Count != 2)
+                //    {
+                //        throw new Exception();
+                //    }
+
+
+                //    if (parts[0].Length != 1)
+                //    {
+                //        throw new Exception();
+                //    }
+
+                //    var key = Utils.TranslateKey(parts[0][0]);
+                //    if (key == Keys.None)
+                //    {
+                //        throw new Exception();
+                //    }
+
+
+                //    var notes = MusicDefinitions.GetNotesFromString(parts[1]);
+                //    if (notes.Count != 1)
+                //    {
+                //        throw new Exception();
+                //    }
+
+                //    var note = notes[0];
+                //    _keyMap.Add(key, note);
+                //}
             }
             catch (Exception)
             {
@@ -203,7 +223,7 @@ namespace MidiGenerator
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void HandleKeyClick(object? sender, SendNoteEventArgs e)
+        void HandleKeyClick(object? sender, UserClickNoteEventArgs e)
         {
             UserClick?.Invoke(this, e);
         }
@@ -298,7 +318,7 @@ namespace MidiGenerator
 
         #region Events
         /// <summary>Notify handlers of key change.</summary>
-        public event EventHandler<SendNoteEventArgs>? KeyClickEvent;
+        public event EventHandler<UserClickNoteEventArgs>? KeyClickEvent;
         #endregion
 
         #region Lifecycle

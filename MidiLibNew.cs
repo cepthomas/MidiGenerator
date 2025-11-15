@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Ephemera.NBagOfTricks;
+using MidiGenerator;
 using NAudio.Midi;
 
 
-namespace MidiLibNew
+// Copy of stuff from original MidiLib to support minimal apps. Works as is unless noted.
+
+namespace Ephemera.MidiLib
 {
-    public class Defs // from MidiDefs and/or MidiLibDefs
+    public class MidiDefs // ==> MidiDefs.cs
     {
         /// <summary>Midi caps.</summary>
         public const int MIN_MIDI = 0;
@@ -19,6 +22,209 @@ namespace MidiLibNew
         /// <summary>Midi caps.</summary>
         public const int NUM_CHANNELS = 16;
 
+
+
+        #region From original TODO2
+
+        static readonly Dictionary<int, string> _instruments = new();
+        static readonly Dictionary<int, string> _controllers = new();
+        static readonly Dictionary<int, string> _drumKits = new();
+        static readonly Dictionary<int, string> _drums = new();
+
+
+        /// <summary>Reverse lookup.</summary>
+        static readonly Dictionary<string, int> _instrumentNumbers = new();
+
+        /// <summary>Reverse lookup.</summary>
+        static readonly Dictionary<string, int> _drumKitNumbers = new();
+
+        /// <summary>Reverse lookup.</summary>
+        static readonly Dictionary<string, int> _drumNumbers = new();
+
+        /// <summary>Reverse lookup.</summary>
+        static readonly Dictionary<string, int> _controllerNumbers = new();
+
+
+
+        //public static List<string> FormatDoc()
+        //{
+        //    return ["aaa"];
+        //}
+
+        //public static string GetInstrumentName(int which)
+        //{
+        //    return $"Inst{which}";
+        //}
+
+        //public static int GetInstrumentNumber(string which)
+        //{
+        //    return 8888;
+        //}
+
+        // public static string GetDrumName(int which)
+        // {
+        //     return $"Drum{which}";
+        // }
+
+        // public static int GetDrumNumber(string which)
+        // {
+        //     return 8888;
+        // }
+
+        // public static string GetControllerName(int which)
+        // {
+        //     return $"Ctrl{which}";
+        // }
+
+        // public static int GetControllerNumber(string which)
+        // {
+        //     return 8888;
+        // }
+
+        // public static string GetDrumKitName(int which)
+        // {
+        //     return $"Kit{which}";
+        // }
+
+        // public static int GetDrumKitNumber(string which)
+        // {
+        //     return 8888;
+        // }
+
+        //public static int GetInstrumentOrDrumKitNumber(string which) // ==> TODO2 replace???
+        //{
+        //    return 8888;
+        //}
+        #endregion
+
+        #region New or modified TODO2
+
+        /// <summary>
+        /// Initialize some collections.
+        /// </summary>
+        static MidiDefs()
+        {
+            bool valid = true;
+
+
+            try
+            {
+                _instruments = DoOne(@"C:\Dev\Apps\MidiGenerator\gm_instruments.ini");
+                _controllers = DoOne(@"C:\Dev\Apps\MidiGenerator\gm_controllers.ini");
+                _drums = DoOne(@"C:\Dev\Apps\MidiGenerator\gm_drums.ini");
+                _drumKits = DoOne(@"C:\Dev\Apps\MidiGenerator\gm_drumkits.ini");
+
+
+                Dictionary<int, string> DoOne(string fn)
+                {
+                    Dictionary<int, string> res = [];
+
+                    var ir = new IniReader(fn);
+
+                    var defs = ir.Contents["midi_defs"];
+
+                    defs.Values.ForEach(kv =>
+                    {
+                        // ["011", "GlassFlute"]
+                        int index = int.Parse(kv.Key); // can throw
+                        if (index < 0 || index > MidiDefs.MAX_MIDI) { throw new Exception(); }
+                        res[index] = kv.Value.Length > 0 ? kv.Value : "";
+                    });
+
+                    return res;
+                }
+            }
+            catch (Exception)
+            {
+                //TODO1 notify?
+                valid = false;
+            }
+
+
+
+            // TODO1 reverses?
+            // _instrumentNumbers = _instruments.ToDictionary(x => x, x => _instruments.IndexOf(x));
+            // _drumKitNumbers = _drumKits.ToDictionary(x => x.Value, x => x.Key);
+            // _drumNumbers = _drums.ToDictionary(x => x.Value, x => x.Key);
+            // _controllerNumbers = _controllers.ToDictionary(x => x.Value, x => x.Key);
+        }
+
+
+
+
+        // public enum DefType { Instrument, Controller, Drum, DrumKit }
+
+        // static readonly Dictionary<DefType, string[]> _defs = [];
+
+        // public static bool Load(DefType dt, string fn)
+        // {
+        //     bool valid = true;
+        //     try
+        //     {
+        //         var vals = Utils.CreateInitializedMidiArray(dt.ToString());
+
+        //         var ir = new IniReader(fn);
+
+        //         var defs = ir.Contents["midi_defs"];
+
+        //         defs.Values.ForEach(kv =>
+        //         {
+        //             // ["011", "GlassFlute"]
+        //             int index = int.Parse(kv.Key); // can throw
+        //             if (index < 0 || index > MidiDefs.MAX_MIDI) { throw new Exception(); }
+        //             vals[index] = kv.Value.Length > 0 ? kv.Value : "";
+        //         });
+
+        //         _defs[dt] = vals;
+
+
+
+        //         //// Read file lines: 011 GlassFlute -> vals[11] = "GlassFlute"
+        //         //var ls = Utils.LoadDefFile(fn);
+
+        //         //var vals = xxxnew string[MidiDefs.MAX_MIDI + 1];
+        //         //for (int i = 0; i < vals.Length; i++) // set defaults
+        //         //{
+        //         //    vals[i] = $"Instrument{i}";
+        //         //}
+
+        //         //foreach (var parts in ls)
+        //         //{
+        //         //    // ["011", "GlassFlute"]
+
+        //         //    if (parts.Count != 2)
+        //         //    {
+        //         //        throw new Exception();
+        //         //    }
+
+        //         //    int index = int.Parse(parts[0]); // can throw
+
+        //         //    if (index < 0 || index > MidiDefs.MAX_MIDI)
+        //         //    {
+        //         //        throw new Exception();
+        //         //    }
+
+        //         //    if (parts[1].Length > 0)
+        //         //    {
+        //         //        vals[index] = parts[1];
+        //         //    }
+
+        //         //    _defs[dt] = vals;
+        //         //}
+        //     }
+        //     catch (Exception)
+        //     {
+        //         //TODO1 notify?
+        //         valid = false;
+        //     }
+
+        //     return valid;
+        // }
+        #endregion
+    }
+
+    public class MidiLibDefs // ==> MidiCommon.cs
+    {
         /// <summary>The normal drum channel.</summary>
         public const int DEFAULT_DRUM_CHANNEL = 10;
 
@@ -29,44 +235,11 @@ namespace MidiLibNew
         public const double MAX_VOLUME = 2.0;
     }
 
-
-
-    public class Presets
-    {
-        public static string[] Load(string fn)
-        {
-            // TODO1 read file lines: 011 GlassFlute using LoadDefFile()
-            var vals = new string[Defs.MAX_MIDI + 1];
-            for (int i = 0; i < vals.Length; i++)
-            {
-                vals[i] = $"Patch{i} {i}"; // fake for now
-            }
-            return vals;
-        }
-
-        // TODO1 these needed? MidiDefs.cs* string to int - script parsing  Nebulator  (not Nebulua  MidiGenerator)
-        public int GetControllerNumber(string which) { return 9999; }
-        public int GetDrumKitNumber(string which) { return 9999; }
-        public int GetDrumNumber(string which) { return 9999; }
-        public int GetInstrumentNumber(string which) { return 9999; }
-        public int GetInstrumentOrDrumKitNumber(string which) { return 9999; }
-        // MidiDefs.cs* int to string - MidiExport
-        public string GetControllerName(int which) { return "9999"; }
-        public string GetDrumKitName(int which) { return "9999"; }
-        public string GetDrumName(int which) { return "9999"; }
-        public string GetInstrumentName(int which) { return "9999"; } //+ PatchPicker, ChannelControl(s)
-
-    }
-
-
-
-    ///////////////////////////////// from MidiLib - works as is: ///////////////////////////
-
     /// <summary>
     /// Midi (real or sim) has received something. It's up to the client to make sense of it.
     /// Property value of -1 indicates invalid or not pertinent e.g a controller event doesn't have velocity.
     /// </summary>
-    public class InputReceiveEventArgs : EventArgs
+    public class InputReceiveEventArgs : EventArgs // ==> IDevice.cs
     {
         /// <summary>Channel number 1-based. Required.</summary>
         public int Channel { get; set; } = 0;
@@ -105,9 +278,8 @@ namespace MidiLibNew
     }
 
 
-    ////////////////////// IDevice.cs //////////////////////////
     /// <summary>Abstraction layer to support all midi-like devices.</summary>
-    public interface IDevice : IDisposable
+    public interface IDevice : IDisposable // ==> IDevice.cs
     {
         #region Properties
         /// <summary>Device name as defined by the system.</summary>
@@ -122,7 +294,7 @@ namespace MidiLibNew
     }
 
     /// <summary>Abstraction layer to support input devices.</summary>
-    public interface IInputDevice : IDevice
+    public interface IInputDevice : IDevice // ==> IDevice.cs
     {
         #region Properties
         /// <summary>Capture on/off.</summary>
@@ -136,7 +308,7 @@ namespace MidiLibNew
     }
 
     /// <summary>Abstraction layer to support output devices.</summary>
-    public interface IOutputDevice : IDevice
+    public interface IOutputDevice : IDevice // ==> IDevice.cs
     {
         #region Properties
 
@@ -150,11 +322,11 @@ namespace MidiLibNew
     }
 
 
-    //////////////////////////////////////////// MidiInput.cs ///////////////////////////////
+
     /// <summary>
     /// Midi input handler.
     /// </summary>
-    public sealed class MidiInput : IInputDevice
+    public sealed class MidiInput : IInputDevice // ==> MidiInput.cs
     {
         #region Fields
         /// <summary>Midi input device.</summary>
@@ -311,11 +483,11 @@ namespace MidiLibNew
     }
 
 
-    //////////////////////////////////////////// MidiOutput.cs ///////////////////////////////
+
     /// <summary>
     /// A midi output layer - associated with a single device.
     /// </summary>
-    public sealed class MidiOutput : IOutputDevice
+    public sealed class MidiOutput : IOutputDevice // ==> MidiOutput.cs
     {
         #region Fields
         /// <summary>Low level midi output device.</summary>

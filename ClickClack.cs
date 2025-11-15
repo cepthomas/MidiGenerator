@@ -45,7 +45,7 @@ namespace MidiGenerator
 
         #region Events
         /// <summary>Click/drag info.</summary>
-        public event EventHandler<SendNoteEventArgs>? UserClick;
+        public event EventHandler<UserClickNoteEventArgs>? UserClick;
         #endregion
 
         #region Lifecycle
@@ -123,7 +123,7 @@ namespace MidiGenerator
         protected override void OnMouseMove(MouseEventArgs e)
         {
             var (ux, uy) = MouseToUser();
-            SendNoteEventArgs args = new() { Note = ux, Velocity = uy };
+            UserClickNoteEventArgs args = new() { Note = ux, Velocity = uy };
             _toolTip.SetToolTip(this, args.ToString()); //TODO1 needs note name
 
             // Also gen click?

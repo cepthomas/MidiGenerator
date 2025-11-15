@@ -10,30 +10,70 @@ using System.ComponentModel;
 using System.Windows.Forms.Design;
 using System.Reflection;
 using NAudio.Midi;
-using MidiLibNew;
 using Ephemera.NBagOfTricks;
 using Ephemera.NBagOfUis;
+using Ephemera.MidiLib;
 
 
 namespace MidiGenerator
 {
+    ///// <summary>Select a patch from list.</summary>
+    //public class PatchSelectorTypeEditor : UITypeEditor
+    //{
+    //    public override object? EditValue(ITypeDescriptorContext? context, IServiceProvider provider, object? value)
+    //    {
+    //        IWindowsFormsEditorService? _service = provider.GetService(typeof(IWindowsFormsEditorService)) as IWindowsFormsEditorService;
+
+    //        // Dig out from context.
+    //        string[] vals = xxxnew string[MidiDefs.MAX_MIDI];
+
+    //        if (context is not null && context.Instance is not null)
+    //        {
+    //            Type t = context!.Instance!.GetType();
+    //            PropertyInfo? prop = t.GetProperty("PresetFile"); //CurrentPresets
+    //            var vv = prop.GetValue(context.Instance, null);
+    //            string pfile = (string)vv;
+    //            vals = Presets.Load(pfile);
+    //        }
+
+    //        // Fill the selector.
+    //        string sel = value!.ToString(); // default
+    //        var lb = new ListBox
+    //        {
+    //            Width = 250,
+    //            SelectionMode = SelectionMode.One
+    //        };
+    //        lb.Click += (_, __) => _service!.CloseDropDown();
+    //        vals.ForEach(v => lb.Items.Add(v));
+    //        _service!.DropDownControl(lb);
+
+    //        return lb.SelectedItem is null ? value : lb.SelectedItem;
+    //    }
+
+    //    public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext? context)
+    //    {
+    //        return UITypeEditorEditStyle.DropDown;
+    //    }
+    //} 
+
     /// <summary>Select a patch from list.</summary>
-    public class PatchSelectorTypeEditor : UITypeEditor
+    public class InstrumentTypeEditor : UITypeEditor
     {
         public override object? EditValue(ITypeDescriptorContext? context, IServiceProvider provider, object? value)
         {
             IWindowsFormsEditorService? _service = provider.GetService(typeof(IWindowsFormsEditorService)) as IWindowsFormsEditorService;
 
             // Dig out from context.
-            string[] vals = new string[Defs.MAX_MIDI];
+            string[] vals;// = new string[MidiDefs.MAX_MIDI];
 
-            if (context is not null && context.Instance is not null)
+        //    if (context is not null && context.Instance is not null)
             {
                 Type t = context!.Instance!.GetType();
-                PropertyInfo? prop = t.GetProperty("PresetFile"); //CurrentPresets
-                var vv = prop.GetValue(context.Instance, null);
-                string pfile = (string)vv;
-                vals = Presets.Load(pfile);
+                PropertyInfo? prop = t.GetProperty("Instruments"); // CurrentPresets
+                vals = (string[])prop.GetValue(context.Instance, null);
+                //var vv = prop.GetValue(context.Instance, null);
+                //string pfile = (string)vv;
+                //>>>> vals = Instruments.Load(pfile);
             }
 
             // Fill the selector.
@@ -71,7 +111,7 @@ namespace MidiGenerator
             };
             lb.Click += (_, __) => _service!.CloseDropDown();
 
-            Enumerable.Range(1, Defs.NUM_CHANNELS).ForEach(v => lb.Items.Add(v.ToString()));
+            Enumerable.Range(1, MidiDefs.NUM_CHANNELS).ForEach(v => lb.Items.Add(v.ToString()));
 
             _service!.DropDownControl(lb);
 

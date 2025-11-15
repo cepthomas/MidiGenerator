@@ -3,9 +3,9 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 using Ephemera.NBagOfUis;
+using Ephemera.MidiLib;
 
 
-using MidiLibNew;
 
 
 namespace MidiGenerator
@@ -30,7 +30,7 @@ namespace MidiGenerator
 
         #region Events
         /// <summary>Notify host of asynchronous changes from user.</summary>
-        public event EventHandler<ChannelChangeEventArgs>? ChannelChange;
+        public event EventHandler<User_ChannelChangeEventArgs>? ChannelChange;
         #endregion
 
         #region Lifecycle
@@ -56,7 +56,7 @@ namespace MidiGenerator
                 BorderStyle = BorderStyle.FixedSingle,
                 Orientation = Orientation.Horizontal,
                 Minimum = 0.0,
-                Maximum = Defs.MAX_VOLUME,
+                Maximum = MidiLibDefs.MAX_VOLUME,
                 Resolution = 0.05,
             };
             Controls.Add(sldVolume);
@@ -109,10 +109,8 @@ namespace MidiGenerator
         /// <param name="e"></param>
         void Volume_ValueChanged(object? sender, EventArgs e)
         {
-            if (sender is not null)
-            {
-                Settings.Volume = (sender as Slider)!.Value;
-            }
+            // No need to check limits.
+            Settings.Volume = (sender as Slider)!.Value;
         }
 
         /// <summary>
@@ -165,7 +163,7 @@ namespace MidiGenerator
         /// <returns></returns>
         public override string ToString()
         {
-            return $"Ch:{Settings.ChannelNumber} Patch:{Settings.Patch}"; // TODO1 patch name
+            return $"Ch:{Settings.ChannelNumber} Patch:{Settings.Instrument}"; // TODO1 patch name
         }
     }
 }

@@ -5,12 +5,13 @@ using System.Text;
 using System.IO;
 using System.Windows.Forms;
 using Ephemera.NBagOfTricks;
+using Ephemera.MidiLib;
 
 
 namespace MidiGenerator
 {
-    #region Events - prob just this app? TODO1
-    public class SendNoteEventArgs : EventArgs
+    #region Events from controls to main - prob just this app? TODO1
+    public class UserClickNoteEventArgs : EventArgs
     {
         /// <summary>The note number to play.</summary>
         public int Note { get; set; }
@@ -25,7 +26,7 @@ namespace MidiGenerator
         }
     }
 
-    public class ControllerEventArgs : EventArgs
+    public class UserClickControllerEventArgs : EventArgs
     {
         /// <summary>Specific controller id.</summary>
         public int Controller { get; set; }
@@ -41,7 +42,7 @@ namespace MidiGenerator
     }
 
     /// <summary>Notify host of UI changes.</summary>
-    public class ChannelChangeEventArgs : EventArgs
+    public class User_ChannelChangeEventArgs : EventArgs
     {
         public bool PatchChange { get; set; } = false;
       // public bool StateChange { get; set; } = false;
@@ -51,45 +52,88 @@ namespace MidiGenerator
     #endregion
 
 
+
+    //public class Presets
+    //{
+    //    public static string[] Load(string fn)
+    //    {
+    //        // TODO1 read file lines: 011 GlassFlute using LoadDefFile()
+    //        var vals = xxxnew string[MidiDefs.MAX_MIDI + 1];
+    //        for (int i = 0; i < vals.Length; i++)
+    //        {
+    //            vals[i] = $"Patch{i} {i}"; // fake for now
+    //        }
+    //        return vals;
+    //    }
+
+    //    // TODO1 these needed? MidiDefs.cs* string to int - script parsing  Nebulator  (not Nebulua  MidiGenerator)
+    //    public int GetControllerNumber(string which) { return 9999; }
+    //    public int GetDrumKitNumber(string which) { return 9999; }
+    //    public int GetDrumNumber(string which) { return 9999; }
+    //    public int GetInstrumentNumber(string which) { return 9999; }
+    //    public int GetInstrumentOrDrumKitNumber(string which) { return 9999; }
+    //    // MidiDefs.cs* int to string - MidiExport
+    //    public string GetControllerName(int which) { return "9999"; }
+    //    public string GetDrumKitName(int which) { return "9999"; }
+    //    public string GetDrumName(int which) { return "9999"; }
+    //    public string GetInstrumentName(int which) { return "9999"; } //+ PatchPicker, ChannelControl(s)
+    //}
+
+
+
+
     public class Utils
     {
-        /// <summary>
-        /// Load a standard def file.
-        /// </summary>
-        /// <param name="fn"></param>
-        /// <returns></returns>
-        public static List<List<string>> LoadDefFile(string fn)
+        public static string[] CreateInitializedMidiArray(string id)
         {
-            List<List<string>> res = [];
+            var vals = new string[MidiDefs.MAX_MIDI + 1];
 
-            foreach (var inline in File.ReadAllLines(fn))
+            for (int i = 0; i < vals.Length; i++)
             {
-                // Clean up line, strip comments.
-                var cmt = inline.IndexOf(';');
-                var line = cmt >= 0 ? inline[0..cmt] : inline;
-
-                line = line.Trim();
-
-                // Ignore empty lines.
-                if (line.Length > 0)
-                {
-                    List<string> resParts = [];
-
-                    var parts = line.SplitByToken(" ");
-                    parts.ForEach(p => resParts.Add(p.Trim()));
-                    res.Add(resParts);
-                }
+                vals[i] = $"{id}{i}"; // fake for now
             }
-
-            return res;
+            return vals;
         }
+
+
+
+        ///// <summary>
+        ///// Load a standard def file.
+        ///// </summary>
+        ///// <param name="fn"></param>
+        ///// <returns></returns>
+        //public static List<List<string>> LoadDefFile(string fn)
+        //{
+        //    List<List<string>> res = [];
+
+        //    foreach (var inline in File.ReadAllLines(fn))
+        //    {
+        //        // Clean up line, strip comments.
+        //        var cmt = inline.IndexOf(';');
+        //        var line = cmt >= 0 ? inline[0..cmt] : inline;
+
+        //        line = line.Trim();
+
+        //        // Ignore empty lines.
+        //        if (line.Length > 0)
+        //        {
+        //            List<string> resParts = [];
+
+        //            var parts = line.SplitByToken(" ");
+        //            parts.ForEach(p => resParts.Add(p.Trim()));
+        //            res.Add(resParts);
+        //        }
+        //    }
+
+        //    return res;
+        //}
 
         /// <summary>
         /// Translate ascii char to Keys.
         /// </summary>
         /// <param name="ch"></param>
         /// <returns></returns>
-        public static Keys TranslateKey(char ch)
+        public static Keys TranslateKey(char ch) //TODO2 put in nbot?
         {
             Keys xlat = Keys.None;
 
