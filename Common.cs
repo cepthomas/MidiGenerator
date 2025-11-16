@@ -22,7 +22,7 @@ namespace MidiGenerator
         /// <summary>Read me.</summary>
         public override string ToString()
         {
-            return $"Note:{Note} Velocity:{Velocity}";
+            return $"Note:{MusicDefinitions.NoteNumberToName(Note)}({Note}):{Velocity}";
         }
     }
 
@@ -37,64 +37,53 @@ namespace MidiGenerator
         /// <summary>Read me.</summary>
         public override string ToString()
         {
-            return $"Controller:{Controller} Value:{Value}";
+            return $"Controller:{MidiDefs.GetControllerName(Controller)}({Controller}):{Value}";
          }
     }
 
-    /// <summary>Notify host of UI changes.</summary>
-    public class User_ChannelChangeEventArgs : EventArgs
-    {
-        public bool PatchChange { get; set; } = false;
-      // public bool StateChange { get; set; } = false;
-        public bool ChannelNumberChange { get; set; } = false;
-    }
-
+    // /// <summary>Notify host of UI changes.</summary>
+    // public class User_ChannelChangeEventArgs : EventArgs
+    // {
+    //     public bool PatchChange { get; set; } = false;
+    //     public bool ChannelNumberChange { get; set; } = false;
+    // }
     #endregion
-
-
-
-    //public class Presets
-    //{
-    //    public static string[] Load(string fn)
-    //    {
-    //        // TODO1 read file lines: 011 GlassFlute using LoadDefFile()
-    //        var vals = xxxnew string[MidiDefs.MAX_MIDI + 1];
-    //        for (int i = 0; i < vals.Length; i++)
-    //        {
-    //            vals[i] = $"Patch{i} {i}"; // fake for now
-    //        }
-    //        return vals;
-    //    }
-
-    //    // TODO1 these needed? MidiDefs.cs* string to int - script parsing  Nebulator  (not Nebulua  MidiGenerator)
-    //    public int GetControllerNumber(string which) { return 9999; }
-    //    public int GetDrumKitNumber(string which) { return 9999; }
-    //    public int GetDrumNumber(string which) { return 9999; }
-    //    public int GetInstrumentNumber(string which) { return 9999; }
-    //    public int GetInstrumentOrDrumKitNumber(string which) { return 9999; }
-    //    // MidiDefs.cs* int to string - MidiExport
-    //    public string GetControllerName(int which) { return "9999"; }
-    //    public string GetDrumKitName(int which) { return "9999"; }
-    //    public string GetDrumName(int which) { return "9999"; }
-    //    public string GetInstrumentName(int which) { return "9999"; } //+ PatchPicker, ChannelControl(s)
-    //}
-
 
 
 
     public class Utils
     {
-        public static string[] CreateInitializedMidiArray(string id)
+        // public static string[] CreateInitializedMidiArray(string id)
+        // {
+        //     var vals = new string[MidiDefs.MAX_MIDI + 1];
+
+        //     for (int i = 0; i < vals.Length; i++)
+        //     {
+        //         vals[i] = $"{id}{i}"; // fake for now
+        //     }
+        //     return vals;
+        // }
+
+
+        // Load a standard def file.
+        public static Dictionary<int, string> DoOne(string fn)
         {
-            var vals = new string[MidiDefs.MAX_MIDI + 1];
+            Dictionary<int, string> res = [];
 
-            for (int i = 0; i < vals.Length; i++)
+            var ir = new IniReader(fn);
+
+            var defs = ir.Contents["midi_defs"];
+
+            defs.Values.ForEach(kv =>
             {
-                vals[i] = $"{id}{i}"; // fake for now
-            }
-            return vals;
-        }
+                // ["011", "GlassFlute"]
+                int index = int.Parse(kv.Key); // can throw
+                if (index < 0 || index > MidiDefs.MAX_MIDI) { throw new Exception(); }
+                res[index] = kv.Value.Length > 0 ? kv.Value : "";
+            });
 
+            return res;
+        }
 
 
         ///// <summary>

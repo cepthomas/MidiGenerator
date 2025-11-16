@@ -13,11 +13,14 @@ namespace Ephemera.MidiLib
     public class Channel
     {
         #region Fields
+#if _FULL
+
         ///<summary>The collection of playable events for this channel and pattern. Key is the internal sub/time.</summary>
         readonly Dictionary<int, List<MidiEvent>> _events = [];
 
         /// <summary>Things that are executed once and disappear: NoteOffs, script send now. Key is the internal sub/time.</summary>
         readonly Dictionary<int, List<MidiEvent>> _transients = [];
+#endif
 
         ///<summary>Current volume.</summary>
         double _volume = MidiLibDefs.DEFAULT_VOLUME;
@@ -57,15 +60,19 @@ namespace Ephemera.MidiLib
 
         /// <summary>For UI user selection.</summary>
         public bool Selected { get; set; } = false;
+#if _FULL
 
         ///<summary>The duration of the whole channel - calculated.</summary>
         public int MaxSub { get; private set; } = 0;
 
         /// <summary>Get the number of events - calculated.</summary>
         public int NumEvents { get { return _events.Count; } }
+#endif
+
         #endregion
 
         #region Functions
+#if _FULL
         /// <summary>
         /// Set the time-ordered events for the channel.
         /// </summary>
@@ -90,22 +97,25 @@ namespace Ephemera.MidiLib
                 MaxSub = Math.Max(MaxSub, te.ScaledTime);
             }
         }
+#endif
 
         /// <summary>
         /// Clean the events for the channel.
         /// </summary>
         public void Reset()
         {
+#if _FULL
             // Reset.
             _events.Clear();
             _transients.Clear();
             MaxSub = 0;
-
+#endif
             State = ChannelState.Normal;
             Selected = false;
             IsDrums = false;
             Patch = -1;
         }
+#if _FULL
 
         /// <summary>
         /// Get the events for a specific sub.
@@ -170,6 +180,7 @@ namespace Ephemera.MidiLib
             _transients.Where(t => t.Key >= sub).ForEach(t => t.Value.ForEach(evt => SendEvent(evt)));
             _transients.Clear();
         }
+#endif
 
         /// <summary>
         /// General patch sender.
@@ -213,6 +224,7 @@ namespace Ephemera.MidiLib
             {
                 throw new InvalidOperationException("Device not set");
             }
+#if _FULL
 
             // If note on, add a transient note off for later.
             if(AddNoteOff && evt is NoteOnEvent)
@@ -227,12 +239,14 @@ namespace Ephemera.MidiLib
 
                 value.Add(nevt.OffEvent);
             }
-
+#endif
             // Now send it.
             Device.SendEvent(evt);
         }
-        #endregion
+#endregion
     }
+
+#if _FULL
 
     /// <summary>Helper extension methods.</summary>
     public static class ChannelUtils
@@ -264,4 +278,6 @@ namespace Ephemera.MidiLib
             return bs.TotalSubs;
         }
     }
+#endif
+
 }

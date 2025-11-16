@@ -68,17 +68,9 @@ namespace MidiGenerator
                 Kill(_settings.ClickClackChannel.ChannelNumber);
             };
 
-            // Figure out which midi output device. TODO1
-            string deviceName = "VirtualMIDISynth #1";
+            // Figure out which midi output device.
+            string deviceName = _settings.OutputDevice;// "VirtualMIDISynth #1";
             _midiOut = new MidiOutput(deviceName);
-            //for (int i = 0; i < MidiOut.NumberOfDevices; i++)
-            //{
-            //    if (deviceName == MidiOut.DeviceInfo(i).ProductName)
-            //    {
-            //        _midiOut = new MidiOutput(i);
-            //        break;
-            //    }
-            //}
 
             if (_midiOut is null)
             {
@@ -89,12 +81,12 @@ namespace MidiGenerator
             ctrlVkey.ControlColor = _settings.ControlColor;
             ctrlVkey.Settings = _settings.VkeyChannel;
             ctrlVkey.ChannelChange += Channel_ChannelChange;
-//            SendPatch(_settings.VkeyChannel.ChannelNumber, _settings.VkeyChannel.Patch);
+//SendPatch(_settings.VkeyChannel.ChannelNumber, _settings.VkeyChannel.Patch);
 
             ctrlCc.ControlColor = _settings.ControlColor;
             ctrlCc.Settings = _settings.ClickClackChannel;
             ctrlCc.ChannelChange += Channel_ChannelChange;
-//            SendPatch(_settings.ClickClackChannel.ChannelNumber, _settings.ClickClackChannel.Patch);
+//SendPatch(_settings.ClickClackChannel.ChannelNumber, _settings.ClickClackChannel.Patch);
 
             cc.UserClick += UserClickEvent;
             vkey.UserClick += UserClickEvent;
@@ -238,12 +230,12 @@ namespace MidiGenerator
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void Channel_ChannelChange(object? sender, User_ChannelChangeEventArgs e) // TODO1
+        void Channel_ChannelChange(object? sender, ChannelChangeEventArgs e) // TODO1
         {
             var cc = sender as ChannelControl;
-            if(e.PatchChange || e.ChannelNumberChange)
+            if (e.PatchChange || e.ChannelNumberChange)
             {
-               // cc!.BoundChannel.SendPatch();
+               SendPatch(cc.Patch);
             }
         }
 

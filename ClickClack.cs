@@ -87,8 +87,8 @@ namespace MidiGenerator
                 pe.Graphics.DrawImage(_bmp.ClientBitmap, 0, 0, _bmp.ClientBitmap.Width, _bmp.ClientBitmap.Height);
             }
 
-            // Draw grid. X is octaves.        int _minX = 24; // C0        int _maxX = 96; // C6
-            foreach (var gl in [36, 48, 60, 72, 84])
+            // Draw grid. X is octaves. Y is volume.
+            foreach (var gl in new int[] { 36, 48, 60, 72, 84 })
             {
                 if (gl >= _minX && gl <= _maxX) // sanity - throw?
                 {
@@ -97,7 +97,7 @@ namespace MidiGenerator
                 }
             }
 
-            foreach (var gl in [20, 40, 60, 80, 100, 120])
+            foreach (var gl in new int[] { 20, 40, 60, 80, 100, 120 })
             {
                 if (gl >= _minY && gl <= _maxY)
                 {

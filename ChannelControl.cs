@@ -6,8 +6,6 @@ using Ephemera.NBagOfUis;
 using Ephemera.MidiLib;
 
 
-
-
 namespace MidiGenerator
 {
     /// <summary>Properties for a midi channel. TODO2 refactor Channel object?</summary>
@@ -30,7 +28,7 @@ namespace MidiGenerator
 
         #region Events
         /// <summary>Notify host of asynchronous changes from user.</summary>
-        public event EventHandler<User_ChannelChangeEventArgs>? ChannelChange;
+        public event EventHandler<ChannelChangeEventArgs>? ChannelChange;
         #endregion
 
         #region Lifecycle
@@ -130,10 +128,10 @@ namespace MidiGenerator
                 switch (name)
                 {
                     case "ChannelNumber":
-                        ChannelChange?.ChannelNumberChange;
+                        ChannelChange?.Invoke(this, new() { ChannelNumberChange = true });
                         break;
                     case "Patch":
-                        ChannelChange?.PatchChange;
+                        ChannelChange?.Invoke(this, new() { PatchChange = true });
                         break;
                     case "PresetFile":
                         //restart = true;
@@ -165,9 +163,9 @@ namespace MidiGenerator
         /// Read me.
          /// </summary>
         /// <returns></returns>
-        public override string ToString()
-        {
-            return $"Ch:{Settings.ChannelNumber} Patch:{GetPatchName(Settings.Patch)} ({Settings.Patch})";
-        }
+        //public override string ToString()
+        //{
+//TODO1            return $"Ch:{Settings.ChannelNumber} Patch:{MidiDefs.GetPatchName(Settings.Patch)} ({Settings.Patch})";
+        //}
     }
 }

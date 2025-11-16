@@ -66,15 +66,9 @@ namespace MidiGenerator
             // Dig out from context.
             string[] vals;// = new string[MidiDefs.MAX_MIDI];
 
-        //    if (context is not null && context.Instance is not null)
-            {
-                Type t = context!.Instance!.GetType();
-                PropertyInfo? prop = t.GetProperty("Patches"); // CurrentPresets
-                vals = (string[])prop.GetValue(context.Instance, null);
-                //var vv = prop.GetValue(context.Instance, null);
-                //string pfile = (string)vv;
-                //>>>> vals = Patches.Load(pfile);
-            }
+            Type t = context!.Instance!.GetType();
+            PropertyInfo? prop = t.GetProperty("Instruments");
+            vals = (string[])prop.GetValue(context.Instance, null);
 
             // Fill the selector.
             int sel = (int)value!; // default

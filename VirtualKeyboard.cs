@@ -71,7 +71,7 @@ namespace MidiGenerator
             CreateKeys();
             if (!CreateKeyMap())
             {
-                //TODO1 notify?
+                throw new Exception(); // TODO2 clean up all throw
             }
             DrawKeys();
         }

@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace Ephemera.MidiLib
 {
+#if _FULL
     #region Enums
     /// <summary>Channel state.</summary>
     public enum ChannelState { Normal = 0, Solo = 1, Mute = 2 }
@@ -83,7 +84,8 @@ namespace Ephemera.MidiLib
         public void SendEvent(MidiEvent evt) { }
     }
     #endregion
-
+#endif
+    
     #region Event args
     /// <summary>Notify host of asynchronous changes from user.</summary>
     public class ChannelChangeEventArgs : EventArgs

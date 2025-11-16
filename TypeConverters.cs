@@ -44,7 +44,7 @@ namespace MidiGenerator
         public override object ConvertFrom(ITypeDescriptorContext? context, System.Globalization.CultureInfo? culture, object value)
         {
             string txt = value.ToString();
-            return 9999;
+            return 9999; // TODO1
             //return MidiDefs.GetInstrumentNumber(txt);
 
             //if (values[0] == txt)

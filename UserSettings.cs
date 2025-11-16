@@ -57,7 +57,7 @@ namespace MidiGenerator
     }
 
     [Serializable]
-    public class ChannelSettings
+    public class ChannelSettings // TODD1 combine or refactor with Channel
     {
         #region Persisted Non-editable Properties
         /// <summary>Actual 1-based midi channel number.</summary>
@@ -70,7 +70,6 @@ namespace MidiGenerator
         }
         int _channelNumber = 1;
 
-
         /// <summary>Current volume.</summary>
         [Browsable(false)]
         public double Volume
@@ -80,19 +79,11 @@ namespace MidiGenerator
         }
         double _volume = MidiLibDefs.DEFAULT_VOLUME;
 
-
-
-
-
-//        public static Dictionary<int, string> DoOne(string fn)
-
-
-
         /// <summary>All possible instrument/patch.</summary>
         [Browsable(false)]
         [JsonIgnore]
-        public Dictionary<int, string>? Patches { get; set; }// = new string[MidiDefs.MAX_MIDI + 1];
-        // public string[] Patches { get; set; }// = new string[MidiDefs.MAX_MIDI + 1];
+        public Dictionary<int, string>? Instruments { get; set; } //TODO1 if null get the defaults.
+        // public string[] Instruments { get; set; }
 
 
         /// <summary>Override default instrument presets.</summary>
@@ -101,45 +92,28 @@ namespace MidiGenerator
         public string PresetFile
         {
             get { return _presetFile; }
-            //set { _presetFile = value; }
-            
             set
             {
                 if (value == "") // use defaults
                 {
-                    Patches = null;
+                    Instruments = null;
                     //MidiDefs.Load(MidiDefs.DefType.Patch, @"C:\Dev\Apps\MidiGenerator\gm_instruments.ini");
                 }
                 else // load override
                 {
                     if (!File.Exists(value)) throw new FileNotFoundException();
-                    Patches = MidiDefs.DoOne(value);
+                    Instruments = Utils.DoOne(value);
                 }
                 _presetFile = value;
             }
-
-            //TODO1 >>> MidiDefs.Load(MidiDefs.DefType.Patch, @"C:\Dev\Apps\MidiGenerator\exp_instruments.txt");
-            // or reset to original
         }
         string _presetFile = "";
-
 
         /// <summary>Edit current instrument/patch number.</summary>
         [Browsable(true)]
         [Editor(typeof(PatchTypeEditor), typeof(UITypeEditor))]
         [TypeConverter(typeof(PatchConverter))]
         public int Patch { get; set; } = 0;
-
-
-
-
-
-
-
         #endregion
-
-
-        //[Browsable(false)]
-        //public Presets Presets { get; set; } = new();
     }
 }
