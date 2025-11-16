@@ -24,20 +24,13 @@ namespace MidiGenerator
 
         /// <summary>Tool tip.</summary>
         readonly ToolTip _toolTip = new();
+
+        /// <summary>Ranges.</summary>
+        int _minX = 24; // C0
+        int _maxX = 96; // C6
+        int _minY = 0;
+        int _maxY = 128;
         #endregion
-
-
-        // octaves
-        List<int> GridX = [36, 48, 60, 72, 84];
-        //List<int> GridY = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120];
-        List<int> GridY = [20, 40, 60, 80, 100, 120];
-
-        int MinX = 24; // C0
-        int MaxX = 96; // C6
-
-        int MinY = 0;
-        int MaxY = 128;
-
 
         #region Properties
         public Color ControlColor { get; set; } = Color.Red;
@@ -94,21 +87,21 @@ namespace MidiGenerator
                 pe.Graphics.DrawImage(_bmp.ClientBitmap, 0, 0, _bmp.ClientBitmap.Width, _bmp.ClientBitmap.Height);
             }
 
-            // Draw grid.
-            foreach (var gl in GridX)
+            // Draw grid. X is octaves.        int _minX = 24; // C0        int _maxX = 96; // C6
+            foreach (var gl in [36, 48, 60, 72, 84])
             {
-                if (gl >= MinX && gl <= MaxX) // sanity - throw?
+                if (gl >= _minX && gl <= _maxX) // sanity - throw?
                 {
-                    int x = MathUtils.Map(gl, MinX, MaxX, 0, Width);
+                    int x = MathUtils.Map(gl, _minX, _maxX, 0, Width);
                     pe.Graphics.DrawLine(_pen, x, 0, x, Height);
                 }
             }
 
-            foreach (var gl in GridY)
+            foreach (var gl in [20, 40, 60, 80, 100, 120])
             {
-                if (gl >= MinY && gl <= MaxY)
+                if (gl >= _minY && gl <= _maxY)
                 {
-                    int y = MathUtils.Map(gl, MinY, MaxY, Height, 0);
+                    int y = MathUtils.Map(gl, _minY, _maxY, Height, 0);
                     pe.Graphics.DrawLine(_pen, 0, y, Width, y);
                 }
             }
@@ -124,7 +117,7 @@ namespace MidiGenerator
         {
             var (ux, uy) = MouseToUser();
             UserClickNoteEventArgs args = new() { Note = ux, Velocity = uy };
-            _toolTip.SetToolTip(this, args.ToString()); //TODO1 needs note name
+            _toolTip.SetToolTip(this, args.ToString()); //TODO1 needs note name -> MidiLib.
 
             // Also gen click?
             if (e.Button == MouseButtons.Left)
@@ -238,9 +231,9 @@ namespace MidiGenerator
             var mp = PointToClient(MousePosition);
 
             // Map and check.
-            int x = MathUtils.Map(mp.X, 0, Width, MinX, MaxX);
+            int x = MathUtils.Map(mp.X, 0, Width, _minX, _maxX);
             int ux = x >= 0 && x < Width ? x : -1;
-            int y = MathUtils.Map(mp.Y, Height, 0, MinY, MaxY);
+            int y = MathUtils.Map(mp.Y, Height, 0, _minY, _maxY);
             int uy = y >= 0 && y < Height ? y : -1;
 
             return (ux, uy);

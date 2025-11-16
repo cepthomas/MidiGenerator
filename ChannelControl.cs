@@ -10,7 +10,7 @@ using Ephemera.MidiLib;
 
 namespace MidiGenerator
 {
-    /// <summary>Properties for a midi channel.</summary>
+    /// <summary>Properties for a midi channel. TODO2 refactor Channel object?</summary>
     public class ChannelControl : UserControl
     {
         #region Designer variables
@@ -120,27 +120,31 @@ namespace MidiGenerator
         /// <param name="e"></param>
         void ChannelEd_Click(object? sender, EventArgs e)
         {
-            var changes = SettingsEditor.Edit(Settings, "User Settings", 400);
+            var changes = SettingsEditor.Edit(Settings, "Channel Settings", 300);
 
             // Detect changes of interest.
-            bool restart = false;
+            //bool restart = false;
 
             foreach (var (name, cat) in changes)
             {
                 switch (name)
                 {
-                    case "ChannelNumber":  // TODO1??
-                    case "Patch": // TODO1 send patch?
+                    case "ChannelNumber":
+                        ChannelChange?.ChannelNumberChange;
+                        break;
+                    case "Patch":
+                        ChannelChange?.PatchChange;
+                        break;
                     case "PresetFile":
-                        restart = true;
+                        //restart = true;
                         break;
                 }
             }
 
-            if (restart)
-            {
-                MessageBox.Show("Restart required for device changes to take effect");
-            }
+            // if (restart)
+            // {
+            //     MessageBox.Show("Restart required for device changes to take effect");
+            // }
 
             UpdateUi();
         }
@@ -159,11 +163,11 @@ namespace MidiGenerator
 
         /// <summary>
         /// Read me.
-        /// </summary>
+         /// </summary>
         /// <returns></returns>
         public override string ToString()
         {
-            return $"Ch:{Settings.ChannelNumber} Patch:{Settings.Instrument}"; // TODO1 patch name
+            return $"Ch:{Settings.ChannelNumber} Patch:{GetPatchName(Settings.Patch)} ({Settings.Patch})";
         }
     }
 }

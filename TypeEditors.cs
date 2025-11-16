@@ -57,7 +57,7 @@ namespace MidiGenerator
     //} 
 
     /// <summary>Select a patch from list.</summary>
-    public class InstrumentTypeEditor : UITypeEditor
+    public class PatchTypeEditor : UITypeEditor
     {
         public override object? EditValue(ITypeDescriptorContext? context, IServiceProvider provider, object? value)
         {
@@ -69,11 +69,11 @@ namespace MidiGenerator
         //    if (context is not null && context.Instance is not null)
             {
                 Type t = context!.Instance!.GetType();
-                PropertyInfo? prop = t.GetProperty("Instruments"); // CurrentPresets
+                PropertyInfo? prop = t.GetProperty("Patches"); // CurrentPresets
                 vals = (string[])prop.GetValue(context.Instance, null);
                 //var vv = prop.GetValue(context.Instance, null);
                 //string pfile = (string)vv;
-                //>>>> vals = Instruments.Load(pfile);
+                //>>>> vals = Patches.Load(pfile);
             }
 
             // Fill the selector.

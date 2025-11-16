@@ -12,7 +12,7 @@ namespace MidiGenerator
     /// <summary>
     /// xxxxx
     /// </summary>
-    public class InstrumentConverter : Int64Converter
+    public class PatchConverter : Int64Converter
     {
         /// <summary>
         /// 

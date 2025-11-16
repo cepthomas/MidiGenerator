@@ -26,74 +26,165 @@ namespace Ephemera.MidiLib
 
         #region From original TODO2
 
-        static readonly Dictionary<int, string> _instruments = new();
+        // int => string  UI + export
+        // Searching 1281 files for "GetPatchName" (case sensitive, whole word)
+
+        // string => int  parse + (script runtime?)
+        // Searching 1282 files for "GetPatchNumber" (case sensitive, whole word)
+
+
+        // Default - each channel has its own.
+        static readonly Dictionary<int, string> _patches = new();
+        //
         static readonly Dictionary<int, string> _controllers = new();
+        //
         static readonly Dictionary<int, string> _drumKits = new();
+        //
         static readonly Dictionary<int, string> _drums = new();
 
 
-        /// <summary>Reverse lookup.</summary>
-        static readonly Dictionary<string, int> _instrumentNumbers = new();
+
 
         /// <summary>Reverse lookup.</summary>
-        static readonly Dictionary<string, int> _drumKitNumbers = new();
-
+        static readonly Dictionary<string, int> _patchesRev = new();
         /// <summary>Reverse lookup.</summary>
-        static readonly Dictionary<string, int> _drumNumbers = new();
-
+        static readonly Dictionary<string, int> _drumKitsRev = new();
         /// <summary>Reverse lookup.</summary>
-        static readonly Dictionary<string, int> _controllerNumbers = new();
+        static readonly Dictionary<string, int> _drumsRev = new();
+        /// <summary>Reverse lookup.</summary>
+        static readonly Dictionary<string, int> _controllersRev = new();
 
+
+
+        // /// <summary>
+        // /// Get patch name.
+        // /// </summary>
+        // /// <param name="which"></param>
+        // /// <returns>The name.</returns>
+        // public static string GetPatchName(int which)
+        // {
+        //     string ret = which switch
+        //     {
+        //         -1 => "NoPatch",
+        //         >= 0 and < MAX_MIDI => _patchs[which],
+        //         _ => throw new ArgumentOutOfRangeException(nameof(which)),
+        //     };
+        //     return ret;
+        // }
+
+        // /// <summary>
+        // /// Get the patch/patch number.
+        // /// </summary>
+        // /// <param name="which"></param>
+        // /// <returns>The midi number or -1 if invalid.</returns>
+        // public static int GetPatchNumber(string which)
+        // {
+        //     if (_patchNumbers.ContainsKey(which))
+        //     {
+        //         return _patchNumbers[which];
+        //     }
+        //     //throw new ArgumentException($"Invalid patch: {which}");
+        //     return -1;
+        // }
+
+        /// <summary>
+        /// Get drum name.
+        /// </summary>
+        /// <param name="which"></param>
+        /// <returns>The drum name or a fabricated one if unknown.</returns>
+        public static string GetDrumName(int which)
+        {
+            return _drums.ContainsKey(which) ? _drums[which] : $"DRUM_{which}";
+        }
+
+        /// <summary>
+        /// Get drum number.
+        /// </summary>
+        /// <param name="which"></param>
+        /// <returns>The midi number or -1 if invalid.</returns>
+        public static int GetDrumNumber(string which)
+        {
+            if (_drumsRev.ContainsKey(which))
+            {
+                return _drumsRev[which];
+            }
+            //throw new ArgumentException($"Invalid drum: {which}");
+            return -1;
+        }
+
+        /// <summary>
+        /// Get controller name.
+        /// </summary>
+        /// <param name="which"></param>
+        /// <returns>The controller name or a fabricated one if unknown.</returns>
+        public static string GetControllerName(int which)
+        {
+            return _controllers.ContainsKey(which) ? _controllers[which] : $"CTLR_{which}";
+        }
+
+        /// <summary>
+        /// Get the controller number.
+        /// </summary>
+        /// <param name="which"></param>
+        /// <returns>The midi number or -1 if invalid.</returns>
+        public static int GetControllerNumber(string which)
+        {
+            if (_controllersRev.ContainsKey(which))
+            {
+                return _controllersRev[which];
+            }
+            //throw new ArgumentException($"Invalid controller: {which}");
+            return -1;
+        }
+
+        /// <summary>
+        /// Get GM drum kit name.
+        /// </summary>
+        /// <param name="which"></param>
+        /// <returns>The drumkit name or a fabricated one if unknown.</returns>
+        public static string GetDrumKitName(int which)
+        {
+            return _drumKits.ContainsKey(which) ? _drumKits[which] : $"KIT_{which}";
+        }
+
+        /// <summary>
+        /// Get GM drum kit number.
+        /// </summary>
+        /// <param name="which"></param>
+        /// <returns>The midi number or -1 if invalid.</returns>
+        public static int GetDrumKitNumber(string which)
+        {
+            if(_drumKitsRev.ContainsKey(which))
+            {
+                return _drumKitsRev[which];
+            }
+            //throw new ArgumentException($"Invalid drum kit: {which}");
+            return -1;
+        }
+
+        // /// <summary>
+        // /// Get the patch/patch or drum number.
+        // /// </summary>
+        // /// <param name="which"></param>
+        // /// <returns>The midi number or -1 if invalid.</returns>
+        // public static int GetPatchOrDrumKitNumber(string which)
+        // {
+        //     if (_patchNumbers.ContainsKey(which))
+        //     {
+        //         return _patchNumbers[which];
+        //     }
+        //     else if (_drumKitNumbers.ContainsKey(which))
+        //     {
+        //         return _drumKitNumbers[which];
+        //     }
+        //     //throw new ArgumentException($"Invalid patch or drum: {which}");
+        //     return -1;
+        // }
 
 
         //public static List<string> FormatDoc()
         //{
         //    return ["aaa"];
-        //}
-
-        //public static string GetInstrumentName(int which)
-        //{
-        //    return $"Inst{which}";
-        //}
-
-        //public static int GetInstrumentNumber(string which)
-        //{
-        //    return 8888;
-        //}
-
-        // public static string GetDrumName(int which)
-        // {
-        //     return $"Drum{which}";
-        // }
-
-        // public static int GetDrumNumber(string which)
-        // {
-        //     return 8888;
-        // }
-
-        // public static string GetControllerName(int which)
-        // {
-        //     return $"Ctrl{which}";
-        // }
-
-        // public static int GetControllerNumber(string which)
-        // {
-        //     return 8888;
-        // }
-
-        // public static string GetDrumKitName(int which)
-        // {
-        //     return $"Kit{which}";
-        // }
-
-        // public static int GetDrumKitNumber(string which)
-        // {
-        //     return 8888;
-        // }
-
-        //public static int GetInstrumentOrDrumKitNumber(string which) // ==> TODO2 replace???
-        //{
-        //    return 8888;
         //}
         #endregion
 
@@ -106,53 +197,50 @@ namespace Ephemera.MidiLib
         {
             bool valid = true;
 
-
             try
             {
-                _instruments = DoOne(@"C:\Dev\Apps\MidiGenerator\gm_instruments.ini");
+                _patches = DoOne(@"C:\Dev\Apps\MidiGenerator\gm_patches.ini");
                 _controllers = DoOne(@"C:\Dev\Apps\MidiGenerator\gm_controllers.ini");
                 _drums = DoOne(@"C:\Dev\Apps\MidiGenerator\gm_drums.ini");
                 _drumKits = DoOne(@"C:\Dev\Apps\MidiGenerator\gm_drumkits.ini");
 
+                // TODO1 reverses?
+                // _patchNumbers = _patchs.ToDictionary(x => x, x => _patchs.IndexOf(x));
+                // _drumKitNumbers = _drumKits.ToDictionary(x => x.Value, x => x.Key);
+                // _drumNumbers = _drums.ToDictionary(x => x.Value, x => x.Key);
+                // _controllerNumbers = _controllers.ToDictionary(x => x.Value, x => x.Key);
 
-                Dictionary<int, string> DoOne(string fn)
-                {
-                    Dictionary<int, string> res = [];
-
-                    var ir = new IniReader(fn);
-
-                    var defs = ir.Contents["midi_defs"];
-
-                    defs.Values.ForEach(kv =>
-                    {
-                        // ["011", "GlassFlute"]
-                        int index = int.Parse(kv.Key); // can throw
-                        if (index < 0 || index > MidiDefs.MAX_MIDI) { throw new Exception(); }
-                        res[index] = kv.Value.Length > 0 ? kv.Value : "";
-                    });
-
-                    return res;
-                }
             }
             catch (Exception)
             {
                 //TODO1 notify?
                 valid = false;
             }
+        }
 
+        ///////////////////
+        public static Dictionary<int, string> DoOne(string fn)
+        {
+            Dictionary<int, string> res = [];
 
+            var ir = new IniReader(fn);
 
-            // TODO1 reverses?
-            // _instrumentNumbers = _instruments.ToDictionary(x => x, x => _instruments.IndexOf(x));
-            // _drumKitNumbers = _drumKits.ToDictionary(x => x.Value, x => x.Key);
-            // _drumNumbers = _drums.ToDictionary(x => x.Value, x => x.Key);
-            // _controllerNumbers = _controllers.ToDictionary(x => x.Value, x => x.Key);
+            var defs = ir.Contents["midi_defs"];
+
+            defs.Values.ForEach(kv =>
+            {
+                // ["011", "GlassFlute"]
+                int index = int.Parse(kv.Key); // can throw
+                if (index < 0 || index > MidiDefs.MAX_MIDI) { throw new Exception(); }
+                res[index] = kv.Value.Length > 0 ? kv.Value : "";
+            });
+
+            return res;
         }
 
 
 
-
-        // public enum DefType { Instrument, Controller, Drum, DrumKit }
+        // public enum DefType { Patch, Controller, Drum, DrumKit }
 
         // static readonly Dictionary<DefType, string[]> _defs = [];
 
@@ -185,7 +273,7 @@ namespace Ephemera.MidiLib
         //         //var vals = xxxnew string[MidiDefs.MAX_MIDI + 1];
         //         //for (int i = 0; i < vals.Length; i++) // set defaults
         //         //{
-        //         //    vals[i] = $"Instrument{i}";
+        //         //    vals[i] = $"Patch{i}";
         //         //}
 
         //         //foreach (var parts in ls)

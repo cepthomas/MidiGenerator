@@ -84,13 +84,15 @@ namespace MidiGenerator
 
 
 
+//        public static Dictionary<int, string> DoOne(string fn)
 
 
 
         /// <summary>All possible instrument/patch.</summary>
         [Browsable(false)]
         [JsonIgnore]
-        public string[] Instruments { get; set; }// = new string[MidiDefs.MAX_MIDI + 1];
+        public Dictionary<int, string>? Patches { get; set; }// = new string[MidiDefs.MAX_MIDI + 1];
+        // public string[] Patches { get; set; }// = new string[MidiDefs.MAX_MIDI + 1];
 
 
         /// <summary>Override default instrument presets.</summary>
@@ -105,19 +107,18 @@ namespace MidiGenerator
             {
                 if (value == "") // use defaults
                 {
-                    MidiDefs.Load(MidiDefs.DefType.Instrument, @"C:\Dev\Apps\MidiGenerator\gm_instruments.ini");
+                    Patches = null;
+                    //MidiDefs.Load(MidiDefs.DefType.Patch, @"C:\Dev\Apps\MidiGenerator\gm_instruments.ini");
                 }
                 else // load override
                 {
                     if (!File.Exists(value)) throw new FileNotFoundException();
-                    Instruments = MidiDefs.Load(MidiDefs.DefType.Instrument, value);
+                    Patches = MidiDefs.DoOne(value);
                 }
                 _presetFile = value;
             }
 
-
-
-            //TODO1 >>> MidiDefs.Load(MidiDefs.DefType.Instrument, @"C:\Dev\Apps\MidiGenerator\exp_instruments.txt");
+            //TODO1 >>> MidiDefs.Load(MidiDefs.DefType.Patch, @"C:\Dev\Apps\MidiGenerator\exp_instruments.txt");
             // or reset to original
         }
         string _presetFile = "";
@@ -125,20 +126,10 @@ namespace MidiGenerator
 
         /// <summary>Edit current instrument/patch number.</summary>
         [Browsable(true)]
-        [Editor(typeof(InstrumentTypeEditor), typeof(UITypeEditor))]
-        [TypeConverter(typeof(InstrumentConverter))]
-        public int Instrument { get; set; } = 0;
+        [Editor(typeof(PatchTypeEditor), typeof(UITypeEditor))]
+        [TypeConverter(typeof(PatchConverter))]
+        public int Patch { get; set; } = 0;
 
-
-        public static string GetInstrumentName(int which)
-        {
-            return $"Inst{which}";
-        }
-
-        public static int GetInstrumentNumber(string which)
-        {
-            return 8888;
-        }
 
 
 
