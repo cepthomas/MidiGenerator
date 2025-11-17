@@ -23,9 +23,9 @@ namespace MidiGenerator
         readonly UserSettings _settings;
 
         /// <summary>Midi output device.</summary>
-        //        MidiOut? _midiOut = null;
-        MidiOutput? _midiOut = null;
+        MidiOutput _midiOut;
         #endregion
+
 
         #region Lifecycle
         /// <summary>
@@ -72,26 +72,22 @@ namespace MidiGenerator
             string deviceName = _settings.OutputDevice;// "VirtualMIDISynth #1";
             _midiOut = new MidiOutput(deviceName);
 
-            if (_midiOut is null)
-            {
-                _logger.Error($"Invalid midi output device:{deviceName}");
-            }
-
             ///// Init the channels and their corresponding controls. /////
+            vkey.UserClickNote += UserClickNoteEvent;
+            vkey.ControlColor = _settings.ControlColor;
+            vkey.Enabled = true;
+
             ctrlVkey.ControlColor = _settings.ControlColor;
-            ctrlVkey.Settings = _settings.VkeyChannel;
+            ctrlVkey.Channel = _settings.VkeyChannel;
             ctrlVkey.ChannelChange += Channel_ChannelChange;
-//SendPatch(_settings.VkeyChannel.ChannelNumber, _settings.VkeyChannel.Patch);
+
+            cc.UserClickNote += UserClickNoteEvent;
+            cc.ControlColor = _settings.ControlColor;
+            cc.Enabled = true;
 
             ctrlCc.ControlColor = _settings.ControlColor;
-            ctrlCc.Settings = _settings.ClickClackChannel;
+            ctrlCc.Channel = _settings.ClickClackChannel;
             ctrlCc.ChannelChange += Channel_ChannelChange;
-//SendPatch(_settings.ClickClackChannel.ChannelNumber, _settings.ClickClackChannel.Patch);
-
-            cc.UserClick += UserClickEvent;
-            vkey.UserClick += UserClickEvent;
-
-            vkey.Enabled = true;
 
             ///// Finish up. /////
             Location = _settings.FormGeometry.Location;
@@ -107,11 +103,19 @@ namespace MidiGenerator
         /// <param name="e"></param>
         protected override void OnLoad(EventArgs e)
         {
-            _logger.Info($"Hello!");
+             _logger.Info($"Hello!");
 
-            if (_midiOut is null)
+            if (!_midiOut.Valid)
             {
                 _logger.Error($"Invalid midi output device");
+            }
+            else
+            {
+                ctrlVkey.Channel.Device = _midiOut;
+                ctrlVkey.Channel.SendPatch();
+
+                ctrlCc.Channel.Device = _midiOut;
+                ctrlCc.Channel.SendPatch();
             }
 
             base.OnLoad(e);
@@ -171,7 +175,7 @@ namespace MidiGenerator
         /// </summary>
         void Settings_Click(object? sender, EventArgs e)
         {
-            var changes = SettingsEditor.Edit(_settings, "User Settings", 400);
+            var changes = SettingsEditor.Edit(_settings, "User Settings", 300);
 
             // Detect changes of interest.
             bool restart = false;
@@ -202,7 +206,7 @@ namespace MidiGenerator
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void UserClickEvent(object? sender, UserClickNoteEventArgs e)
+        void UserClickNoteEvent(object? sender, UserClickNoteEventArgs e)
         {
             if (e.Note != -1 && e.Velocity != -1)
             {
@@ -226,17 +230,17 @@ namespace MidiGenerator
         }
 
         /// <summary>
-        /// User requests a patch change.
+        /// User edits the channel params.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void Channel_ChannelChange(object? sender, ChannelChangeEventArgs e) // TODO1
+        void Channel_ChannelChange(object? sender, ChannelChangeEventArgs e)
         {
-            var cc = sender as ChannelControl;
-            if (e.PatchChange || e.ChannelNumberChange)
-            {
-               SendPatch(cc.Patch);
-            }
+            //var cc = sender as ChannelControl;
+            //if (e.PatchChange || e.ChannelNumberChange)
+            //{
+            //    SendPatch(cc.Patch);
+            //}
         }
 
         /// <summary>
@@ -263,40 +267,40 @@ namespace MidiGenerator
             _settings.LogMidi = btnLogMidi.Checked;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="chan"></param>
-        /// <param name="note"></param>
-        /// <param name="velocity"></param>
-        public void SendNote(int chan, int note, int velocity)
-        {
+        ///// <summary>
+        ///// 
+        ///// </summary>
+        ///// <param name="chan"></param>
+        ///// <param name="note"></param>
+        ///// <param name="velocity"></param>
+        //public void SendNote(int chan, int note, int velocity)
+        //{
 
-            NoteEvent evt = velocity > 0 ?
-                new NoteOnEvent(0, chan, note, velocity, 0) :
-                new NoteEvent(0, chan, MidiCommandCode.NoteOff, note, 0);
-            _midiOut.SendEvent(evt);
-        }
+        //    NoteEvent evt = velocity > 0 ?
+        //        new NoteOnEvent(0, chan, note, velocity, 0) :
+        //        new NoteEvent(0, chan, MidiCommandCode.NoteOff, note, 0);
+        //    _midiOut.SendEvent(evt);
+        //}
 
-        /// <summary>
-        /// Patch sender.
-        /// </summary>
-        public void SendPatch(int chan, int patch)
-        {
-            PatchChangeEvent evt = new(0, chan, patch);
-            _midiOut.SendEvent(evt);
-        }
+        ///// <summary>
+        ///// Patch sender.
+        ///// </summary>
+        //public void SendPatch(int chan, int patch)
+        //{
+        //    PatchChangeEvent evt = new(0, chan, patch);
+        //    _midiOut.SendEvent(evt);
+        //}
 
-        /// <summary>
-        /// Send a controller.
-        /// </summary>
-        /// <param name="controller"></param>
-        /// <param name="val"></param>
-        public void SendController(int chan, MidiController controller, int val)
-        {
-            ControlChangeEvent evt = new(0, chan, controller, val);
-            _midiOut.SendEvent(evt);
-        }
+        ///// <summary>
+        ///// Send a controller.
+        ///// </summary>
+        ///// <param name="controller"></param>
+        ///// <param name="val"></param>
+        //public void SendController(int chan, MidiController controller, int val)
+        //{
+        //    ControlChangeEvent evt = new(0, chan, controller, val);
+        //    _midiOut.SendEvent(evt);
+        //}
 
         /// <summary>
         /// Send midi all notes off.

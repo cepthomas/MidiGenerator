@@ -38,7 +38,7 @@ namespace MidiGenerator
 
         #region Events
         /// <summary>Click/drag info.</summary>
-        public event EventHandler<UserClickNoteEventArgs>? UserClick;
+        public event EventHandler<UserClickNoteEventArgs>? UserClickNote;
         #endregion
 
         #region Lifecycle
@@ -117,7 +117,7 @@ namespace MidiGenerator
         {
             var (ux, uy) = MouseToUser();
             UserClickNoteEventArgs args = new() { Note = ux, Velocity = uy };
-            _toolTip.SetToolTip(this, args.ToString()); //TODO1 needs note name -> MidiLib.
+            _toolTip.SetToolTip(this, args.ToString());
 
             // Also gen click?
             if (e.Button == MouseButtons.Left)
@@ -128,12 +128,12 @@ namespace MidiGenerator
                     if (_lastNote != -1)
                     {
                         // Turn off last note.
-                        UserClick?.Invoke(this, new() { Note = _lastNote, Velocity = 0 });
+                        UserClickNote?.Invoke(this, new() { Note = _lastNote, Velocity = 0 });
                     }
 
                     // Start the new note.
                     _lastNote = ux;
-                    UserClick?.Invoke(this, new() { Note = ux, Velocity = uy });
+                    UserClickNote?.Invoke(this, new() { Note = ux, Velocity = uy });
                 }
             }
 
@@ -148,7 +148,7 @@ namespace MidiGenerator
         {
             var (ux, uy) = MouseToUser();
             _lastNote = ux;
-            UserClick?.Invoke(this, new() { Note = ux, Velocity = uy });
+            UserClickNote?.Invoke(this, new() { Note = ux, Velocity = uy });
 
             base.OnMouseDown(e);
         }
@@ -161,7 +161,7 @@ namespace MidiGenerator
         {
             if (_lastNote != -1)
             {
-                UserClick?.Invoke(this, new() { Note = _lastNote, Velocity = 0 });
+                UserClickNote?.Invoke(this, new() { Note = _lastNote, Velocity = 0 });
                 _lastNote = -1;
             }
 
@@ -177,12 +177,12 @@ namespace MidiGenerator
             // Turn off last click.
             if (_lastNote != -1)
             {
-                UserClick?.Invoke(this, new() { Note = _lastNote, Velocity = 0 });
+                UserClickNote?.Invoke(this, new() { Note = _lastNote, Velocity = 0 });
             }
 
             // Reset and tell client.
             _lastNote = -1;
-            UserClick?.Invoke(this, new() { Note = -1, Velocity = -1 });
+            //UserClick?.Invoke(this, new() { Note = -1, Velocity = -1 });//TODO1?
 
             _toolTip.SetToolTip(this, "");
 

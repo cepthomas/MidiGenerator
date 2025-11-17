@@ -9,53 +9,20 @@ using System.Drawing.Design;
 using System.ComponentModel;
 using System.Windows.Forms.Design;
 using System.Reflection;
+using Ephemera.NBagOfTricks;
+using Ephemera.MidiLib;
+
+
 using NAudio.Midi;
 using Ephemera.NBagOfTricks;
 using Ephemera.NBagOfUis;
 using Ephemera.MidiLib;
 
+// NEW ADDED
 
-namespace MidiGenerator
+
+namespace Ephemera.MidiLib
 {
-    ///// <summary>Select a patch from list.</summary>
-    //public class PatchSelectorTypeEditor : UITypeEditor
-    //{
-    //    public override object? EditValue(ITypeDescriptorContext? context, IServiceProvider provider, object? value)
-    //    {
-    //        IWindowsFormsEditorService? _service = provider.GetService(typeof(IWindowsFormsEditorService)) as IWindowsFormsEditorService;
-
-    //        // Dig out from context.
-    //        string[] vals = xxxnew string[MidiDefs.MAX_MIDI];
-
-    //        if (context is not null && context.Instance is not null)
-    //        {
-    //            Type t = context!.Instance!.GetType();
-    //            PropertyInfo? prop = t.GetProperty("PresetFile"); //CurrentPresets
-    //            var vv = prop.GetValue(context.Instance, null);
-    //            string pfile = (string)vv;
-    //            vals = Presets.Load(pfile);
-    //        }
-
-    //        // Fill the selector.
-    //        string sel = value!.ToString(); // default
-    //        var lb = new ListBox
-    //        {
-    //            Width = 250,
-    //            SelectionMode = SelectionMode.One
-    //        };
-    //        lb.Click += (_, __) => _service!.CloseDropDown();
-    //        vals.ForEach(v => lb.Items.Add(v));
-    //        _service!.DropDownControl(lb);
-
-    //        return lb.SelectedItem is null ? value : lb.SelectedItem;
-    //    }
-
-    //    public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext? context)
-    //    {
-    //        return UITypeEditorEditStyle.DropDown;
-    //    }
-    //} 
-
     /// <summary>Select a patch from list.</summary>
     public class PatchTypeEditor : UITypeEditor
     {
@@ -74,7 +41,7 @@ namespace MidiGenerator
             int sel = (int)value!; // default
             var lb = new ListBox
             {
-                Width = 250,
+                Width = 150,
                 SelectionMode = SelectionMode.One
             };
             lb.Click += (_, __) => _service!.CloseDropDown();
@@ -100,7 +67,7 @@ namespace MidiGenerator
             // Fill the selector.
             var lb = new ListBox
             {
-                Width = 100,
+                Width = 50,
                 SelectionMode = SelectionMode.One
             };
             lb.Click += (_, __) => _service!.CloseDropDown();
@@ -119,7 +86,7 @@ namespace MidiGenerator
     }
 
     /// <summary>Select a device from list.</summary>
-    public class DevicesTypeEditor : UITypeEditor
+    public class DeviceTypeEditor : UITypeEditor
     {
         public override object? EditValue(ITypeDescriptorContext? context, IServiceProvider provider, object? value)
         {
@@ -128,7 +95,7 @@ namespace MidiGenerator
             // Fill the selector.
             var lb = new ListBox
             {
-                Width = 150,
+                Width = 100,
                 SelectionMode = SelectionMode.One
             };
             lb.Click += (_, __) => _service!.CloseDropDown();
@@ -146,6 +113,47 @@ namespace MidiGenerator
         public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext? context)
         {
             return UITypeEditorEditStyle.DropDown;
+        }
+    }
+
+    /// <summary>
+    /// xxxxx
+    /// </summary>
+    public class PatchConverter : Int64Converter
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="culture"></param>
+        /// <param name="value"></param>
+        /// <param name="destinationType"></param>
+        /// <returns></returns>
+        public override object ConvertTo(ITypeDescriptorContext? context, System.Globalization.CultureInfo? culture, object? value, Type destinationType)
+        {
+            //return MidiDefs.GetInstrumentName((int)value!);
+
+            if (value is int && destinationType == typeof(string))
+            {
+               //return MidiDefs.GetInstrumentName((int)value);
+            }
+            return base.ConvertTo(context, culture, value, destinationType);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="culture"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public override object ConvertFrom(ITypeDescriptorContext? context, System.Globalization.CultureInfo? culture, object value)
+        {
+            string txt = value.ToString();
+
+            //return MidiDefs.GetInstrumentNumber(txt);
+
+            return base.ConvertFrom(context, culture, value);
         }
     }
 }

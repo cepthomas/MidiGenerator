@@ -5,10 +5,12 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Ephemera.NBagOfTricks;
 
 
 namespace Ephemera.MidiLib
 {
+
 #if _FULL
     #region Enums
     /// <summary>Channel state.</summary>
@@ -84,6 +86,18 @@ namespace Ephemera.MidiLib
         public void SendEvent(MidiEvent evt) { }
     }
     #endregion
+
+#else
+    #region Definitions
+    public class MidiLibDefs
+    {
+        /// <summary>Default value.</summary>
+        public const double DEFAULT_VOLUME = 0.8;
+
+        /// <summary>Allow UI controls some more headroom.</summary>
+        public const double MAX_VOLUME = 2.0;
+    }
+    #endregion
 #endif
     
     #region Event args
@@ -137,4 +151,29 @@ namespace Ephemera.MidiLib
         }
     }
     #endregion
+
+
+    /// <summary>TODO2 consolidate?</summary>
+    public class LibUtils
+    {
+        // Load a standard midi def file.
+        public static Dictionary<int, string> LoadDefs(string fn)
+        {
+            Dictionary<int, string> res = [];
+
+            var ir = new IniReader(fn);
+
+            var defs = ir.Contents["midi_defs"];
+
+            defs.Values.ForEach(kv =>
+            {
+                // ["011", "GlassFlute"]
+                int index = int.Parse(kv.Key); // can throw
+                if (index < 0 || index > MidiDefs.MAX_MIDI) { throw new InvalidOperationException($"Invalid def file {fn}"); }
+                res[index] = kv.Value.Length > 0 ? kv.Value : "";
+            });
+
+            return res;
+        }
+    }
 }

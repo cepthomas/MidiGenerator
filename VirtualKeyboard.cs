@@ -24,8 +24,8 @@ namespace MidiGenerator
         #endregion
 
         #region Events
-        /// <summary>Click (including drag) info.</summary>
-        public event EventHandler<UserClickNoteEventArgs>? UserClick;
+        /// <summary>Click info.</summary>
+        public event EventHandler<UserClickNoteEventArgs>? UserClickNote;
         #endregion
 
         #region Constants
@@ -69,11 +69,20 @@ namespace MidiGenerator
             ClientSize = new Size(1200, 140);
 
             CreateKeys();
-            if (!CreateKeyMap())
+            if (CreateKeyMap())
             {
-                throw new Exception(); // TODO2 clean up all throw
+                DrawKeys();
             }
-            DrawKeys();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="e"></param>
+        protected override void OnLoad(EventArgs e)
+        {
+            _keys.ForEach(key => { key.ControlColor = ControlColor ; });
+            base.OnLoad(e);
         }
 
         /// <summary>
@@ -110,28 +119,27 @@ namespace MidiGenerator
             _keyMap.Clear();
             bool valid = true;
 
-
             try
             {
-                var ir = new IniReader(@"C:\Dev\Apps\MidiGenerator\def_keymap.ini");
+                var fn = @"C:\Dev\Apps\MidiGenerator\def_keymap.ini";// TODO1 file loc
+                var ir = new IniReader(fn);
 
                 var defs = ir.Contents["keymap"];
 
                 defs.Values.ForEach(kv => 
                 {
                     // Z = C3
-                    if (kv.Key.Length != 1) { throw new Exception(); }
+                    if (kv.Key.Length != 1) { throw new InvalidOperationException($"Invalid key {kv.Key} in {fn}"); }
+
                     var chkey = Utils.TranslateKey(kv.Key[0]);
-                    if (chkey == Keys.None) { throw new Exception(); }
+                    if (chkey == Keys.None) { throw new InvalidOperationException($"Invalid key {kv.Key} in {fn}"); }
+
                     var notes = MusicDefinitions.GetNotesFromString(kv.Value);
-                    if (notes.Count != 1) { throw new Exception(); }
+                    if (notes.Count != 1) { throw new InvalidOperationException($"Invalid key {kv.Key} in {fn}"); }
+
                     var note = notes[0];
                     _keyMap.Add(chkey, note);
                 });
-
-
-
-
 
 
                 //var ls = Utils.LoadDefFile(@"C:\Dev\Apps\MidiGenerator\def_keymap.txt");
@@ -142,26 +150,26 @@ namespace MidiGenerator
 
                 //    if (parts.Count != 2)
                 //    {
-                //        throw new Exception();
+                //        throw new Exception(x);
                 //    }
 
 
                 //    if (parts[0].Length != 1)
                 //    {
-                //        throw new Exception();
+                //        throw new Exception(x);
                 //    }
 
                 //    var key = Utils.TranslateKey(parts[0][0]);
                 //    if (key == Keys.None)
                 //    {
-                //        throw new Exception();
+                //        throw new Exception(x);
                 //    }
 
 
                 //    var notes = MusicDefinitions.GetNotesFromString(parts[1]);
                 //    if (notes.Count != 1)
                 //    {
-                //        throw new Exception();
+                //        throw new Exception(x);
                 //    }
 
                 //    var note = notes[0];
@@ -225,7 +233,7 @@ namespace MidiGenerator
         /// <param name="e"></param>
         void HandleKeyClick(object? sender, UserClickNoteEventArgs e)
         {
-            UserClick?.Invoke(this, e);
+            UserClickNote?.Invoke(this, e);
         }
         #endregion
 
@@ -240,10 +248,8 @@ namespace MidiGenerator
             for (int i = 0; i < HIGH_NOTE - LOW_NOTE; i++)
             {
                 int noteId = i + LOW_NOTE;
-                VirtualKey pk = new(this, noteId)
-                {
-                    ControlColor = ControlColor
-                };
+                VirtualKey pk = new(this, noteId);
+
                 // Pass along an event from a virtual key.
                 pk.KeyClickEvent += HandleKeyClick;
 

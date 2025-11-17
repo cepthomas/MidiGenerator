@@ -2,13 +2,46 @@
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
+using Ephemera.NBagOfTricks;
 using Ephemera.NBagOfUis;
 using Ephemera.MidiLib;
 
 
 namespace MidiGenerator
 {
-    /// <summary>Properties for a midi channel. TODO2 refactor Channel object?</summary>
+    #region Events
+    public class UserClickNoteEventArgs : EventArgs
+    {
+        /// <summary>The note number to play.</summary>
+        public int Note { get; set; }
+
+        /// <summary>0 to 127.</summary>
+        public int Velocity { get; set; }
+
+        /// <summary>Read me.</summary>
+        public override string ToString()
+        {
+            return $"Note:{MusicDefinitions.NoteNumberToName(Note)}({Note}):{Velocity}";
+        }
+    }
+
+    public class UserClickControllerEventArgs : EventArgs
+    {
+        /// <summary>Specific controller id.</summary>
+        public int Controller { get; set; }
+
+        /// <summary>Payload.</summary>
+        public int Value { get; set; }
+
+        /// <summary>Read me.</summary>
+        public override string ToString()
+        {
+            return $"Controller:{MidiDefs.TheDefs.GetControllerName(Controller)}({Controller}):{Value}";
+        }
+    }
+    #endregion
+
+    /// <summary>Properties for a midi channel. TODO1 refactor Channel object(s)?</summary>
     public class ChannelControl : UserControl
     {
         #region Designer variables
@@ -20,7 +53,8 @@ namespace MidiGenerator
 
         #region Properties
         /// <summary>Everything about me.</summary>
-        public ChannelSettings Settings { get; set; } = new();
+        public Channel Channel { get; set; } = new();
+        // public ChannelSettings Settings { get; set; } = new();
 
         /// <summary>Cosmetics.</summary>
         public Color ControlColor { get; set; } = Color.Red;
@@ -49,7 +83,7 @@ namespace MidiGenerator
 
             sldVolume = new()
             {
-                Location = new(194, 3),
+                Location = new(56, 3),
                 Size = new(83, 30),
                 BorderStyle = BorderStyle.FixedSingle,
                 Orientation = Orientation.Horizontal,
@@ -61,19 +95,19 @@ namespace MidiGenerator
 
             toolTip = new ToolTip(components);
 
-            Size = new Size(345, 38);
+            Size = new Size(142, 38);
 
             ResumeLayout(false);
             PerformLayout();
         }
 
         /// <summary>
-        /// Apply customization. Settings should be valid now.
+        /// Apply customization. Channel should be valid now.
         /// </summary>
         /// <param name="e"></param>
         protected override void OnLoad(EventArgs e)
         {
-            sldVolume.Value = Settings.Volume;
+            sldVolume.Value = Channel.Volume;
             sldVolume.DrawColor = ControlColor;
             sldVolume.ValueChanged += Volume_ValueChanged;
 
@@ -108,7 +142,7 @@ namespace MidiGenerator
         void Volume_ValueChanged(object? sender, EventArgs e)
         {
             // No need to check limits.
-            Settings.Volume = (sender as Slider)!.Value;
+            Channel.Volume = (sender as Slider)!.Value;
         }
 
         /// <summary>
@@ -118,31 +152,26 @@ namespace MidiGenerator
         /// <param name="e"></param>
         void ChannelEd_Click(object? sender, EventArgs e)
         {
-            var changes = SettingsEditor.Edit(Settings, "Channel Settings", 300);
+            var changes = SettingsEditor.Edit(Channel, "Channel", 300);
 
             // Detect changes of interest.
-            //bool restart = false;
-
             foreach (var (name, cat) in changes)
             {
                 switch (name)
                 {
                     case "ChannelNumber":
                         ChannelChange?.Invoke(this, new() { ChannelNumberChange = true });
+                        Channel.SendPatch();
                         break;
                     case "Patch":
                         ChannelChange?.Invoke(this, new() { PatchChange = true });
+                        Channel.SendPatch();
                         break;
                     case "PresetFile":
-                        //restart = true;
+                        // Handled in property setter.
                         break;
                 }
             }
-
-            // if (restart)
-            // {
-            //     MessageBox.Show("Restart required for device changes to take effect");
-            // }
 
             UpdateUi();
         }
@@ -155,17 +184,17 @@ namespace MidiGenerator
         void UpdateUi()
         {
             // General.
-            lblChannelInfo.Text = $"Ch{Settings.ChannelNumber}";
-            toolTip.SetToolTip(this, string.Join(Environment.NewLine, "Info"));
+            lblChannelInfo.Text = $"Ch{Channel.ChannelNumber}";
+            toolTip.SetToolTip(this, ToString());
         }
 
         /// <summary>
         /// Read me.
          /// </summary>
         /// <returns></returns>
-        //public override string ToString()
-        //{
-//TODO1            return $"Ch:{Settings.ChannelNumber} Patch:{MidiDefs.GetPatchName(Settings.Patch)} ({Settings.Patch})";
-        //}
+        public override string ToString()
+        {
+            return $"Ch:{Channel.ChannelNumber} Patch:{Channel.GetPatchName()}({Channel.Patch})";
+        }
     }
 }
