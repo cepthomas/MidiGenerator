@@ -131,8 +131,23 @@ namespace MidiGenerator
                     // Z = C3
                     if (kv.Key.Length != 1) { throw new InvalidOperationException($"Invalid key {kv.Key} in {fn}"); }
 
-                    var chkey = Utils.TranslateKey(kv.Key[0]);
-                    if (chkey == Keys.None) { throw new InvalidOperationException($"Invalid key {kv.Key} in {fn}"); }
+                    Keys chkey = Keys.None;
+                    switch (kv.Key[0])
+                    {
+                        case ',':  chkey = Keys.Oemcomma; break;
+                        case '=':  chkey = Keys.Oemplus; break;
+                        case '-':  chkey = Keys.OemMinus; break;
+                        case '/':  chkey = Keys.OemQuestion; break;
+                        case '.':  chkey = Keys.OemPeriod; break;
+                        case '\'': chkey = Keys.OemQuotes; break;
+                        case '\\': chkey = Keys.OemPipe; break;
+                        case ']':  chkey = Keys.OemCloseBrackets; break;
+                        case '[':  chkey = Keys.OemOpenBrackets; break;
+                        case '`':  chkey = Keys.Oemtilde; break;
+                        case ';':  chkey = Keys.OemSemicolon; break;
+                        case (>= 'A' and <= 'Z') or (>= '0' and <= '9'): chkey = (Keys)kv.Key[0]; break;
+                        default: throw new InvalidOperationException($"Invalid key {kv.Key} in {fn}");
+                    }
 
                     var notes = MusicDefinitions.GetNotesFromString(kv.Value);
                     if (notes.Count != 1) { throw new InvalidOperationException($"Invalid key {kv.Key} in {fn}"); }
@@ -140,41 +155,6 @@ namespace MidiGenerator
                     var note = notes[0];
                     _keyMap.Add(chkey, note);
                 });
-
-
-                //var ls = Utils.LoadDefFile(@"C:\Dev\Apps\MidiGenerator\def_keymap.txt");
-
-                //foreach (var parts in ls)
-                //{
-                //    // Z  C3
-
-                //    if (parts.Count != 2)
-                //    {
-                //        throw new Exception(x);
-                //    }
-
-
-                //    if (parts[0].Length != 1)
-                //    {
-                //        throw new Exception(x);
-                //    }
-
-                //    var key = Utils.TranslateKey(parts[0][0]);
-                //    if (key == Keys.None)
-                //    {
-                //        throw new Exception(x);
-                //    }
-
-
-                //    var notes = MusicDefinitions.GetNotesFromString(parts[1]);
-                //    if (notes.Count != 1)
-                //    {
-                //        throw new Exception(x);
-                //    }
-
-                //    var note = notes[0];
-                //    _keyMap.Add(key, note);
-                //}
             }
             catch (Exception)
             {

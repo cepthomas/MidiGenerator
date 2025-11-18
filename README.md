@@ -7,6 +7,10 @@ Emulated midi controllers:
 - Can be used to drive external midi devices via USB or internal soft devices using a loopback like [LoopMidi](https://www.tobias-erichsen.de/software/loopmidi.html).
 - Requires VS2022 and .NET8.
 
+SimpleChannelControl
+- Simple/dumb UI control.
+- Provides volume, channel, patch selection.
+
 
 VirtualKeyboard
 - Piano control based loosely on Leslie Sanford's [Midi Toolkit](https://github.com/tebjan/Sanford.Multimedia.Midi).

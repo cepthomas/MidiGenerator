@@ -47,11 +47,8 @@ namespace MidiGenerator
 
             // Load defs.
             // MidiDefs.Load(MidiDefs.DefType.Instrument, @"C:\Dev\Apps\MidiGenerator\gm_instruments.ini");
-
             // MidiDefs.Load(MidiDefs.DefType.Controller, @"C:\Dev\Apps\MidiGenerator\gm_controllers.txt");
-
             // MidiDefs.Load(MidiDefs.DefType.Drum, @"C:\Dev\Apps\MidiGenerator\gm_drums.txt");
-
             // MidiDefs.Load(MidiDefs.DefType.DrumKit, @"C:\Dev\Apps\MidiGenerator\gm_drumkits.txt");
 
 
@@ -72,18 +69,38 @@ namespace MidiGenerator
             string deviceName = _settings.OutputDevice;// "VirtualMIDISynth #1";
             _midiOut = new MidiOutput(deviceName);
 
-            ///// Init the channels and their corresponding controls. /////
+            ///// Init the channels and their corresponding controls. TODO2 clean up/////
+            // Channels.
             vkey.UserClickNote += UserClickNoteEvent;
             vkey.ControlColor = _settings.ControlColor;
             vkey.Enabled = true;
-
-            ctrlVkey.ControlColor = _settings.ControlColor;
-            ctrlVkey.Channel = _settings.VkeyChannel;
-            ctrlVkey.ChannelChange += Channel_ChannelChange;
+            if (vkey.PresetFile != "")
+            {
+                if (!File.Exists(vkey.PresetFile)) throw new FileNotFoundException(vkey.PresetFile);
+                vkey.Instruments = LibUtils.LoadDefs(vkey.PresetFile);
+            }
+            else // use defaults
+            {
+                vkey.Instruments = MidiDefs.GetDefaultInstrumentDefs();
+            }
 
             cc.UserClickNote += UserClickNoteEvent;
             cc.ControlColor = _settings.ControlColor;
             cc.Enabled = true;
+            if (cc.PresetFile != "")
+            {
+                if (!File.Exists(cc.PresetFile)) throw new FileNotFoundException(cc.PresetFile);
+                cc.Instruments = LibUtils.LoadDefs(cc.PresetFile);
+            }
+            else // use defaults
+            {
+                cc.Instruments = MidiDefs.GetDefaultInstrumentDefs();
+            }
+
+            // Channel controls.
+            ctrlVkey.ControlColor = _settings.ControlColor;
+            ctrlVkey.Channel = _settings.VkeyChannel;
+            ctrlVkey.ChannelChange += Channel_ChannelChange;
 
             ctrlCc.ControlColor = _settings.ControlColor;
             ctrlCc.Channel = _settings.ClickClackChannel;
@@ -98,12 +115,12 @@ namespace MidiGenerator
         }
 
         /// <summary>
-        /// Form is legal now. Init things that want to log or play with controls..
+        /// Form is legal now. Tie up some loose ends.
         /// </summary>
         /// <param name="e"></param>
         protected override void OnLoad(EventArgs e)
         {
-             _logger.Info($"Hello!");
+             // _logger.Info($"Hello!");
 
             if (!_midiOut.Valid)
             {
