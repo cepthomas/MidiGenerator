@@ -27,10 +27,6 @@ namespace MidiGenerator
             Channel chan = context.Instance as Channel;
             var vals = chan.Instruments;
 
-            //Type t = context!.Instance!.GetType();
-            //var fld = t.GetField("_instruments", BindingFlags.NonPublic | BindingFlags.Instance);
-            //var vals = (Dictionary<int, string>)fld.GetValue(context.Instance)!;
-
             // Fill the selector.
             int sel = (int)value!; // default
             var lb = new ListBox
@@ -39,7 +35,7 @@ namespace MidiGenerator
                 SelectionMode = SelectionMode.One
             };
             lb.Click += (_, __) => _service!.CloseDropDown();
-            vals.ForEach(v => lb.Items.Add(v));
+            vals.ForEach(v => lb.Items.Add($"{v.Key} {v.Value}"));
             _service!.DropDownControl(lb);
 
             return lb.SelectedItem is null ? value : lb.SelectedIndex;

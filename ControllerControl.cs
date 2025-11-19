@@ -7,16 +7,24 @@ using Ephemera.NBagOfTricks;
 using Ephemera.NBagOfUis;
 
 
+
+
+
 namespace MidiGenerator
 {
-    public class ChannelControl : UserControl
+    public class ControllerControl : UserControl
     {
         #region Designer variables
         readonly Container? components = null;
-        readonly Label lblChannelInfo;
-        readonly Slider sldVolume;
+        readonly Label lblControllerInfo;
+        readonly Slider sldValue;
         readonly ToolTip toolTip;
         #endregion
+
+// controller:
+// channel
+// picker for controller id 0-127 w/wo translate - custom list like Channel.Instruments
+// slider 0-127 value
 
         #region Properties
         /// <summary>Everything about me.</summary>
@@ -35,22 +43,22 @@ namespace MidiGenerator
         /// <summary>
         /// Constructor. Create controls.
         /// </summary>
-        public ChannelControl()
+        public ControllerControl()
         {
             components = new Container();
             SuspendLayout();
 
-            lblChannelInfo = new()
+            lblControllerInfo = new()
             {
                 Location = new(4, 8),
                 Size = new(200, 20),
                 Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right
             };
-            Controls.Add(lblChannelInfo);
+            Controls.Add(lblControllerInfo);
 
-            sldVolume = new()
+            sldValue = new()
             {
-                Location = new(lblChannelInfo.Right + 4, 3),
+                Location = new(lblControllerInfo.Right + 4, 3),
                 Size = new(83, 30),
                 BorderStyle = BorderStyle.FixedSingle,
                 Orientation = Orientation.Horizontal,
@@ -59,11 +67,11 @@ namespace MidiGenerator
                 Resolution = 0.05,
                 Anchor = AnchorStyles.Top | AnchorStyles.Right
             };
-            Controls.Add(sldVolume);
+            Controls.Add(sldValue);
 
             toolTip = new ToolTip(components);
 
-            Size = new Size(sldVolume.Right + 4, 38); // default
+            Size = new Size(sldValue.Right + 4, 38); // default
 
             ResumeLayout(false);
             PerformLayout();
@@ -75,12 +83,12 @@ namespace MidiGenerator
         /// <param name="e"></param>
         protected override void OnLoad(EventArgs e)
         {
-            sldVolume.Value = BoundChannel.Volume;
-            sldVolume.DrawColor = ControlColor;
-            sldVolume.ValueChanged += Volume_ValueChanged;
+            sldValue.Value = BoundChannel.Volume;
+            sldValue.DrawColor = ControlColor;
+            sldValue.ValueChanged += Volume_ValueChanged;
 
-            lblChannelInfo.Click += ChannelEd_Click;
-            lblChannelInfo.BackColor = Color.LightBlue;
+            lblControllerInfo.Click += ChannelEd_Click;
+            lblControllerInfo.BackColor = Color.LightBlue;
 
             UpdateUi();
 
@@ -142,8 +150,8 @@ namespace MidiGenerator
         void UpdateUi()
         {
             // General.
-            lblChannelInfo.Text = ToString().Left(30);
-            toolTip.SetToolTip(lblChannelInfo, "??????");
+            lblControllerInfo.Text = ToString().Left(30);
+            toolTip.SetToolTip(lblControllerInfo, "??????");
         }
 
         /// <summary>

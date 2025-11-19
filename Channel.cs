@@ -49,10 +49,7 @@ namespace MidiGenerator
         public string PresetFile
         {
             get { return _presetFile; }
-            set
-            {
-                _presetFile = value;
-            }
+            set { _presetFile = value; }
         }
         string _presetFile = "";
 
@@ -67,7 +64,6 @@ namespace MidiGenerator
         }
         int _patch = 0;
         #endregion
-
 
         /// <summary>Convenience property.</summary>
         [Browsable(false)]
