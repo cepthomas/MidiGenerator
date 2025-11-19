@@ -182,7 +182,6 @@ namespace MidiGenerator
 
             // Reset and tell client.
             _lastNote = -1;
-            //UserClick?.Invoke(this, new() { Note = -1, Velocity = -1 });//TODO1?
 
             _toolTip.SetToolTip(this, "");
 

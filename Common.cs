@@ -9,7 +9,7 @@ using Ephemera.NBagOfTricks;
 
 namespace MidiGenerator
 {
-    public class MiscDefs //TODO1 petter home
+    public class MiscDefs
     {
         /// <summary>Default value.</summary>
         public const double DEFAULT_VOLUME = 0.8;

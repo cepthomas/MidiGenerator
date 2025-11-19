@@ -121,7 +121,7 @@ namespace MidiGenerator
 
             try
             {
-                var fn = @"C:\Dev\Apps\MidiGenerator\def_keymap.ini";// TODO1 file loc
+                var fn = @"defs\def_keymap.ini";
                 var ir = new IniReader(fn);
 
                 var defs = ir.Contents["keymap"];

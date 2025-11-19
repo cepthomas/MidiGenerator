@@ -15,7 +15,7 @@ namespace MidiGenerator
         readonly Container? components = null;
         readonly Label lblChannelInfo;
         readonly Slider sldVolume;
-        //readonly ToolTip toolTip;
+        readonly ToolTip toolTip;
         #endregion
 
         #region Properties
@@ -44,25 +44,26 @@ namespace MidiGenerator
             {
                 Location = new(4, 8),
                 Size = new(200, 20),
-                
+                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right
             };
             Controls.Add(lblChannelInfo);
 
             sldVolume = new()
             {
-                Location = new(208, 3),
+                Location = new(lblChannelInfo.Right + 4, 3),
                 Size = new(83, 30),
                 BorderStyle = BorderStyle.FixedSingle,
                 Orientation = Orientation.Horizontal,
                 Minimum = 0.0,
                 Maximum = MiscDefs.MAX_VOLUME,
                 Resolution = 0.05,
+                Anchor = AnchorStyles.Top | AnchorStyles.Right
             };
             Controls.Add(sldVolume);
 
-            //toolTip = new ToolTip(components);
+            toolTip = new ToolTip(components);
 
-            Size = new Size(142, 38); // default
+            Size = new Size(sldVolume.Right + 4, 38); // default
 
             ResumeLayout(false);
             PerformLayout();
@@ -141,9 +142,8 @@ namespace MidiGenerator
         void UpdateUi()
         {
             // General.
-            //lblChannelInfo.Text = $"Ch{Channel.ChannelNumber}";
             lblChannelInfo.Text = ToString().Left(30);
-            //toolTip.SetToolTip(this, ToString());
+            toolTip.SetToolTip(lblChannelInfo, "??????");
         }
 
         /// <summary>
@@ -152,7 +152,7 @@ namespace MidiGenerator
         /// <returns></returns>
         public override string ToString()
         {
-            return $"Ch:{Channel.ChannelNumber} {Channel.Instruments[Channel.Patch]}({Channel.Patch})";
+            return $"Ch {Channel.ChannelNumber} {Channel.Instruments[Channel.Patch]}({Channel.Patch})";
         }
     }
 }

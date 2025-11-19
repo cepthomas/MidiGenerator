@@ -92,13 +92,6 @@ namespace MidiGenerator
                 _instruments = MidiDefs.TheDefs.GetDefaultInstrumentDefs();
             }
         }
-
-        ///// <summary>Get patch name.</summary>
-        ///// <returns>The name.</returns>
-        //public string GetPatchName()
-        //{
-        //    return _instruments[Patch];
-        //}
         #endregion
     }
 }

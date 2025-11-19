@@ -60,7 +60,7 @@ namespace MidiGenerator
             };
 
             ///// Figure out which midi output device. /////
-            string deviceName = _settings.OutputDevice;// "VirtualMIDISynth #1";
+            string deviceName = _settings.OutputDevice; // "VirtualMIDISynth #1";
             for (int i = 0; i < MidiOut.NumberOfDevices; i++)
             {
                 if (deviceName == MidiOut.DeviceInfo(i).ProductName)
@@ -99,7 +99,6 @@ namespace MidiGenerator
             ClClChannelControl.Channel = _settings.ClClChannel;
             ClClChannelControl.ChannelChange += Channel_ChannelChange;
 
-
             ///// Finish up. /////
             SendPatch(VkeyChannelControl.Channel.ChannelNumber, VkeyChannelControl.Channel.Patch);
             SendPatch(ClClChannelControl.Channel.ChannelNumber, ClClChannelControl.Channel.Patch);
@@ -112,26 +111,9 @@ namespace MidiGenerator
         /// Form is legal now. Tie up some loose ends.
         /// </summary>
         /// <param name="e"></param>
-        protected override void OnLoad(EventArgs e) //TODO1 anything?
+        protected override void OnLoad(EventArgs e)
         {
-            // _logger.Info($"Hello!");
-
-            //if (_midiOut is null)
-            //{
-            //    _logger.Error($"Invalid midi output device");
-            //}
-            //else
-            //{
-            //    SendPatch(ctrlVkey.Channel.ChannelNumber, ctrlVkey.Channel.Patch);
-            //    SendPatch(ctrlCc.Channel.ChannelNumber, ctrlCc.Channel.Patch);
-
-
-            //    //ctrlVkey.Channel.Device = _midiOut;
-            //    //ctrlVkey.Channel.SendPatch();
-
-            //    //ctrlCc.Channel.Device = _midiOut;
-            //    //ctrlCc.Channel.SendPatch();
-            //}
+            _logger.Info($"It's alive!");
 
             base.OnLoad(e);
         }
@@ -247,7 +229,8 @@ namespace MidiGenerator
 
             if (e.PresetFileChange)
             {
-                // Update channel presets. TODO1
+                // Update channel presets.
+                cc.Channel.UpdatePresets();
             }
         }
 
@@ -335,7 +318,7 @@ namespace MidiGenerator
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void About_Click(object? sender, EventArgs e) //TODO1
+        void About_Click(object? sender, EventArgs e)
         {
             // Show the builtin definitions and user devices.
             List<string> ls = [];

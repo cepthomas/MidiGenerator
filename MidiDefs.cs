@@ -45,19 +45,21 @@ namespace MidiGenerator
         readonly Dictionary<int, string> _drumKits;
         #endregion
 
+        #region Lifecycle
         /// <summary>
         /// Initialize some collections.
         /// </summary>
         public MidiDefs()
         {
-            // TODO1 files from where?
-            _instruments = Utils.LoadDefs(@"C:\Dev\Apps\MidiGenerator\gm_instruments.ini");
-            _controllers = Utils.LoadDefs(@"C:\Dev\Apps\MidiGenerator\gm_controllers.ini");
-            _drums = Utils.LoadDefs(@"C:\Dev\Apps\MidiGenerator\gm_drums.ini");
-            _drumKits = Utils.LoadDefs(@"C:\Dev\Apps\MidiGenerator\gm_drumkits.ini");
+            var cd = Environment.CurrentDirectory;
+            _instruments = Utils.LoadDefs(@"defs\gm_instruments.ini");
+            _controllers = Utils.LoadDefs(@"defs\gm_controllers.ini");
+            _drums = Utils.LoadDefs(@"defs\gm_drums.ini");
+            _drumKits = Utils.LoadDefs(@"defs\gm_drumkits.ini");
         }
+        #endregion
 
-        #region API  TODO1 clean up debris
+        #region Public
         /// <summary>Default instruments.</summary>
         /// <returns></returns>
         public Dictionary<int, string> GetDefaultInstrumentDefs()
@@ -66,10 +68,10 @@ namespace MidiGenerator
         }
 
         /// <summary>
-        /// Make markdown content from the definitions.
+        /// Make content from the definitions.
         /// </summary>
-        /// <returns>Markdown content.</returns>
-        public List<string> FormatDoc()//TODO1
+        /// <returns>Content.</returns>
+        public List<string> FormatDoc()
         {
             List<string> docs = new();
             docs.Add("# Midi GM Instruments");
@@ -105,21 +107,6 @@ namespace MidiGenerator
             return _drums.ContainsKey(which) ? _drums[which] : $"DRUM_{which}";
         }
 
-        // /// <summary>
-        // /// Get drum number.
-        // /// </summary>
-        // /// <param name="which"></param>
-        // /// <returns>The midi number or -1 if invalid.</returns>
-        // public static int GetDrumNumber(string which)
-        // {
-        //     if (_drumNumbers.ContainsKey(which))
-        //     {
-        //         return _drumNumbers[which];
-        //     }
-        //     //throw new ArgumentException($"Invalid drum: {which}");
-        //     return -1;
-        // }
-
         /// <summary>
         /// Get controller name.
         /// </summary>
@@ -129,21 +116,6 @@ namespace MidiGenerator
         {
             return _controllers.ContainsKey(which) ? _controllers[which] : $"CTLR_{which}";
         }
-
-        // /// <summary>
-        // /// Get the controller number.
-        // /// </summary>
-        // /// <param name="which"></param>
-        // /// <returns>The midi number or -1 if invalid.</returns>
-        // public static int GetControllerNumber(string which)
-        // {
-        //     if (_controllerNumbers.ContainsKey(which))
-        //     {
-        //         return _controllerNumbers[which];
-        //     }
-        //     //throw new ArgumentException($"Invalid controller: {which}");
-        //     return -1;
-        // }
 
         /// <summary>
         /// Get GM drum kit name.
@@ -156,19 +128,25 @@ namespace MidiGenerator
         }
 
         // /// <summary>
+        // /// Get drum number.
+        // /// </summary>
+        // /// <param name="which"></param>
+        // /// <returns>The midi number or -1 if invalid.</returns>
+        // public static int GetDrumNumber(string which)
+
+        // /// <summary>
+        // /// Get the controller number.
+        // /// </summary>
+        // /// <param name="which"></param>
+        // /// <returns>The midi number or -1 if invalid.</returns>
+        // public static int GetControllerNumber(string which)
+
+        // /// <summary>
         // /// Get GM drum kit number.
         // /// </summary>
         // /// <param name="which"></param>
         // /// <returns>The midi number or -1 if invalid.</returns>
         // public static int GetDrumKitNumber(string which)
-        // {
-        //     if(_drumKitNumbers.ContainsKey(which))
-        //     {
-        //         return _drumKitNumbers[which];
-        //     }
-        //     //throw new ArgumentException($"Invalid drum kit: {which}");
-        //     return -1;
-        // }
 
         // /// <summary>
         // /// Get the instrument/patch or drum number.
@@ -176,18 +154,6 @@ namespace MidiGenerator
         // /// <param name="which"></param>
         // /// <returns>The midi number or -1 if invalid.</returns>
         // public static int GetInstrumentOrDrumKitNumber(string which)
-        // {
-        //     if (_instrumentNumbers.ContainsKey(which))
-        //     {
-        //         return _instrumentNumbers[which];
-        //     }
-        //     else if (_drumKitNumbers.ContainsKey(which))
-        //     {
-        //         return _drumKitNumbers[which];
-        //     }
-        //     //throw new ArgumentException($"Invalid instrument or drum: {which}");
-        //     return -1;
-        // }
         #endregion
     }
 }    
