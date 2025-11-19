@@ -1,10 +1,10 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 using Ephemera.NBagOfTricks;
 using Ephemera.NBagOfUis;
-using Ephemera.MidiLib;
 
 
 namespace MidiGenerator
@@ -15,20 +15,19 @@ namespace MidiGenerator
         readonly Container? components = null;
         readonly Label lblChannelInfo;
         readonly Slider sldVolume;
-        readonly ToolTip toolTip;
+        //readonly ToolTip toolTip;
         #endregion
 
         #region Properties
         /// <summary>Everything about me.</summary>
         public Channel Channel { get; set; } = new();
-        // public ChannelSettings Settings { get; set; } = new();
 
         /// <summary>Cosmetics.</summary>
         public Color ControlColor { get; set; } = Color.Red;
         #endregion
 
         #region Events
-        /// <summary>Notify host of asynchronous changes from user.</summary>
+        /// <summary>Notify host of changes from user.</summary>
         public event EventHandler<ChannelChangeEventArgs>? ChannelChange;
         #endregion
 
@@ -43,26 +42,27 @@ namespace MidiGenerator
 
             lblChannelInfo = new()
             {
-                Location = new(2, 8),
-                Size = new(48, 20)
+                Location = new(4, 8),
+                Size = new(200, 20),
+                
             };
             Controls.Add(lblChannelInfo);
 
             sldVolume = new()
             {
-                Location = new(56, 3),
+                Location = new(208, 3),
                 Size = new(83, 30),
                 BorderStyle = BorderStyle.FixedSingle,
                 Orientation = Orientation.Horizontal,
                 Minimum = 0.0,
-                Maximum = MidiLibDefs.MAX_VOLUME,
+                Maximum = MiscDefs.MAX_VOLUME,
                 Resolution = 0.05,
             };
             Controls.Add(sldVolume);
 
-            toolTip = new ToolTip(components);
+            //toolTip = new ToolTip(components);
 
-            Size = new Size(142, 38);
+            Size = new Size(142, 38); // default
 
             ResumeLayout(false);
             PerformLayout();
@@ -113,7 +113,7 @@ namespace MidiGenerator
         }
 
         /// <summary>
-        /// Handle selection.
+        /// Edit channel properties.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -122,28 +122,18 @@ namespace MidiGenerator
             var changes = SettingsEditor.Edit(Channel, "Channel", 300);
 
             // Detect changes of interest.
-            foreach (var (name, cat) in changes)
+            ChannelChangeEventArgs args = new()
             {
-                switch (name)
-                {
-                    case "ChannelNumber":
-                        ChannelChange?.Invoke(this, new() { ChannelNumberChange = true });
-                        Channel.SendPatch();
-                        break;
-                    case "Patch":
-                        ChannelChange?.Invoke(this, new() { PatchChange = true });
-                        Channel.SendPatch();
-                        break;
-                    case "PresetFile":
-                        // Handled in property setter.
-                        break;
-                }
-            }
+                ChannelNumberChange = changes.Any(ch => ch.name == "ChannelNumber"),
+                PatchChange = changes.Any(ch => ch.name == "Patch"),
+                PresetFileChange = changes.Any(ch => ch.name == "PresetFile"),
+            };
+
+            ChannelChange?.Invoke(this, new() { ChannelNumberChange = true });
 
             UpdateUi();
         }
         #endregion
-
 
         /// <summary>
         /// Draw mode checkboxes etc.
@@ -151,8 +141,9 @@ namespace MidiGenerator
         void UpdateUi()
         {
             // General.
-            lblChannelInfo.Text = $"Ch{Channel.ChannelNumber}";
-            toolTip.SetToolTip(this, ToString());
+            //lblChannelInfo.Text = $"Ch{Channel.ChannelNumber}";
+            lblChannelInfo.Text = ToString().Left(30);
+            //toolTip.SetToolTip(this, ToString());
         }
 
         /// <summary>
@@ -161,7 +152,7 @@ namespace MidiGenerator
         /// <returns></returns>
         public override string ToString()
         {
-            return $"Ch:{Channel.ChannelNumber} Patch:{Channel.GetPatchName()}({Channel.Patch})";
+            return $"Ch:{Channel.ChannelNumber} {Channel.Instruments[Channel.Patch]}({Channel.Patch})";
         }
     }
 }

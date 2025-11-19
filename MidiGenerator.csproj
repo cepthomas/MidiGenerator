@@ -26,8 +26,17 @@
 
     <ItemGroup>
       <Compile Remove="lib\**" />
+      <Compile Remove="MidiLibNew\**" />
       <EmbeddedResource Remove="lib\**" />
+      <EmbeddedResource Remove="MidiLibNew\**" />
       <None Remove="lib\**" />
+      <None Remove="MidiLibNew\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="MidiGenerator_2.zip" />
+      <None Remove="MidiGenerator_3.zip" />
+      <None Remove="notes.txt" />
     </ItemGroup>
 
     <ItemGroup>
@@ -36,9 +45,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Reference Include="Ephemera.MidiLib">
-            <HintPath>lib\Ephemera.MidiLib.dll</HintPath>
-        </Reference>
         <Reference Include="Ephemera.NBagOfTricks">
             <HintPath>lib\Ephemera.NBagOfTricks.dll</HintPath>
         </Reference>

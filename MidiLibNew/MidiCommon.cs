@@ -153,7 +153,7 @@ namespace Ephemera.MidiLib
     #endregion
 
 
-    /// <summary>TODO2 consolidate?</summary>
+    /// <summary>consolidate?</summary>
     public class LibUtils
     {
         // Load a standard midi def file.

@@ -443,7 +443,7 @@ namespace MidiGenerator
             // Outline.
             e.Graphics.DrawRectangle(Pens.Black, 0, 0, Size.Width - 1, Size.Height - 1);
 
-            // Note name. TODO just C to minimize clutter.
+            // Note name. Just C to minimize clutter.
             if(_owner.ShowNoteNames)
             {
                 int root = NoteId % 12;

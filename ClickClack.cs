@@ -26,10 +26,10 @@ namespace MidiGenerator
         readonly ToolTip _toolTip = new();
 
         /// <summary>Ranges.</summary>
-        int _minX = 24; // C0
-        int _maxX = 96; // C6
-        int _minY = 0;
-        int _maxY = 128;
+        const int MIN_X = 24; // C0
+        const int MAX_X = 96; // C6
+        const int MIN_Y = 0;
+        const int MAX_Y = 128;
         #endregion
 
         #region Properties
@@ -90,18 +90,18 @@ namespace MidiGenerator
             // Draw grid. X is octaves. Y is volume.
             foreach (var gl in new int[] { 36, 48, 60, 72, 84 })
             {
-                if (gl >= _minX && gl <= _maxX) // sanity - throw?
+                if (gl >= MIN_X && gl <= MAX_X) // sanity - throw?
                 {
-                    int x = MathUtils.Map(gl, _minX, _maxX, 0, Width);
+                    int x = MathUtils.Map(gl, MIN_X, MAX_X, 0, Width);
                     pe.Graphics.DrawLine(_pen, x, 0, x, Height);
                 }
             }
 
             foreach (var gl in new int[] { 20, 40, 60, 80, 100, 120 })
             {
-                if (gl >= _minY && gl <= _maxY)
+                if (gl >= MIN_Y && gl <= MAX_Y)
                 {
-                    int y = MathUtils.Map(gl, _minY, _maxY, Height, 0);
+                    int y = MathUtils.Map(gl, MIN_Y, MAX_Y, Height, 0);
                     pe.Graphics.DrawLine(_pen, 0, y, Width, y);
                 }
             }
@@ -231,9 +231,9 @@ namespace MidiGenerator
             var mp = PointToClient(MousePosition);
 
             // Map and check.
-            int x = MathUtils.Map(mp.X, 0, Width, _minX, _maxX);
+            int x = MathUtils.Map(mp.X, 0, Width, MIN_X, MAX_X);
             int ux = x >= 0 && x < Width ? x : -1;
-            int y = MathUtils.Map(mp.Y, Height, 0, _minY, _maxY);
+            int y = MathUtils.Map(mp.Y, Height, 0, MIN_Y, MAX_Y);
             int uy = y >= 0 && y < Height ? y : -1;
 
             return (ux, uy);

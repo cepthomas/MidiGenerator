@@ -9,7 +9,7 @@ using NAudio.Midi;
 using Ephemera.NBagOfTricks;
 
 
-namespace Ephemera.MidiLib
+namespace MidiGenerator
 {
     /// <summary>Stuff like readable versions of midi numbers.</summary>
     public class MidiDefs
@@ -32,7 +32,7 @@ namespace Ephemera.MidiLib
         #endregion
 
         #region Fields
-        /// <summary>All the default GM instruments.</summary>
+        /// <summary>All the GM instruments - default.</summary>
         readonly Dictionary<int, string> _instruments;
         
         /// <summary>All the GM CCs.</summary>
@@ -50,18 +50,26 @@ namespace Ephemera.MidiLib
         /// </summary>
         public MidiDefs()
         {
-            // files from where?
-            _instruments = LibUtils.LoadDefs(@"C:\Dev\Apps\MidiGenerator\MidiLibNew\gm_instruments.ini");
-            _controllers = LibUtils.LoadDefs(@"C:\Dev\Apps\MidiGenerator\MidiLibNew\gm_controllers.ini");
-            _drums = LibUtils.LoadDefs(@"C:\Dev\Apps\MidiGenerator\MidiLibNew\gm_drums.ini");
-            _drumKits = LibUtils.LoadDefs(@"C:\Dev\Apps\MidiGenerator\MidiLibNew\gm_drumkits.ini");
+            // TODO1 files from where?
+            _instruments = Utils.LoadDefs(@"C:\Dev\Apps\MidiGenerator\gm_instruments.ini");
+            _controllers = Utils.LoadDefs(@"C:\Dev\Apps\MidiGenerator\gm_controllers.ini");
+            _drums = Utils.LoadDefs(@"C:\Dev\Apps\MidiGenerator\gm_drums.ini");
+            _drumKits = Utils.LoadDefs(@"C:\Dev\Apps\MidiGenerator\gm_drumkits.ini");
+        }
+
+        #region API  TODO1 clean up debris
+        /// <summary>Default instruments.</summary>
+        /// <returns></returns>
+        public Dictionary<int, string> GetDefaultInstrumentDefs()
+        {
+            return _instruments;
         }
 
         /// <summary>
         /// Make markdown content from the definitions.
         /// </summary>
         /// <returns>Markdown content.</returns>
-        public List<string> FormatDoc()
+        public List<string> FormatDoc()//TODO1
         {
             List<string> docs = new();
             docs.Add("# Midi GM Instruments");
@@ -86,51 +94,6 @@ namespace Ephemera.MidiLib
 
             return docs;
         }
-
-        #region API
-
-
-#if _OLD
-
-        /// <summary>
-        /// Get patch name.
-        /// </summary>
-        /// <param name="which"></param>
-        /// <returns>The name.</returns>
-        public static string GetInstrumentName(int which)
-        {
-            string ret = which switch
-            {
-                -1 => "NoPatch",
-                >= 0 and < MAX_MIDI => _instruments[which],
-                _ => throw new ArgumentOutOfRangeException(nameof(which)),
-            };
-            return ret;
-        }
-
-        /// <summary>
-        /// Get the instrument/patch number.
-        /// </summary>
-        /// <param name="which"></param>
-        /// <returns>The midi number or -1 if invalid.</returns>
-        public static int GetInstrumentNumber(string which)
-        {
-            if (_instrumentNumbers.ContainsKey(which))
-            {
-                return _instrumentNumbers[which];
-            }
-            //throw new ArgumentException($"Invalid instrument: {which}");
-            return -1;
-        }
-#else
-
-        public Dictionary<int, string> GetDefaultInstrumentDefs()
-        {
-            return _instruments;
-        }
-#endif
-
-
 
         /// <summary>
         /// Get drum name.

@@ -5,12 +5,21 @@ using System.Text;
 using System.IO;
 using System.Windows.Forms;
 using Ephemera.NBagOfTricks;
-using Ephemera.MidiLib;
 
 
 namespace MidiGenerator
 {
+    public class MiscDefs //TODO1 petter home
+    {
+        /// <summary>Default value.</summary>
+        public const double DEFAULT_VOLUME = 0.8;
+
+        /// <summary>Allow UI controls some more headroom.</summary>
+        public const double MAX_VOLUME = 2.0;
+    }
+
     #region Events
+    /// <summary>Notify host of user clicks.</summary>
     public class UserClickNoteEventArgs : EventArgs
     {
         /// <summary>The note number to play.</summary>
@@ -26,6 +35,7 @@ namespace MidiGenerator
         }
     }
 
+    /// <summary>Notify host of user clicks.</summary>
     public class UserClickControllerEventArgs : EventArgs
     {
         /// <summary>Specific controller id.</summary>
@@ -40,81 +50,36 @@ namespace MidiGenerator
             return $"Controller:{MidiDefs.TheDefs.GetControllerName(Controller)}({Controller}):{Value}";
         }
     }
+
+    /// <summary>Notify host of user clicks.</summary>
+    public class ChannelChangeEventArgs : EventArgs
+    {
+        public bool PatchChange { get; set; } = false;
+        public bool ChannelNumberChange { get; set; } = false;
+        public bool PresetFileChange { get; set; } = false;
+    }
     #endregion
-
-
-
-
 
     public class Utils
     {
-        // public static string[] CreateInitializedMidiArray(string id)
-        // {
-        //     var vals = new string[MidiDefs.MAX_MIDI + 1];
+        // Load a standard midi def file.
+        public static Dictionary<int, string> LoadDefs(string fn)
+        {
+            Dictionary<int, string> res = [];
 
-        //     for (int i = 0; i < vals.Length; i++)
-        //     {
-        //         vals[i] = $"{id}{i}"; // fake for now
-        //     }
-        //     return vals;
-        // }
+            var ir = new IniReader(fn);
 
+            var defs = ir.Contents["midi_defs"];
 
-        ///// <summary>
-        ///// Load a standard def file.
-        ///// </summary>
-        ///// <param name="fn"></param>
-        ///// <returns></returns>
-        //public static List<List<string>> LoadDefFile(string fn)
-        //{
-        //    List<List<string>> res = [];
-        //    foreach (var inline in File.ReadAllLines(fn))
-        //    {
-        //        // Clean up line, strip comments.
-        //        var cmt = inline.IndexOf(';');
-        //        var line = cmt >= 0 ? inline[0..cmt] : inline;
-        //        line = line.Trim();
-        //        // Ignore empty lines.
-        //        if (line.Length > 0)
-        //        {
-        //            List<string> resParts = [];
-        //            var parts = line.SplitByToken(" ");
-        //            parts.ForEach(p => resParts.Add(p.Trim()));
-        //            res.Add(resParts);
-        //        }
-        //    }
-        //    return res;
-        //}
+            defs.Values.ForEach(kv =>
+            {
+                // ["011", "GlassFlute"]
+                int index = int.Parse(kv.Key); // can throw
+                if (index < 0 || index > MidiDefs.MAX_MIDI) { throw new InvalidOperationException($"Invalid def file {fn}"); }
+                res[index] = kv.Value.Length > 0 ? kv.Value : "";
+            });
 
-        // /// <summary>
-        // /// Translate ascii char to Keys.
-        // /// </summary>
-        // /// <param name="ch"></param>
-        // /// <returns></returns>
-        // public static Keys TranslateKey(char ch)
-        // {
-        //     Keys xlat = Keys.None;
-
-        //     switch (ch)
-        //     {
-        //         case ',':  xlat = Keys.Oemcomma; break;
-        //         case '=':  xlat = Keys.Oemplus; break;
-        //         case '-':  xlat = Keys.OemMinus; break;
-        //         case '/':  xlat = Keys.OemQuestion; break;
-        //         case '.':  xlat = Keys.OemPeriod; break;
-        //         case '\'': xlat = Keys.OemQuotes; break;
-        //         case '\\': xlat = Keys.OemPipe; break;
-        //         case ']':  xlat = Keys.OemCloseBrackets; break;
-        //         case '[':  xlat = Keys.OemOpenBrackets; break;
-        //         case '`':  xlat = Keys.Oemtilde; break;
-        //         case ';':  xlat = Keys.OemSemicolon; break;
-        //         case (>= 'A' and <= 'Z') or (>= '0' and <= '9'): xlat = (Keys)ch; break;
-        //     }
-
-        //     return xlat;
-        // }
+            return res;
+        }
     }
-
-
-
 }

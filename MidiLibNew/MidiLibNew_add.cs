@@ -22,7 +22,7 @@ namespace Ephemera.MidiLib
         /// <summary>Midi caps.</summary>
         public const int NUM_CHANNELS = 16;
 
-        #region New or modified TODO2
+        #region New or modified
         /// <summary>
         /// Initialize some collections.
         /// </summary>
