@@ -1,7 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using Ephemera.NBagOfTricks;
 using Ephemera.NBagOfUis;
@@ -9,16 +13,8 @@ using Ephemera.NBagOfUis;
 
 namespace MidiGenerator
 {
-    public class ChannelControl : UserControl
+    public partial class ChannelControl : UserControl
     {
-        #region Designer variables
-        readonly Container? components = null;
-        readonly Label lblChannelInfo;
-        readonly Slider sldVolume;
-        readonly Slider sldController;
-        readonly ToolTip toolTip;
-        #endregion
-
         #region Properties
         /// <summary>Everything about me.</summary>
         public Channel BoundChannel { get; set; } = new();
@@ -38,85 +34,62 @@ namespace MidiGenerator
         /// </summary>
         public ChannelControl()
         {
-            components = new Container();
-            SuspendLayout();
+            InitializeComponent();
 
-            lblChannelInfo = new()
-            {
-                Location = new(4, 8),
-                Size = new(200, 20),
-                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right
-            };
-            Controls.Add(lblChannelInfo);
-
-            sldVolume = new()
-            {
-                Location = new(lblChannelInfo.Right + 4, 3),
-                Size = new(83, 30),
-                BorderStyle = BorderStyle.FixedSingle,
-                Orientation = Orientation.Horizontal,
-                Minimum = 0.0,
-                Maximum = MiscDefs.MAX_VOLUME,
-                Resolution = 0.05,
-                Anchor = AnchorStyles.Top | AnchorStyles.Right
-            };
-            Controls.Add(sldVolume);
-
-            sldController = new()
-            {
-                Location = new(sldVolume.Right + 4, 3),
-                Size = new(83, 30),
-                BorderStyle = BorderStyle.FixedSingle,
-                Orientation = Orientation.Horizontal,
-                Minimum = 0,
-                Maximum = MidiDefs.MAX_MIDI,
-                Resolution = 1,
-                Anchor = AnchorStyles.Top | AnchorStyles.Right
-            };
-            Controls.Add(sldController);
-
-            toolTip = new ToolTip(components);
-
-            Size = new Size(sldController.Right + 4, 38); // default
-
-            ResumeLayout(false);
-            PerformLayout();
-        }
-
-        /// <summary>
-        /// Apply customization. Channel should be valid now.
-        /// </summary>
-        /// <param name="e"></param>
-        protected override void OnLoad(EventArgs e)
-        {
+            sldVolume.Minimum = 0.0;
+            sldVolume.Maximum = MiscDefs.MAX_VOLUME;
+            sldVolume.Resolution = 0.05;
             sldVolume.Value = BoundChannel.Volume;
             sldVolume.DrawColor = ControlColor;
             sldVolume.ValueChanged += Volume_ValueChanged;
 
-            sldController.Value = BoundChannel.ControllerValue;
-            sldController.DrawColor = ControlColor;
-            sldController.ValueChanged += Controller_ValueChanged;
+            sldControllerValue.Minimum = 0;
+            sldControllerValue.Maximum = MidiDefs.MAX_MIDI;
+            sldControllerValue.Resolution = 1;
+            sldControllerValue.Value = BoundChannel.ControllerValue;
+            sldControllerValue.DrawColor = ControlColor;
+            sldControllerValue.ValueChanged += Controller_ValueChanged;
 
-            lblChannelInfo.Click += ChannelEd_Click;
-            lblChannelInfo.BackColor = Color.LightBlue;
+            txtChannelInfo.Click += ChannelEd_Click;
+            txtChannelInfo.BackColor = Color.LightBlue;
 
             UpdateUi();
-
-            base.OnLoad(e);
         }
 
-        /// <summary> 
-        /// Clean up any resources being used.
-        /// </summary>
-        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing && (components != null))
-            {
-                components.Dispose();
-            }
-            base.Dispose(disposing);
-        }
+        // /// <summary>
+        // /// Apply customization. Channel should be valid now.
+        // /// </summary>
+        // /// <param name="e"></param>
+        // protected override void OnLoad(EventArgs e)
+        // {
+        //     sldVolume.Value = BoundChannel.Volume;
+        //     sldVolume.DrawColor = ControlColor;
+        //     sldVolume.ValueChanged += Volume_ValueChanged;
+
+        //     sldControllerValue.Value = BoundChannel.ControllerValue;
+        //     sldControllerValue.DrawColor = ControlColor;
+        //     sldControllerValue.ValueChanged += Controller_ValueChanged;
+
+        //     txtChannelInfo.Click += ChannelEd_Click;
+        //     txtChannelInfo.BackColor = Color.LightBlue;
+
+        //     UpdateUi();
+
+        //     base.OnLoad(e);
+        // }
+
+        // /// <summary> 
+        // /// Clean up any resources being used.
+        // /// </summary>
+        // /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        // protected override void Dispose(bool disposing)
+        // {
+        //     if (disposing && (components != null))
+        //     {
+        //         components.Dispose();
+        //     }
+        //     base.Dispose(disposing);
+        // }
         #endregion
 
         #region Handlers for user selections
@@ -173,8 +146,8 @@ namespace MidiGenerator
         void UpdateUi()
         {
             // General.
-            lblChannelInfo.Text = ToString().Left(30);
-            toolTip.SetToolTip(lblChannelInfo, "TODO1 ??????");
+            txtChannelInfo.Text = ToString().Left(30);
+            toolTip.SetToolTip(txtChannelInfo, "TODO1 ??????");
         }
 
         /// <summary>
