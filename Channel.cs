@@ -7,9 +7,9 @@ using System.Windows.Forms.Design;
 using System.IO;
 using System.ComponentModel;
 using System.Drawing.Design;
+using System.Text.Json.Serialization;
 using NAudio.Midi;
 using Ephemera.NBagOfTricks;
-using System.Text.Json.Serialization;
 
 
 namespace MidiGenerator
@@ -23,25 +23,16 @@ namespace MidiGenerator
         Dictionary<int, string> _instruments = MidiDefs.TheDefs.GetDefaultInstrumentDefs();
         #endregion
 
-        #region Persisted Non-editable Properties
+        #region Persisted Editable Properties
         /// <summary>Actual 1-based midi channel number.</summary>
         [Browsable(true)]
-        [Editor(typeof(ChannelSelectorTypeEditor), typeof(UITypeEditor))]
+        [Editor(typeof(MidiValueTypeEditor), typeof(UITypeEditor))]
         public int ChannelNumber
         {
             get { return _channelNumber; }
             set { _channelNumber = MathUtils.Constrain(value, 1, MidiDefs.NUM_CHANNELS); }
         }
         int _channelNumber = 1;
-
-        /// <summary>Current volume.</summary>
-        [Browsable(false)]
-        public double Volume
-        {
-            get { return _volume; }
-            set { _volume = MathUtils.Constrain(value, 0.0, MiscDefs.MAX_VOLUME); }
-        }
-        double _volume = MiscDefs.DEFAULT_VOLUME;
 
         /// <summary>Override default instrument presets.</summary>
         [Browsable(true)]
@@ -63,12 +54,44 @@ namespace MidiGenerator
             set { _patch = MathUtils.Constrain(value, 0, MidiDefs.MAX_MIDI); }
         }
         int _patch = 0;
+
+        /// <summary>Edit current controller number.</summary>
+        [Browsable(true)]
+        [Editor(typeof(MidiValueTypeEditor), typeof(UITypeEditor))]
+        public int ControllerId
+        {
+            get { return _controllerId; }
+            set { _controllerId = MathUtils.Constrain(value, 0, MidiDefs.MAX_MIDI); }
+        }
+        int _controllerId = 0;
         #endregion
 
+        #region Persisted Non-editable Properties
+        /// <summary>Current volume.</summary>
+        [Browsable(false)]
+        public double Volume
+        {
+            get { return _volume; }
+            set { _volume = MathUtils.Constrain(value, 0.0, MiscDefs.MAX_VOLUME); }
+        }
+        double _volume = MiscDefs.DEFAULT_VOLUME;
+
+        /// <summary>Controller payload.</summary>
+        [Browsable(false)]
+        public int ControllerValue
+        {
+            get { return _controllerValue; }
+            set { _controllerValue = MathUtils.Constrain(value, 0, MidiDefs.MAX_MIDI); }
+        }
+        int _controllerValue = 0;
+        #endregion
+
+        #region Non-persisted Properties
         /// <summary>Convenience property.</summary>
         [Browsable(false)]
         [JsonIgnore]
         public Dictionary<int, string> Instruments { get { return _instruments; } }
+        #endregion
 
         #region Misc functions
         /// <summary>Use default or custom presets.</summary>

@@ -15,6 +15,7 @@ namespace MidiGenerator
         readonly Container? components = null;
         readonly Label lblChannelInfo;
         readonly Slider sldVolume;
+        readonly Slider sldController;
         readonly ToolTip toolTip;
         #endregion
 
@@ -61,9 +62,22 @@ namespace MidiGenerator
             };
             Controls.Add(sldVolume);
 
+            sldController = new()
+            {
+                Location = new(sldVolume.Right + 4, 3),
+                Size = new(83, 30),
+                BorderStyle = BorderStyle.FixedSingle,
+                Orientation = Orientation.Horizontal,
+                Minimum = 0,
+                Maximum = MidiDefs.MAX_MIDI,
+                Resolution = 1,
+                Anchor = AnchorStyles.Top | AnchorStyles.Right
+            };
+            Controls.Add(sldController);
+
             toolTip = new ToolTip(components);
 
-            Size = new Size(sldVolume.Right + 4, 38); // default
+            Size = new Size(sldController.Right + 4, 38); // default
 
             ResumeLayout(false);
             PerformLayout();
@@ -78,6 +92,10 @@ namespace MidiGenerator
             sldVolume.Value = BoundChannel.Volume;
             sldVolume.DrawColor = ControlColor;
             sldVolume.ValueChanged += Volume_ValueChanged;
+
+            sldController.Value = BoundChannel.ControllerValue;
+            sldController.DrawColor = ControlColor;
+            sldController.ValueChanged += Controller_ValueChanged;
 
             lblChannelInfo.Click += ChannelEd_Click;
             lblChannelInfo.BackColor = Color.LightBlue;
@@ -103,7 +121,7 @@ namespace MidiGenerator
 
         #region Handlers for user selections
         /// <summary>
-        /// 
+        /// No need to notify.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -114,7 +132,18 @@ namespace MidiGenerator
         }
 
         /// <summary>
-        /// Edit channel properties.
+        /// TODO1 notify client
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void Controller_ValueChanged(object? sender, EventArgs e)
+        {
+            // No need to check limits.
+            BoundChannel.ControllerValue = (int)(sender as Slider)!.Value;
+        }
+
+        /// <summary>
+        /// Edit channel properties. Notifies client of any changes.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -123,11 +152,13 @@ namespace MidiGenerator
             var changes = SettingsEditor.Edit(BoundChannel, "Channel", 300);
 
             // Detect changes of interest.
+            //bool restart = false;
             ChannelChangeEventArgs args = new()
             {
                 ChannelNumberChange = changes.Any(ch => ch.name == "ChannelNumber"),
                 PatchChange = changes.Any(ch => ch.name == "Patch"),
                 PresetFileChange = changes.Any(ch => ch.name == "PresetFile"),
+                ControllerIdChange = changes.Any(ch => ch.name == "ControllerId"),
             };
 
             ChannelChange?.Invoke(this, new() { ChannelNumberChange = true });
@@ -143,7 +174,7 @@ namespace MidiGenerator
         {
             // General.
             lblChannelInfo.Text = ToString().Left(30);
-            toolTip.SetToolTip(lblChannelInfo, "??????");
+            toolTip.SetToolTip(lblChannelInfo, "TODO1 ??????");
         }
 
         /// <summary>

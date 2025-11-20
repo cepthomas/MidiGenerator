@@ -57,6 +57,8 @@ namespace MidiGenerator
         public bool PatchChange { get; set; } = false;
         public bool ChannelNumberChange { get; set; } = false;
         public bool PresetFileChange { get; set; } = false;
+        public bool ControllerIdChange { get; set; } = false;
+        public bool ControllerValueChange { get; set; } = false;
     }
     #endregion
 

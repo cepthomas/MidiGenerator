@@ -39,6 +39,8 @@ namespace MidiGenerator
 
             InitializeComponent();
 
+            Icon = Properties.Resources.toro;
+
             // Init logging.
             LogManager.MinLevelFile = _settings.FileLogLevel;
             LogManager.MinLevelNotif = _settings.NotifLogLevel;
@@ -170,18 +172,7 @@ namespace MidiGenerator
             var changes = SettingsEditor.Edit(_settings, "User Settings", 300);
 
             // Detect changes of interest.
-            bool restart = false;
-
-            foreach (var (name, cat) in changes)
-            {
-                switch (name)
-                {
-                    case "ControlColor":
-                    case "OutputDevice":
-                        restart = true;
-                        break;
-                }
-            }
+            bool restart = changes.Any(ch => ch.name == "ControlColor" || ch.name == "OutputDevice");
 
             if (restart)
             {

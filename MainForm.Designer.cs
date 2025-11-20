@@ -125,7 +125,7 @@ namespace MidiGenerator
             // VkeyChannelControl
             // 
             VkeyChannelControl.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            VkeyChannelControl.Channel = (Channel)resources.GetObject("VkeyChannelControl.Channel");
+            VkeyChannelControl.BoundChannel = (Channel)resources.GetObject("VkeyChannelControl.Channel");
             VkeyChannelControl.ControlColor = System.Drawing.Color.Red;
             VkeyChannelControl.Location = new System.Drawing.Point(22, 41);
             VkeyChannelControl.Name = "VkeyChannelControl";
@@ -135,7 +135,7 @@ namespace MidiGenerator
             // ClClChannelControl
             // 
             ClClChannelControl.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            ClClChannelControl.Channel = (Channel)resources.GetObject("ClClChannelControl.Channel");
+            ClClChannelControl.BoundChannel = (Channel)resources.GetObject("ClClChannelControl.Channel");
             ClClChannelControl.ControlColor = System.Drawing.Color.Red;
             ClClChannelControl.Location = new System.Drawing.Point(399, 40);
             ClClChannelControl.Name = "ClClChannelControl";
