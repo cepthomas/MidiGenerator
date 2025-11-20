@@ -5,10 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Diagnostics;
+using System.IO;
 using NAudio.Midi;
 using Ephemera.NBagOfTricks;
 using Ephemera.NBagOfUis;
-using System.IO;
 
 
 namespace MidiGenerator
@@ -85,7 +85,7 @@ namespace MidiGenerator
             VkeyControl.Enabled = true;
             // ChannelControl.
             VkeyChannelControl.ControlColor = _settings.ControlColor;
-            VkeyChannelControl.Channel = _settings.VkeyChannel;
+            VkeyChannelControl.BoundChannel = _settings.VkeyChannel;
             VkeyChannelControl.ChannelChange += Channel_ChannelChange;
 
             // Channel.
@@ -96,12 +96,12 @@ namespace MidiGenerator
             ClClControl.Enabled = true;
             // ChannelControl.
             ClClChannelControl.ControlColor = _settings.ControlColor;
-            ClClChannelControl.Channel = _settings.ClClChannel;
+            ClClChannelControl.BoundChannel = _settings.ClClChannel;
             ClClChannelControl.ChannelChange += Channel_ChannelChange;
 
             ///// Finish up. /////
-            SendPatch(VkeyChannelControl.Channel.ChannelNumber, VkeyChannelControl.Channel.Patch);
-            SendPatch(ClClChannelControl.Channel.ChannelNumber, ClClChannelControl.Channel.Patch);
+            SendPatch(VkeyChannelControl.BoundChannel.ChannelNumber, VkeyChannelControl.BoundChannel.Patch);
+            SendPatch(ClClChannelControl.BoundChannel.ChannelNumber, ClClChannelControl.BoundChannel.Patch);
 
             Location = _settings.FormGeometry.Location;
             Size = _settings.FormGeometry.Size;
@@ -224,13 +224,13 @@ namespace MidiGenerator
             var cc = sender as ChannelControl;
             if (e.PatchChange || e.ChannelNumberChange)
             {
-                SendPatch(cc.Channel.ChannelNumber, cc.Channel.Patch);
+                SendPatch(cc.BoundChannel.ChannelNumber, cc.BoundChannel.Patch);
             }
 
             if (e.PresetFileChange)
             {
                 // Update channel presets.
-                cc.Channel.UpdatePresets();
+                cc.BoundChannel.UpdatePresets();
             }
         }
 
