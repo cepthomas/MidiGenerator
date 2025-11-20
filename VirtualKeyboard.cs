@@ -20,7 +20,14 @@ namespace MidiGenerator
         /// <summary>Determines the overall size.</summary>
         public int KeySize { get; set; } = 14;
 
+        /// <summary>Cosmetics.</summary>
         public Color ControlColor { get; set; } = Color.Red;
+
+        /// <summary>Lowest key.</summary>
+        public int LowNote { get; set; } = 21; // A0 for 88 keyboard.
+
+        /// <summary>Highest key.</summary>
+        public int HighNote { get; set; } = 108; // C8 for 88 keyboard.
         #endregion
 
         #region Events
@@ -31,11 +38,11 @@ namespace MidiGenerator
         #region Constants
         //https://studiocode.dev/resources/midi-middle-c/
 
-        /// <summary>Standard 88 keyboard - lowest note A0.</summary>
-        const int LOW_NOTE = 21; // A0
+        ///// <summary>Standard 88 keyboard - lowest note A0.</summary>
+        //const int LOW_NOTE = 21; // A0
 
-        /// <summary>Standard 88 keyboard - highest note C8.</summary>
-        const int HIGH_NOTE = 108; // C88
+        ///// <summary>Standard 88 keyboard - highest note C8.</summary>
+        //const int HIGH_NOTE = 108; // C88
 
         /// <summary>Standard 88 keyboard - reference C4.</summary>
         const int MIDDLE_C = 60;
@@ -67,12 +74,6 @@ namespace MidiGenerator
             AutoScaleDimensions = new SizeF(6F, 13F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1200, 140);
-
-            CreateKeys();
-            if (CreateKeyMap())
-            {
-                DrawKeys();
-            }
         }
 
         /// <summary>
@@ -82,6 +83,13 @@ namespace MidiGenerator
         protected override void OnLoad(EventArgs e)
         {
             _keys.ForEach(key => { key.ControlColor = ControlColor ; });
+
+            CreateKeys();
+            if (CreateKeyMap())
+            {
+                DrawKeys();
+            }
+
             base.OnLoad(e);
         }
 
@@ -225,9 +233,9 @@ namespace MidiGenerator
         {
             _keys.Clear();
 
-            for (int i = 0; i < HIGH_NOTE - LOW_NOTE; i++)
+            for (int i = 0; i < HighNote - LowNote; i++)
             {
-                int noteId = i + LOW_NOTE;
+                int noteId = i + LowNote;
                 VirtualKey pk = new(this, noteId);
 
                 // Pass along an event from a virtual key.

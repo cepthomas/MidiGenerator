@@ -35,7 +35,14 @@ namespace MidiGenerator
         public ChannelControl()
         {
             InitializeComponent();
+        }
 
+        /// <summary>
+        /// Apply customization. Channel should be valid now.
+        /// </summary>
+        /// <param name="e"></param>
+        protected override void OnLoad(EventArgs e)
+        {
             sldVolume.Minimum = 0.0;
             sldVolume.Maximum = MiscDefs.MAX_VOLUME;
             sldVolume.Resolution = 0.05;
@@ -54,42 +61,9 @@ namespace MidiGenerator
             txtChannelInfo.BackColor = Color.LightBlue;
 
             UpdateUi();
+
+            base.OnLoad(e);
         }
-
-        // /// <summary>
-        // /// Apply customization. Channel should be valid now.
-        // /// </summary>
-        // /// <param name="e"></param>
-        // protected override void OnLoad(EventArgs e)
-        // {
-        //     sldVolume.Value = BoundChannel.Volume;
-        //     sldVolume.DrawColor = ControlColor;
-        //     sldVolume.ValueChanged += Volume_ValueChanged;
-
-        //     sldControllerValue.Value = BoundChannel.ControllerValue;
-        //     sldControllerValue.DrawColor = ControlColor;
-        //     sldControllerValue.ValueChanged += Controller_ValueChanged;
-
-        //     txtChannelInfo.Click += ChannelEd_Click;
-        //     txtChannelInfo.BackColor = Color.LightBlue;
-
-        //     UpdateUi();
-
-        //     base.OnLoad(e);
-        // }
-
-        // /// <summary> 
-        // /// Clean up any resources being used.
-        // /// </summary>
-        // /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-        // protected override void Dispose(bool disposing)
-        // {
-        //     if (disposing && (components != null))
-        //     {
-        //         components.Dispose();
-        //     }
-        //     base.Dispose(disposing);
-        // }
         #endregion
 
         #region Handlers for user selections

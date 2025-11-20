@@ -85,6 +85,8 @@ namespace MidiGenerator
             VkeyControl.UserClickNote += UserClickNoteEvent;
             VkeyControl.ControlColor = _settings.ControlColor;
             VkeyControl.Enabled = true;
+            VkeyControl.LowNote = 36;
+            VkeyControl.HighNote = 84;
             // ChannelControl.
             VkeyChannelControl.ControlColor = _settings.ControlColor;
             VkeyChannelControl.BoundChannel = _settings.VkeyChannel;

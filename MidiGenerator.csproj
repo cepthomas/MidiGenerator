@@ -34,6 +34,10 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Compile Remove="ChannelControl_o.cs" />
+    </ItemGroup>
+
+    <ItemGroup>
       <None Remove="MidiGenerator_2.zip" />
       <None Remove="MidiGenerator_3.zip" />
       <None Remove="notes.txt" />
