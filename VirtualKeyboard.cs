@@ -36,14 +36,6 @@ namespace MidiGenerator
         #endregion
 
         #region Constants
-        //https://studiocode.dev/resources/midi-middle-c/
-
-        ///// <summary>Standard 88 keyboard - lowest note A0.</summary>
-        //const int LOW_NOTE = 21; // A0
-
-        ///// <summary>Standard 88 keyboard - highest note C8.</summary>
-        //const int HIGH_NOTE = 108; // C88
-
         /// <summary>Standard 88 keyboard - reference C4.</summary>
         const int MIDDLE_C = 60;
         #endregion
@@ -82,7 +74,7 @@ namespace MidiGenerator
         /// <param name="e"></param>
         protected override void OnLoad(EventArgs e)
         {
-            _keys.ForEach(key => { key.ControlColor = ControlColor ; });
+            _keys.ForEach(key => { key.ControlColor = ControlColor; });
 
             CreateKeys();
             if (CreateKeyMap())

@@ -33,16 +33,16 @@ namespace MidiGenerator
 
         #region Fields
         /// <summary>All the GM instruments - default.</summary>
-        readonly Dictionary<int, string> _instruments;
+        readonly Dictionary<int, string> _instruments = [];
         
         /// <summary>All the GM CCs.</summary>
-        readonly Dictionary<int, string> _controllers;
+        readonly Dictionary<int, string> _controllers = [];
         
         /// <summary>All the GM drums.</summary>
-        readonly Dictionary<int, string> _drums;
+        readonly Dictionary<int, string> _drums = [];
         
         /// <summary>All the GM drum kits.</summary>
-        readonly Dictionary<int, string> _drumKits;
+        readonly Dictionary<int, string> _drumKits = [];
         #endregion
 
         #region Lifecycle
@@ -51,11 +51,17 @@ namespace MidiGenerator
         /// </summary>
         public MidiDefs()
         {
-            var cd = Environment.CurrentDirectory;
-            _instruments = Utils.LoadDefs(@"defs\gm_instruments.ini");
-            _controllers = Utils.LoadDefs(@"defs\gm_controllers.ini");
-            _drums = Utils.LoadDefs(@"defs\gm_drums.ini");
-            _drumKits = Utils.LoadDefs(@"defs\gm_drumkits.ini");
+            try
+            {
+                _instruments = Utils.LoadDefs(@"defs\gm_instruments.ini");
+                _controllers = Utils.LoadDefs(@"defs\gm_controllers.ini");
+                _drums = Utils.LoadDefs(@"defs\gm_drums.ini");
+                _drumKits = Utils.LoadDefs(@"defs\gm_drumkits.ini");
+            }
+            catch
+            {
+                // Fails in designer - ignore.
+            }
         }
         #endregion
 

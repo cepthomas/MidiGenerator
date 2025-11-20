@@ -40,7 +40,8 @@
             // sldControllerValue
             // 
             sldControllerValue.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
-            sldControllerValue.BackColor = System.Drawing.Color.RosyBrown;
+            sldControllerValue.BackColor = System.Drawing.SystemColors.Control;
+            sldControllerValue.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             sldControllerValue.DrawColor = System.Drawing.Color.White;
             sldControllerValue.Label = "";
             sldControllerValue.Location = new System.Drawing.Point(252, 4);
@@ -67,7 +68,8 @@
             // sldVolume
             // 
             sldVolume.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
-            sldVolume.BackColor = System.Drawing.Color.RosyBrown;
+            sldVolume.BackColor = System.Drawing.SystemColors.Control;
+            sldVolume.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             sldVolume.DrawColor = System.Drawing.Color.White;
             sldVolume.Label = "";
             sldVolume.Location = new System.Drawing.Point(165, 4);
