@@ -10,7 +10,7 @@ using Ephemera.NBagOfTricks;
 
 namespace MidiGenerator
 {
-    public class ClickClack : UserControl
+    public class ClickClack : ChannelControl
     {
         #region Fields
         /// <summary>Background image data.</summary>
@@ -32,15 +32,6 @@ namespace MidiGenerator
         const int MAX_Y = 128;
         #endregion
 
-        #region Properties
-        public Color ControlColor { get; set; } = Color.Red;
-        #endregion
-
-        #region Events
-        /// <summary>Click/drag info.</summary>
-        public event EventHandler<UserClickNoteEventArgs>? UserClickNote;
-        #endregion
-
         #region Lifecycle
         /// <summary>
         /// Normal constructor.
@@ -49,7 +40,6 @@ namespace MidiGenerator
         {
             SetStyle(ControlStyles.DoubleBuffer | ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint, true);
             Name = nameof(ClickClack);
-            ClientSize = new Size(300, 300);
         }
 
         /// <summary>
@@ -81,10 +71,12 @@ namespace MidiGenerator
         /// <param name="pe"></param>
         protected override void OnPaint(PaintEventArgs pe)
         {
+            Graphics g = pe.Graphics;
+
             // Background?
             if (_bmp is not null)
             {
-                pe.Graphics.DrawImage(_bmp.ClientBitmap, 0, 0, _bmp.ClientBitmap.Width, _bmp.ClientBitmap.Height);
+                g.DrawImage(_bmp.ClientBitmap, DrawRect);
             }
 
             // Draw grid. X is octaves. Y is volume.
@@ -93,7 +85,7 @@ namespace MidiGenerator
                 if (gl >= MIN_X && gl <= MAX_X) // sanity - throw?
                 {
                     int x = MathUtils.Map(gl, MIN_X, MAX_X, 0, Width);
-                    pe.Graphics.DrawLine(_pen, x, 0, x, Height);
+                    g.DrawLine(_pen, x, 0, x, Height);
                 }
             }
 
@@ -102,7 +94,7 @@ namespace MidiGenerator
                 if (gl >= MIN_Y && gl <= MAX_Y)
                 {
                     int y = MathUtils.Map(gl, MIN_Y, MAX_Y, Height, 0);
-                    pe.Graphics.DrawLine(_pen, 0, y, Width, y);
+                    g.DrawLine(_pen, 0, y, Width, y);
                 }
             }
 
@@ -116,7 +108,7 @@ namespace MidiGenerator
         protected override void OnMouseMove(MouseEventArgs e)
         {
             var (ux, uy) = MouseToUser();
-            UserClickNoteEventArgs args = new() { Note = ux, Velocity = uy };
+            NoteEventArgs args = new() { Note = ux, Velocity = uy };
             _toolTip.SetToolTip(this, args.ToString());
 
             // Also gen click?
@@ -128,12 +120,12 @@ namespace MidiGenerator
                     if (_lastNote != -1)
                     {
                         // Turn off last note.
-                        UserClickNote?.Invoke(this, new() { Note = _lastNote, Velocity = 0 });
+                        OnNoteSend(new() { Note = _lastNote, Velocity = 0 });
                     }
 
                     // Start the new note.
                     _lastNote = ux;
-                    UserClickNote?.Invoke(this, new() { Note = ux, Velocity = uy });
+                    OnNoteSend(new() { Note = ux, Velocity = uy });
                 }
             }
 
@@ -148,7 +140,7 @@ namespace MidiGenerator
         {
             var (ux, uy) = MouseToUser();
             _lastNote = ux;
-            UserClickNote?.Invoke(this, new() { Note = ux, Velocity = uy });
+            OnNoteSend(new() { Note = ux, Velocity = uy });
 
             base.OnMouseDown(e);
         }
@@ -161,7 +153,7 @@ namespace MidiGenerator
         {
             if (_lastNote != -1)
             {
-                UserClickNote?.Invoke(this, new() { Note = _lastNote, Velocity = 0 });
+                OnNoteSend(new() { Note = _lastNote, Velocity = 0 });
                 _lastNote = -1;
             }
 
@@ -177,7 +169,7 @@ namespace MidiGenerator
             // Turn off last click.
             if (_lastNote != -1)
             {
-                UserClickNote?.Invoke(this, new() { Note = _lastNote, Velocity = 0 });
+                OnNoteSend(new() { Note = _lastNote, Velocity = 0 });
             }
 
             // Reset and tell client.
@@ -211,12 +203,14 @@ namespace MidiGenerator
             _bmp?.Dispose();
 
             // Draw background.
-            _bmp = new(Width, Height);
-            for (var y = 0; y < Height; y++)
+            var w = DrawRect.Width;
+            var h = DrawRect.Height;
+            _bmp = new(w, h);
+            for (var y = 0; y < h; y++)
             {
-                for (var x = 0; x < Width; x++)
+                for (var x = 0; x < w; x++)
                 {
-                    _bmp!.SetPixel(x, y, Color.FromArgb(255, x * 256 / Width, y * 256 / Height, 150));
+                    _bmp!.SetPixel(x, y, Color.FromArgb(255, x * 256 / w, y * 256 / h, 150));
                 }
             }
         }
@@ -232,7 +226,7 @@ namespace MidiGenerator
             // Map and check.
             int x = MathUtils.Map(mp.X, 0, Width, MIN_X, MAX_X);
             int ux = x >= 0 && x < Width ? x : -1;
-            int y = MathUtils.Map(mp.Y, Height, 0, MIN_Y, MAX_Y);
+            int y = MathUtils.Map(mp.Y, Height, DrawRect.Top, MIN_Y, MAX_Y);
             int uy = y >= 0 && y < Height ? y : -1;
 
             return (ux, uy);

@@ -72,9 +72,9 @@ namespace MidiGenerator
         public double Volume
         {
             get { return _volume; }
-            set { _volume = MathUtils.Constrain(value, 0.0, MiscDefs.MAX_VOLUME); }
+            set { _volume = MathUtils.Constrain(value, 0.0, Defs.MAX_VOLUME); }
         }
-        double _volume = MiscDefs.DEFAULT_VOLUME;
+        double _volume = Defs.DEFAULT_VOLUME;
 
         /// <summary>Controller payload.</summary>
         [Browsable(false)]
@@ -110,6 +110,16 @@ namespace MidiGenerator
             {
                 _instruments = MidiDefs.TheDefs.GetDefaultInstrumentDefs();
             }
+        }
+
+        /// <summary>
+        /// Get patch name.
+        /// </summary>
+        /// <param name="which"></param>
+        /// <returns>The name or a fabricated one if unknown.</returns>
+        public string GetPatchName(int which)
+        {
+            return _instruments.TryGetValue(which, out string? value) ? value : $"PATCH_{which}";
         }
         #endregion
     }

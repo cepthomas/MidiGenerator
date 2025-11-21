@@ -110,7 +110,7 @@ namespace MidiGenerator
         /// <returns>The drum name or a fabricated one if unknown.</returns>
         public string GetDrumName(int which)
         {
-            return _drums.ContainsKey(which) ? _drums[which] : $"DRUM_{which}";
+            return _drums.TryGetValue(which, out string? value) ? value : $"DRUM_{which}";
         }
 
         /// <summary>
@@ -120,7 +120,7 @@ namespace MidiGenerator
         /// <returns>The controller name or a fabricated one if unknown.</returns>
         public string GetControllerName(int which)
         {
-            return _controllers.ContainsKey(which) ? _controllers[which] : $"CTLR_{which}";
+            return _controllers.TryGetValue(which, out string? value) ? value : $"CTLR_{which}";
         }
 
         /// <summary>
@@ -130,7 +130,7 @@ namespace MidiGenerator
         /// <returns>The drumkit name or a fabricated one if unknown.</returns>
         public string GetDrumKitName(int which)
         {
-            return _drumKits.ContainsKey(which) ? _drumKits[which] : $"KIT_{which}";
+            return _drumKits.TryGetValue(which, out string? value) ? value : $"KIT_{which}";
         }
 
         // /// <summary>

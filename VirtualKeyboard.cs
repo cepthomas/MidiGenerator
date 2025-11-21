@@ -11,7 +11,7 @@ using System.DirectoryServices.ActiveDirectory;
 namespace MidiGenerator
 {
     /// <summary>Virtual keyboard control borrowed from Leslie Sanford with extras.</summary>
-    public class VirtualKeyboard : UserControl
+    public class VirtualKeyboard : ChannelControl
     {
         #region Properties
         /// <summary>Draw the names on the keys.</summary>
@@ -20,19 +20,11 @@ namespace MidiGenerator
         /// <summary>Determines the overall size.</summary>
         public int KeySize { get; set; } = 14;
 
-        /// <summary>Cosmetics.</summary>
-        public Color ControlColor { get; set; } = Color.Red;
-
         /// <summary>Lowest key.</summary>
         public int LowNote { get; set; } = 21; // A0 for 88 keyboard.
 
         /// <summary>Highest key.</summary>
         public int HighNote { get; set; } = 108; // C8 for 88 keyboard.
-        #endregion
-
-        #region Events
-        /// <summary>Click info.</summary>
-        public event EventHandler<UserClickNoteEventArgs>? UserClickNote;
         #endregion
 
         #region Constants
@@ -62,10 +54,6 @@ namespace MidiGenerator
 
             Name = "VirtualKeyboard";
             Text = "Virtual Keyboard";
-
-            AutoScaleDimensions = new SizeF(6F, 13F);
-            AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1200, 140);
         }
 
         /// <summary>
@@ -74,8 +62,6 @@ namespace MidiGenerator
         /// <param name="e"></param>
         protected override void OnLoad(EventArgs e)
         {
-            _keys.ForEach(key => { key.ControlColor = ControlColor; });
-
             CreateKeys();
             if (CreateKeyMap())
             {
@@ -108,6 +94,10 @@ namespace MidiGenerator
             }
             base.Dispose(disposing);
         }
+
+        void InitializeComponent()
+        {
+        }
         #endregion
 
         #region Private functions
@@ -126,7 +116,7 @@ namespace MidiGenerator
 
                 var defs = ir.Contents["keymap"];
 
-                defs.Values.ForEach(kv => 
+                defs.Values.ForEach(kv =>
                 {
                     // Z = C3
                     if (kv.Key.Length != 1) { throw new InvalidOperationException($"Invalid key {kv.Key} in {fn}"); }
@@ -134,17 +124,17 @@ namespace MidiGenerator
                     Keys chkey = Keys.None;
                     switch (kv.Key[0])
                     {
-                        case ',':  chkey = Keys.Oemcomma; break;
-                        case '=':  chkey = Keys.Oemplus; break;
-                        case '-':  chkey = Keys.OemMinus; break;
-                        case '/':  chkey = Keys.OemQuestion; break;
-                        case '.':  chkey = Keys.OemPeriod; break;
+                        case ',': chkey = Keys.Oemcomma; break;
+                        case '=': chkey = Keys.Oemplus; break;
+                        case '-': chkey = Keys.OemMinus; break;
+                        case '/': chkey = Keys.OemQuestion; break;
+                        case '.': chkey = Keys.OemPeriod; break;
                         case '\'': chkey = Keys.OemQuotes; break;
                         case '\\': chkey = Keys.OemPipe; break;
-                        case ']':  chkey = Keys.OemCloseBrackets; break;
-                        case '[':  chkey = Keys.OemOpenBrackets; break;
-                        case '`':  chkey = Keys.Oemtilde; break;
-                        case ';':  chkey = Keys.OemSemicolon; break;
+                        case ']': chkey = Keys.OemCloseBrackets; break;
+                        case '[': chkey = Keys.OemOpenBrackets; break;
+                        case '`': chkey = Keys.Oemtilde; break;
+                        case ';': chkey = Keys.OemSemicolon; break;
                         case (>= 'A' and <= 'Z') or (>= '0' and <= '9'): chkey = (Keys)kv.Key[0]; break;
                         default: throw new InvalidOperationException($"Invalid key {kv.Key} in {fn}");
                     }
@@ -165,7 +155,7 @@ namespace MidiGenerator
         }
         #endregion
 
-        #region User input handlers
+        #region User alpha keyboard handlers
         /// <summary>
         /// Use alpha keyboard to drive piano.
         /// </summary>
@@ -205,16 +195,6 @@ namespace MidiGenerator
             }
             base.OnKeyUp(e);
         }
-
-        /// <summary>
-        /// Pass along an event from a virtual key.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        void HandleKeyClick(object? sender, UserClickNoteEventArgs e)
-        {
-            UserClickNote?.Invoke(this, e);
-        }
         #endregion
 
         #region Drawing
@@ -228,10 +208,10 @@ namespace MidiGenerator
             for (int i = 0; i < HighNote - LowNote; i++)
             {
                 int noteId = i + LowNote;
-                VirtualKey pk = new(this, noteId);
+                VirtualKey pk = new(this, noteId) { ControlColor = ControlColor };
 
                 // Pass along an event from a virtual key.
-                pk.KeyClickEvent += HandleKeyClick;
+                pk.Vkey_Click += (object? sender, NoteEventArgs e) => OnNoteSend(e);
 
                 _keys.Add(pk);
                 Controls.Add(pk);
@@ -248,14 +228,13 @@ namespace MidiGenerator
         /// </summary>
         void DrawKeys()
         {
-            if(_keys.Count > 0)
+            if (_keys.Count > 0)
             {
                 int whiteKeyWidth = _keys.Count * KeySize / _keys.Count(k => MusicDefinitions.IsNatural(k.NoteId));
                 int blackKeyWidth = (int)(whiteKeyWidth * 0.6);
-                int whiteKeyHeight = Height; // KeyHeight
+                int whiteKeyHeight = DrawRect.Height;
                 int blackKeyHeight = (int)(whiteKeyHeight * 0.65);
                 int offset = whiteKeyWidth - blackKeyWidth / 2;
-
                 int numWhiteKeys = 0;
 
                 for (int i = 0; i < _keys.Count; i++)
@@ -263,18 +242,18 @@ namespace MidiGenerator
                     VirtualKey pk = _keys[i];
 
                     // Note that controls have to have integer width so resizing is a bit lumpy.
-                    if (MusicDefinitions.IsNatural(pk.NoteId))
+                    if (MusicDefinitions.IsNatural(pk.NoteId)) // white key
                     {
                         pk.Height = whiteKeyHeight;
                         pk.Width = whiteKeyWidth;
-                        pk.Location = new Point(numWhiteKeys * whiteKeyWidth, 0);
+                        pk.Location = new Point(numWhiteKeys * whiteKeyWidth, DrawRect.Top);
                         numWhiteKeys++;
                     }
-                    else
+                    else // black key
                     {
                         pk.Height = blackKeyHeight;
                         pk.Width = blackKeyWidth;
-                        pk.Location = new Point(offset + (numWhiteKeys - 1) * whiteKeyWidth);
+                        pk.Location = new Point(offset + (numWhiteKeys - 1) * whiteKeyWidth, DrawRect.Top);
                         pk.BringToFront();
                     }
                 }
@@ -304,7 +283,7 @@ namespace MidiGenerator
 
         #region Events
         /// <summary>Notify handlers of key change.</summary>
-        public event EventHandler<UserClickNoteEventArgs>? KeyClickEvent;
+        public event EventHandler<NoteEventArgs>? Vkey_Click;
         #endregion
 
         #region Lifecycle
@@ -331,7 +310,7 @@ namespace MidiGenerator
         {
             IsPressed = true;
             Invalidate();
-            KeyClickEvent?.Invoke(this, new() { Note = NoteId, Velocity = velocity });
+            Vkey_Click?.Invoke(this, new() { Note = NoteId, Velocity = velocity });
         }
 
         /// <summary>
@@ -341,7 +320,7 @@ namespace MidiGenerator
         {
             IsPressed = false;
             Invalidate();
-            KeyClickEvent?.Invoke(this, new() { Note = NoteId, Velocity = 0 });
+            Vkey_Click?.Invoke(this, new() { Note = NoteId, Velocity = 0 });
         }
         #endregion
 

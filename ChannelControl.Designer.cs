@@ -33,18 +33,15 @@
             txtChannelInfo = new System.Windows.Forms.TextBox();
             sldVolume = new Ephemera.NBagOfUis.Slider();
             toolTip = new System.Windows.Forms.ToolTip(components);
-            picDraw = new System.Windows.Forms.PictureBox();
-            ((System.ComponentModel.ISupportInitialize)picDraw).BeginInit();
             SuspendLayout();
             // 
             // sldControllerValue
             // 
-            sldControllerValue.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
             sldControllerValue.BackColor = System.Drawing.SystemColors.Control;
             sldControllerValue.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             sldControllerValue.DrawColor = System.Drawing.Color.White;
             sldControllerValue.Label = "";
-            sldControllerValue.Location = new System.Drawing.Point(252, 4);
+            sldControllerValue.Location = new System.Drawing.Point(95, 5);
             sldControllerValue.Maximum = 10D;
             sldControllerValue.Minimum = 0D;
             sldControllerValue.Name = "sldControllerValue";
@@ -59,20 +56,19 @@
             // 
             txtChannelInfo.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
             txtChannelInfo.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            txtChannelInfo.Location = new System.Drawing.Point(7, 7);
+            txtChannelInfo.Location = new System.Drawing.Point(185, 8);
             txtChannelInfo.Name = "txtChannelInfo";
             txtChannelInfo.ReadOnly = true;
-            txtChannelInfo.Size = new System.Drawing.Size(152, 26);
+            txtChannelInfo.Size = new System.Drawing.Size(182, 26);
             txtChannelInfo.TabIndex = 3;
             // 
             // sldVolume
             // 
-            sldVolume.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
             sldVolume.BackColor = System.Drawing.SystemColors.Control;
             sldVolume.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             sldVolume.DrawColor = System.Drawing.Color.White;
             sldVolume.Label = "";
-            sldVolume.Location = new System.Drawing.Point(165, 4);
+            sldVolume.Location = new System.Drawing.Point(5, 5);
             sldVolume.Maximum = 10D;
             sldVolume.Minimum = 0D;
             sldVolume.Name = "sldVolume";
@@ -83,26 +79,16 @@
             sldVolume.TabStop = false;
             sldVolume.Value = 5D;
             // 
-            // picDraw
-            // 
-            picDraw.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
-            picDraw.Location = new System.Drawing.Point(7, 43);
-            picDraw.Name = "picDraw";
-            picDraw.Size = new System.Drawing.Size(325, 55);
-            picDraw.TabIndex = 4;
-            picDraw.TabStop = false;
-            // 
             // ChannelControl
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(8F, 19F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            Controls.Add(picDraw);
+            BackColor = System.Drawing.SystemColors.Control;
             Controls.Add(txtChannelInfo);
             Controls.Add(sldControllerValue);
             Controls.Add(sldVolume);
             Name = "ChannelControl";
-            Size = new System.Drawing.Size(338, 101);
-            ((System.ComponentModel.ISupportInitialize)picDraw).EndInit();
+            Size = new System.Drawing.Size(372, 42);
             ResumeLayout(false);
             PerformLayout();
         }
@@ -114,6 +100,5 @@
         private Ephemera.NBagOfUis.Slider sldVolume;
         private Ephemera.NBagOfUis.Slider sldControllerValue;
         private System.Windows.Forms.ToolTip toolTip;
-        private System.Windows.Forms.PictureBox picDraw;
     }
 }

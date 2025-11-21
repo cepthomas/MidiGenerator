@@ -16,7 +16,6 @@ namespace MidiGenerator
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             toolStrip1 = new System.Windows.Forms.ToolStrip();
             btnLogMidi = new System.Windows.Forms.ToolStripButton();
             toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
@@ -27,8 +26,6 @@ namespace MidiGenerator
             txtViewer = new Ephemera.NBagOfUis.TextViewer();
             VkeyControl = new VirtualKeyboard();
             ClClControl = new ClickClack();
-            VkeyChannelControl = new ChannelControl();
-            ClClChannelControl = new ChannelControl();
             toolStrip1.SuspendLayout();
             SuspendLayout();
             // 
@@ -93,65 +90,47 @@ namespace MidiGenerator
             // 
             txtViewer.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left;
             txtViewer.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            txtViewer.Location = new System.Drawing.Point(399, 222);
+            txtViewer.Location = new System.Drawing.Point(399, 202);
             txtViewer.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             txtViewer.MaxText = 5000;
             txtViewer.Name = "txtViewer";
             txtViewer.Prompt = "";
-            txtViewer.Size = new System.Drawing.Size(694, 291);
+            txtViewer.Size = new System.Drawing.Size(694, 253);
             txtViewer.TabIndex = 58;
             txtViewer.WordWrap = true;
             // 
             // VkeyControl
             // 
+            VkeyControl.BackColor = System.Drawing.SystemColors.Control;
+            VkeyControl.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             VkeyControl.ControlColor = System.Drawing.Color.Red;
             VkeyControl.HighNote = 108;
             VkeyControl.KeySize = 14;
-            VkeyControl.Location = new System.Drawing.Point(399, 100);
+            VkeyControl.Location = new System.Drawing.Point(399, 39);
             VkeyControl.LowNote = 21;
             VkeyControl.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             VkeyControl.Name = "VkeyControl";
             VkeyControl.ShowNoteNames = true;
-            VkeyControl.Size = new System.Drawing.Size(694, 113);
+            VkeyControl.Size = new System.Drawing.Size(694, 154);
             VkeyControl.TabIndex = 93;
             // 
             // ClClControl
             // 
             ClClControl.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left;
+            ClClControl.BackColor = System.Drawing.SystemColors.Control;
+            ClClControl.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             ClClControl.ControlColor = System.Drawing.Color.Red;
-            ClClControl.Location = new System.Drawing.Point(12, 100);
+            ClClControl.Location = new System.Drawing.Point(13, 39);
             ClClControl.Name = "ClClControl";
-            ClClControl.Size = new System.Drawing.Size(380, 413);
+            ClClControl.Size = new System.Drawing.Size(380, 416);
             ClClControl.TabIndex = 102;
-            // 
-            // VkeyChannelControl
-            // 
-            VkeyChannelControl.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            VkeyChannelControl.BoundChannel = (Channel)resources.GetObject("VkeyChannelControl.BoundChannel");
-            VkeyChannelControl.ControlColor = System.Drawing.Color.Red;
-            VkeyChannelControl.Location = new System.Drawing.Point(399, 50);
-            VkeyChannelControl.Name = "VkeyChannelControl";
-            VkeyChannelControl.Size = new System.Drawing.Size(380, 42);
-            VkeyChannelControl.TabIndex = 94;
-            // 
-            // ClClChannelControl
-            // 
-            ClClChannelControl.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            ClClChannelControl.BoundChannel = (Channel)resources.GetObject("ClClChannelControl.BoundChannel");
-            ClClChannelControl.ControlColor = System.Drawing.Color.Red;
-            ClClChannelControl.Location = new System.Drawing.Point(12, 50);
-            ClClChannelControl.Name = "ClClChannelControl";
-            ClClChannelControl.Size = new System.Drawing.Size(380, 42);
-            ClClChannelControl.TabIndex = 101;
             // 
             // MainForm
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(8F, 19F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            ClientSize = new System.Drawing.Size(1103, 532);
+            ClientSize = new System.Drawing.Size(1103, 461);
             Controls.Add(ClClControl);
-            Controls.Add(ClClChannelControl);
-            Controls.Add(VkeyChannelControl);
             Controls.Add(VkeyControl);
             Controls.Add(txtViewer);
             Controls.Add(toolStrip1);
@@ -176,8 +155,8 @@ namespace MidiGenerator
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
-        private ChannelControl VkeyChannelControl;
-        private ChannelControl ClClChannelControl;
+        //private ChannelControl VkeyChannelControl;
+        //private ChannelControl ClClChannelControl;
         private ClickClack ClClControl;
         private VirtualKeyboard VkeyControl;
     }

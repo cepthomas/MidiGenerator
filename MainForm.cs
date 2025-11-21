@@ -45,8 +45,7 @@ namespace MidiGenerator
             LogManager.MinLevelFile = _settings.FileLogLevel;
             LogManager.MinLevelNotif = _settings.NotifLogLevel;
             LogManager.LogMessage += LogManager_LogMessage;
-            LogManager.Run();
-
+            LogManager.Run(Path.Combine(appDir, "log.txt"), 50000);
 
             ///// Configure UI. /////
             toolStrip1.Renderer = new ToolStripCheckBoxRenderer() { SelectedColor = _settings.ControlColor };
@@ -78,34 +77,27 @@ namespace MidiGenerator
             }
 
             ///// Init the channels and their corresponding controls. /////
-
-            // Channel.
             _settings.VkeyChannel.UpdatePresets();
-            // Control.
-            VkeyControl.UserClickNote += UserClickNoteEvent;
+            VkeyControl.BoundChannel = _settings.VkeyChannel;
+            ClClControl.BoundChannel = _settings.ClClChannel;
             VkeyControl.ControlColor = _settings.ControlColor;
             VkeyControl.Enabled = true;
             VkeyControl.LowNote = 36;
             VkeyControl.HighNote = 84;
-            // ChannelControl.
-            VkeyChannelControl.ControlColor = _settings.ControlColor;
-            VkeyChannelControl.BoundChannel = _settings.VkeyChannel;
-            VkeyChannelControl.ChannelChange += Channel_ChannelChange;
+            VkeyControl.ChannelChange += User_ChannelChange;
+            VkeyControl.NoteSend += User_NoteSend;
+            VkeyControl.ControllerSend += User_ControllerSend;
 
-            // Channel.
             _settings.ClClChannel.UpdatePresets();
-            // Control.
-            ClClControl.UserClickNote += UserClickNoteEvent;
             ClClControl.ControlColor = _settings.ControlColor;
             ClClControl.Enabled = true;
-            // ChannelControl.
-            ClClChannelControl.ControlColor = _settings.ControlColor;
-            ClClChannelControl.BoundChannel = _settings.ClClChannel;
-            ClClChannelControl.ChannelChange += Channel_ChannelChange;
+            ClClControl.ChannelChange += User_ChannelChange;
+            ClClControl.NoteSend += User_NoteSend;
+            ClClControl.ControllerSend += User_ControllerSend;
 
             ///// Finish up. /////
-            SendPatch(VkeyChannelControl.BoundChannel.ChannelNumber, VkeyChannelControl.BoundChannel.Patch);
-            SendPatch(ClClChannelControl.BoundChannel.ChannelNumber, ClClChannelControl.BoundChannel.Patch);
+            SendPatch(VkeyControl.BoundChannel.ChannelNumber, VkeyControl.BoundChannel.Patch);
+            SendPatch(ClClControl.BoundChannel.ChannelNumber, ClClControl.BoundChannel.Patch);
 
             Location = _settings.FormGeometry.Location;
             Size = _settings.FormGeometry.Size;
@@ -191,20 +183,21 @@ namespace MidiGenerator
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void UserClickNoteEvent(object? sender, UserClickNoteEventArgs e)
+        void User_NoteSend(object? sender, NoteEventArgs e)
         {
-            try
-            {
-                int chanNum = sender == VkeyControl ? _settings.VkeyChannel.ChannelNumber : _settings.ClClChannel.ChannelNumber;
+            var cc = sender as ChannelControl;
+            SendNote(cc!.BoundChannel.ChannelNumber, e.Note, e.Velocity);
+        }
 
-                _logger.Trace($"Ch:{chanNum} N:{e.Note} V:{e.Velocity}");
-
-                SendNote(chanNum, e.Note, e.Velocity);
-            }
-            catch (Exception ex)
-            {
-                _logger.Exception(ex);
-            }
+        /// <summary>
+        /// User clicked something. Send some midi.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void User_ControllerSend(object? sender, ControllerEventArgs e)
+        {
+            var cc = sender as ChannelControl;
+            SendController(cc!.BoundChannel.ChannelNumber, (MidiController)e.ControllerId, e.Value);
         }
 
         /// <summary>
@@ -212,18 +205,18 @@ namespace MidiGenerator
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void Channel_ChannelChange(object? sender, ChannelChangeEventArgs e)
+        void User_ChannelChange(object? sender, ChannelEventArgs e)
         {
             var cc = sender as ChannelControl;
             if (e.PatchChange || e.ChannelNumberChange)
             {
-                SendPatch(cc.BoundChannel.ChannelNumber, cc.BoundChannel.Patch);
+                SendPatch(cc!.BoundChannel.ChannelNumber, cc.BoundChannel.Patch);
             }
 
             if (e.PresetFileChange)
             {
                 // Update channel presets.
-                cc.BoundChannel.UpdatePresets();
+                cc!.BoundChannel.UpdatePresets();
             }
         }
 
@@ -261,7 +254,8 @@ namespace MidiGenerator
         /// <param name="velocity"></param>
         void SendNote(int chanNum, int note, int velocity)
         {
-           NoteEvent evt = velocity > 0 ?
+            _logger.Trace($"Note Ch:{chanNum} N:{note} V:{velocity}");
+            NoteEvent evt = velocity > 0 ?
                new NoteOnEvent(0, chanNum, note, velocity, 0) :
                new NoteEvent(0, chanNum, MidiCommandCode.NoteOff, note, 0);
            SendEvent(evt);
@@ -272,7 +266,8 @@ namespace MidiGenerator
         /// </summary>
         void SendPatch(int chanNum, int patch)
         {
-           PatchChangeEvent evt = new(0, chanNum, patch);
+            _logger.Trace($"Patch Ch:{chanNum} P:{patch}");
+            PatchChangeEvent evt = new(0, chanNum, patch);
            SendEvent(evt);
         }
 
@@ -283,7 +278,8 @@ namespace MidiGenerator
         /// <param name="val"></param>
         void SendController(int chanNum, MidiController controller, int val)
         {
-           ControlChangeEvent evt = new(0, chanNum, controller, val);
+            _logger.Trace($"Controller Ch:{chanNum} C:{controller} V:{val}");
+            ControlChangeEvent evt = new(0, chanNum, controller, val);
            SendEvent(evt);
         }
 

@@ -17,15 +17,40 @@ namespace MidiGenerator
     {
         #region Properties
         /// <summary>Everything about me.</summary>
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public Channel BoundChannel { get; set; } = new();
 
         /// <summary>Cosmetics.</summary>
         public Color ControlColor { get; set; } = Color.Red;
+
+        /// <summary>The graphics draw area.</summary>
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        protected Rectangle DrawRect { get { return new Rectangle(0, sldVolume.Bottom + 4, Width, Height - (sldVolume.Bottom + 4)); } }
         #endregion
 
         #region Events
         /// <summary>Notify host of changes from user.</summary>
-        public event EventHandler<ChannelChangeEventArgs>? ChannelChange;
+        public event EventHandler<ChannelEventArgs>? ChannelChange;
+
+        /// <summary>Click info.</summary>
+        public event EventHandler<NoteEventArgs>? NoteSend;
+
+        /// <summary>Notify host of changes from user.</summary>
+        public event EventHandler<ControllerEventArgs>? ControllerSend;
+
+        /// <summary>Derived class helper.</summary>
+        protected virtual void OnNoteSend(NoteEventArgs e)
+        {
+            NoteSend?.Invoke(this, e);
+        }
+
+        /// <summary>Derived class helper.</summary>
+        protected virtual void OnControllerSend(ControllerEventArgs e)
+        {
+            ControllerSend?.Invoke(this, e);
+        }
         #endregion
 
         #region Lifecycle
@@ -44,11 +69,11 @@ namespace MidiGenerator
         protected override void OnLoad(EventArgs e)
         {
             sldVolume.Minimum = 0.0;
-            sldVolume.Maximum = MiscDefs.MAX_VOLUME;
+            sldVolume.Maximum = Defs.MAX_VOLUME;
             sldVolume.Resolution = 0.05;
             sldVolume.Value = BoundChannel.Volume;
             sldVolume.DrawColor = ControlColor;
-            sldVolume.ValueChanged += Volume_ValueChanged;
+            sldVolume.ValueChanged += (object? sender, EventArgs e) => BoundChannel.Volume = (sender as Slider)!.Value;
 
             sldControllerValue.Minimum = 0;
             sldControllerValue.Maximum = MidiDefs.MAX_MIDI;
@@ -57,8 +82,8 @@ namespace MidiGenerator
             sldControllerValue.DrawColor = ControlColor;
             sldControllerValue.ValueChanged += Controller_ValueChanged;
 
-            txtChannelInfo.Click += ChannelEd_Click;
-            txtChannelInfo.BackColor = Color.LightBlue;
+            txtChannelInfo.Click += ChannelInfo_Click;
+            //txtChannelInfo.BackColor = ControlColor;
 
             UpdateUi();
 
@@ -68,18 +93,7 @@ namespace MidiGenerator
 
         #region Handlers for user selections
         /// <summary>
-        /// No need to notify.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        void Volume_ValueChanged(object? sender, EventArgs e)
-        {
-            // No need to check limits.
-            BoundChannel.Volume = (sender as Slider)!.Value;
-        }
-
-        /// <summary>
-        /// TODO1 notify client
+        /// Notify client
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -87,6 +101,7 @@ namespace MidiGenerator
         {
             // No need to check limits.
             BoundChannel.ControllerValue = (int)(sender as Slider)!.Value;
+            OnControllerSend(new() { ControllerId = BoundChannel.ControllerId, Value = BoundChannel.ControllerValue });
         }
 
         /// <summary>
@@ -94,18 +109,16 @@ namespace MidiGenerator
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void ChannelEd_Click(object? sender, EventArgs e)
+        void ChannelInfo_Click(object? sender, EventArgs e)
         {
             var changes = SettingsEditor.Edit(BoundChannel, "Channel", 300);
 
-            // Detect changes of interest.
-            //bool restart = false;
-            ChannelChangeEventArgs args = new()
+            // Notify client.
+            ChannelEventArgs args = new()
             {
                 ChannelNumberChange = changes.Any(ch => ch.name == "ChannelNumber"),
                 PatchChange = changes.Any(ch => ch.name == "Patch"),
                 PresetFileChange = changes.Any(ch => ch.name == "PresetFile"),
-                ControllerIdChange = changes.Any(ch => ch.name == "ControllerId"),
             };
 
             ChannelChange?.Invoke(this, new() { ChannelNumberChange = true });
@@ -119,18 +132,21 @@ namespace MidiGenerator
         /// </summary>
         void UpdateUi()
         {
-            // General.
-            txtChannelInfo.Text = ToString().Left(30);
-            toolTip.SetToolTip(txtChannelInfo, "TODO1 ??????");
+            txtChannelInfo.Text = ToString();
+
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine($"Channel {BoundChannel.ChannelNumber}");
+            sb.AppendLine($"{BoundChannel.GetPatchName(BoundChannel.Patch)} {BoundChannel.Patch}");
+            toolTip.SetToolTip(txtChannelInfo, sb.ToString());
         }
 
         /// <summary>
         /// Read me.
-         /// </summary>
+        /// </summary>
         /// <returns></returns>
         public override string ToString()
         {
-            return $"Ch {BoundChannel.ChannelNumber} {BoundChannel.Instruments[BoundChannel.Patch]}({BoundChannel.Patch})";
+            return $"Ch{BoundChannel.ChannelNumber} P{BoundChannel.Patch}";
         }
     }
 }

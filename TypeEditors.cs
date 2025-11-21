@@ -14,7 +14,7 @@ using Ephemera.NBagOfTricks;
 using Ephemera.NBagOfUis;
 
 
-// Shut up warnings in this file. Using manual checking.
+// Shut up warnings in this file. Using manual checking where needed.
 #pragma warning disable CS8602
 
 namespace MidiGenerator
@@ -33,7 +33,7 @@ namespace MidiGenerator
                 SelectionMode = SelectionMode.One
             };
             lb.Click += (_, __) => _service.CloseDropDown();
-            instList.ForEach(v => lb.Items.Add($"{v.Value} ({v.Key})"));
+            instList.ForEach(v => lb.Items.Add($"{v.Value}({v.Key})"));
             _service.DropDownControl(lb);
 
             return lb.SelectedItem is null ? value : lb.SelectedIndex;
