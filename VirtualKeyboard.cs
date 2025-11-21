@@ -111,7 +111,7 @@ namespace MidiGenerator
 
             try
             {
-                var fn = @"defs\def_keymap.ini";
+                var fn = @"def_keymap.ini";
                 var ir = new IniReader(fn);
 
                 var defs = ir.Contents["keymap"];

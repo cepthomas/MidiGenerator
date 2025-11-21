@@ -26,21 +26,8 @@
 
     <ItemGroup>
       <Compile Remove="lib\**" />
-      <Compile Remove="MidiLibNew\**" />
       <EmbeddedResource Remove="lib\**" />
-      <EmbeddedResource Remove="MidiLibNew\**" />
       <None Remove="lib\**" />
-      <None Remove="MidiLibNew\**" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Compile Remove="ChannelControl_o.cs" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <None Remove="MidiGenerator_2.zip" />
-      <None Remove="MidiGenerator_3.zip" />
-      <None Remove="notes.txt" />
     </ItemGroup>
 
     <ItemGroup>
@@ -77,19 +64,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="defs\def_keymap.ini">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="defs\gm_controllers.ini">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="defs\gm_drumkits.ini">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="defs\gm_drums.ini">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="defs\gm_instruments.ini">
+      <None Update="def_keymap.ini">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
     </ItemGroup>

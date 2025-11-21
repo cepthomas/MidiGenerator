@@ -34,15 +34,6 @@ namespace MidiGenerator
         #region Fields
         /// <summary>All the GM instruments - default.</summary>
         readonly Dictionary<int, string> _instruments = [];
-        
-        /// <summary>All the GM CCs.</summary>
-        readonly Dictionary<int, string> _controllers = [];
-        
-        /// <summary>All the GM drums.</summary>
-        readonly Dictionary<int, string> _drums = [];
-        
-        /// <summary>All the GM drum kits.</summary>
-        readonly Dictionary<int, string> _drumKits = [];
         #endregion
 
         #region Lifecycle
@@ -51,16 +42,9 @@ namespace MidiGenerator
         /// </summary>
         public MidiDefs()
         {
-            try
+            for (int i = 0; i < _instrumentsList.Count; i++)
             {
-                _instruments = Utils.LoadDefs(@"defs\gm_instruments.ini");
-                _controllers = Utils.LoadDefs(@"defs\gm_controllers.ini");
-                _drums = Utils.LoadDefs(@"defs\gm_drums.ini");
-                _drumKits = Utils.LoadDefs(@"defs\gm_drumkits.ini");
-            }
-            catch
-            {
-                // Fails in designer - ignore.
+                _instruments[i] = _instrumentsList[i];
             }
         }
         #endregion
@@ -132,34 +116,65 @@ namespace MidiGenerator
         {
             return _drumKits.TryGetValue(which, out string? value) ? value : $"KIT_{which}";
         }
-
-        // /// <summary>
-        // /// Get drum number.
-        // /// </summary>
-        // /// <param name="which"></param>
-        // /// <returns>The midi number or -1 if invalid.</returns>
-        // public static int GetDrumNumber(string which)
-
-        // /// <summary>
-        // /// Get the controller number.
-        // /// </summary>
-        // /// <param name="which"></param>
-        // /// <returns>The midi number or -1 if invalid.</returns>
-        // public static int GetControllerNumber(string which)
-
-        // /// <summary>
-        // /// Get GM drum kit number.
-        // /// </summary>
-        // /// <param name="which"></param>
-        // /// <returns>The midi number or -1 if invalid.</returns>
-        // public static int GetDrumKitNumber(string which)
-
-        // /// <summary>
-        // /// Get the instrument/patch or drum number.
-        // /// </summary>
-        // /// <param name="which"></param>
-        // /// <returns>The midi number or -1 if invalid.</returns>
-        // public static int GetInstrumentOrDrumKitNumber(string which)
         #endregion
+
+        #region All the GM names
+        /// <summary>The GM midi instrument definitions.</summary>
+        readonly List<string> _instrumentsList =
+        [
+            "AcousticGrandPiano", "BrightAcousticPiano", "ElectricGrandPiano", "HonkyTonkPiano", "ElectricPiano1", "ElectricPiano2", "Harpsichord",
+            "Clavinet", "Celesta", "Glockenspiel", "MusicBox", "Vibraphone", "Marimba", "Xylophone", "TubularBells", "Dulcimer", "DrawbarOrgan",
+            "PercussiveOrgan", "RockOrgan", "ChurchOrgan", "ReedOrgan", "Accordion", "Harmonica", "TangoAccordion", "AcousticGuitarNylon",
+            "AcousticGuitarSteel", "ElectricGuitarJazz", "ElectricGuitarClean", "ElectricGuitarMuted", "OverdrivenGuitar", "DistortionGuitar",
+            "GuitarHarmonics", "AcousticBass", "ElectricBassFinger", "ElectricBassPick", "FretlessBass", "SlapBass1", "SlapBass2", "SynthBass1",
+            "SynthBass2", "Violin", "Viola", "Cello", "Contrabass", "TremoloStrings", "PizzicatoStrings", "OrchestralHarp", "Timpani",
+            "StringEnsemble1", "StringEnsemble2", "SynthStrings1", "SynthStrings2", "ChoirAahs", "VoiceOohs", "SynthVoice", "OrchestraHit",
+            "Trumpet", "Trombone", "Tuba", "MutedTrumpet", "FrenchHorn", "BrassSection", "SynthBrass1", "SynthBrass2", "SopranoSax", "AltoSax",
+            "TenorSax", "BaritoneSax", "Oboe", "EnglishHorn", "Bassoon", "Clarinet", "Piccolo", "Flute", "Recorder", "PanFlute", "BlownBottle",
+            "Shakuhachi", "Whistle", "Ocarina", "Lead1Square", "Lead2Sawtooth", "Lead3Calliope", "Lead4Chiff", "Lead5Charang", "Lead6Voice",
+            "Lead7Fifths", "Lead8BassAndLead", "Pad1NewAge", "Pad2Warm", "Pad3Polysynth", "Pad4Choir", "Pad5Bowed", "Pad6Metallic", "Pad7Halo",
+            "Pad8Sweep", "Fx1Rain", "Fx2Soundtrack", "Fx3Crystal", "Fx4Atmosphere", "Fx5Brightness", "Fx6Goblins", "Fx7Echoes", "Fx8SciFi",
+            "Sitar", "Banjo", "Shamisen", "Koto", "Kalimba", "BagPipe", "Fiddle", "Shanai", "TinkleBell", "Agogo", "SteelDrums", "Woodblock",
+            "TaikoDrum", "MelodicTom", "SynthDrum", "ReverseCymbal", "GuitarFretNoise", "BreathNoise", "Seashore", "BirdTweet", "TelephoneRing",
+            "Helicopter", "Applause", "Gunshot"
+        ];
+
+        /// <summary>The GM midi drum kit definitions.</summary>
+        readonly Dictionary<int, string> _drumKits = new()
+        {
+            { 0, "Standard" }, { 8, "Room" }, { 16, "Power" }, { 24, "Electronic" }, { 25, "TR808" },
+            { 32, "Jazz" }, { 40, "Brush" }, { 48, "Orchestra" }, { 56, "SFX" }
+        };
+
+        /// <summary>The GM midi drum definitions.</summary>
+        readonly Dictionary<int, string> _drums = new()
+        {
+            { 035, "AcousticBassDrum" }, { 036, "BassDrum1" }, { 037, "SideStick" }, { 038, "AcousticSnare" }, { 039, "HandClap" }, 
+            { 040, "ElectricSnare" }, { 041, "LowFloorTom" }, { 042, "ClosedHiHat" }, { 043, "HighFloorTom" }, { 044, "PedalHiHat" }, 
+            { 045, "LowTom" }, { 046, "OpenHiHat" }, { 047, "LowMidTom" }, { 048, "HiMidTom" }, { 049, "CrashCymbal1" }, 
+            { 050, "HighTom" }, { 051, "RideCymbal1" }, { 052, "ChineseCymbal" }, { 053, "RideBell" }, { 054, "Tambourine" }, 
+            { 055, "SplashCymbal" }, { 056, "Cowbell" }, { 057, "CrashCymbal2" }, { 058, "Vibraslap" }, { 059, "RideCymbal2" }, 
+            { 060, "HiBongo" }, { 061, "LowBongo" }, { 062, "MuteHiConga" }, { 063, "OpenHiConga" }, { 064, "LowConga" }, 
+            { 065, "HighTimbale" }, { 066, "LowTimbale" }, { 067, "HighAgogo" }, { 068, "LowAgogo" }, { 069, "Cabasa" }, 
+            { 070, "Maracas" }, { 071, "ShortWhistle" }, { 072, "LongWhistle" }, { 073, "ShortGuiro" }, { 074, "LongGuiro" }, 
+            { 075, "Claves" }, { 076, "HiWoodBlock" }, { 077, "LowWoodBlock" }, { 078, "MuteCuica" }, { 079, "OpenCuica" }, 
+            { 080, "MuteTriangle" }, { 081, "OpenTriangle" }
+        };
+
+        /// <summary>The midi controller definitions.</summary>
+        readonly Dictionary<int, string> _controllers = new()
+        {
+            { 000, "BankSelect" }, { 001, "Modulation" }, { 002, "BreathController" }, { 004, "FootController" }, { 005, "PortamentoTime" }, 
+            { 007, "Volume" }, { 008, "Balance" }, { 010, "Pan" }, { 011, "Expression" }, { 032, "BankSelectLSB" }, { 033, "ModulationLSB" }, 
+            { 034, "BreathControllerLSB" }, { 036, "FootControllerLSB" }, { 037, "PortamentoTimeLSB" }, { 039, "VolumeLSB" }, 
+            { 040, "BalanceLSB" }, { 042, "PanLSB" }, { 043, "ExpressionLSB" }, { 064, "Sustain" }, { 065, "Portamento" }, { 066, "Sostenuto" }, 
+            { 067, "SoftPedal" }, { 068, "Legato" }, { 069, "Sustain2" }, { 084, "PortamentoControl" }, { 120, "AllSoundOff" }, 
+            { 121, "ResetAllControllers" }, { 122, "LocalKeyboard" }, { 123, "AllNotesOff" }
+        };
+        #endregion
+
+
+
+
     }
 }    
