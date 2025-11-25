@@ -61,7 +61,7 @@ namespace MidiGenerator
             };
 
             ///// Figure out which midi output device. /////
-            string deviceName = _settings.OutputDevice; // "VirtualMIDISynth #1";
+            string deviceName = _settings.OutputDevice;
             for (int i = 0; i < MidiOut.NumberOfDevices; i++)
             {
                 if (deviceName == MidiOut.DeviceInfo(i).ProductName)
@@ -73,7 +73,7 @@ namespace MidiGenerator
 
             if (_midiOut is null)
             {
-                _logger.Error($"Invalid midi output device");
+                _logger.Error($"Invalid midi output device [{deviceName}]"); //TODO1 retry
             }
 
             ///// Init the channels and their corresponding controls. /////
@@ -154,7 +154,6 @@ namespace MidiGenerator
         void SaveSettings()
         {
             _settings.FormGeometry = new Rectangle(Location, Size);
-
             _settings.Save();
         }
 
@@ -313,21 +312,19 @@ namespace MidiGenerator
             List<string> ls = [];
 
             // Show them what they have.
-            ls.Add($"# Your Midi Devices");
-            ls.Add($"");
-            ls.Add($"## Outputs");
+            ls.Add($"Your Midi Outputs");
             ls.Add($"");
             for (int i = 0; i < MidiOut.NumberOfDevices; i++)
             {
-                ls.Add($"- \"{MidiOut.DeviceInfo(i).ProductName}\"");
+                ls.Add($"- [{MidiOut.DeviceInfo(i).ProductName}]");
             }
 
             ls.Add($"");
-            ls.Add($"## Inputs");
+            ls.Add($"Your Midi Inputs");
             ls.Add($"");
             for (int i = 0; i < MidiIn.NumberOfDevices; i++)
             {
-                ls.Add($"- \"{MidiIn.DeviceInfo(i).ProductName}\"");
+                ls.Add($"- [{MidiIn.DeviceInfo(i).ProductName}]");
             }
 
             MessageBox.Show(string.Join(Environment.NewLine, ls));
