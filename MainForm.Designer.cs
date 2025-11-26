@@ -16,6 +16,7 @@ namespace MidiGenerator
         /// </summary>
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
             toolStrip1 = new System.Windows.Forms.ToolStrip();
             btnLogMidi = new System.Windows.Forms.ToolStripButton();
             toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
@@ -26,6 +27,7 @@ namespace MidiGenerator
             txtViewer = new Ephemera.NBagOfUis.TextViewer();
             VkeyControl = new VirtualKeyboard();
             ClClControl = new ClickClack();
+            timer1 = new System.Windows.Forms.Timer(components);
             toolStrip1.SuspendLayout();
             SuspendLayout();
             // 
@@ -159,6 +161,7 @@ namespace MidiGenerator
         //private ChannelControl ClClChannelControl;
         private ClickClack ClClControl;
         private VirtualKeyboard VkeyControl;
+        private System.Windows.Forms.Timer timer1;
     }
 }
 

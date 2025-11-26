@@ -24,7 +24,7 @@ namespace MidiGenerator
 
         /// <summary>Midi output device.</summary>
         /// <summary>Low level midi output device.</summary>
-        readonly MidiOut? _midiOut = null;
+        MidiOut? _midiOut = null;
         #endregion
 
         #region Lifecycle
@@ -61,20 +61,23 @@ namespace MidiGenerator
             };
 
             ///// Figure out which midi output device. /////
-            string deviceName = _settings.OutputDevice;
-            for (int i = 0; i < MidiOut.NumberOfDevices; i++)
-            {
-                if (deviceName == MidiOut.DeviceInfo(i).ProductName)
-                {
-                    _midiOut = new MidiOut(i);
-                    break;
-                }
-            }
+            timer1.Interval = 1000;
+            timer1.Tick += (object? sender, EventArgs e) => ConnectDevice();
+            timer1.Start();
+            //string deviceName = _settings.OutputDevice;
+            //for (int i = 0; i < MidiOut.NumberOfDevices; i++)
+            //{
+            //    if (deviceName == MidiOut.DeviceInfo(i).ProductName)
+            //    {
+            //        _midiOut = new MidiOut(i);
+            //        break;
+            //    }
+            //}
 
-            if (_midiOut is null)
-            {
-                _logger.Error($"Invalid midi output device [{deviceName}]"); //TODO1 retry
-            }
+            //if (_midiOut is null)
+            //{
+            //    _logger.Error($"Invalid midi output device [{deviceName}]"); //TODO1 retry
+            //}
 
             ///// Init the channels and their corresponding controls. /////
             _settings.VkeyChannel.UpdatePresets();
@@ -229,7 +232,7 @@ namespace MidiGenerator
             // Usually come from a different thread.
             if (IsHandleCreated)
             {
-                this.InvokeIfRequired(_ => { txtViewer.AppendLine($"{e.Message}"); });
+                this.InvokeIfRequired(_ => { Tell($"{e.Message}"); });
             }
         }
 
@@ -301,6 +304,43 @@ namespace MidiGenerator
         }
         #endregion
 
+        #region Stuff
+        /// <summary>
+        /// Tell me something good.
+        /// </summary>
+        /// <param name="s"></param>
+        void Tell(string s)
+        {
+            txtViewer.AppendLine($"{s}");
+        }
+
+        /// <summary>
+        /// Figure out which midi output device.
+        /// </summary>
+        void ConnectDevice() //TODO1 retry
+        {
+            if (_midiOut == null)
+            {
+                string deviceName = _settings.OutputDevice;
+                for (int i = 0; i < MidiOut.NumberOfDevices; i++)
+                {
+                    if (deviceName == MidiOut.DeviceInfo(i).ProductName)
+                    {
+                        _midiOut = new MidiOut(i);
+                        Text = $"Midi Generator - {deviceName}";
+                        Tell($"Connect to {deviceName}");
+                        timer1.Stop();
+                        break;
+                    }
+                }
+
+                //if (_midiOut is null)
+                //{
+                //    _logger.Error($"Invalid midi output device [{deviceName}]");
+                //}
+            }
+        }
+
         /// <summary>
         /// The meaning of life.
         /// </summary>
@@ -329,5 +369,6 @@ namespace MidiGenerator
 
             MessageBox.Show(string.Join(Environment.NewLine, ls));
         }
+        #endregion
     }
 }
