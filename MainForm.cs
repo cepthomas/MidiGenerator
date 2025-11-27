@@ -60,24 +60,11 @@ namespace MidiGenerator
                 Kill(_settings.ClClChannel.ChannelNumber);
             };
 
-            ///// Figure out which midi output device. /////
+            ///// Determine midi output device. /////
+            Text = "Midi Generator - no output device";
             timer1.Interval = 1000;
-            timer1.Tick += (object? sender, EventArgs e) => ConnectDevice();
+            timer1.Tick += (sender, e) => ConnectDevice();
             timer1.Start();
-            //string deviceName = _settings.OutputDevice;
-            //for (int i = 0; i < MidiOut.NumberOfDevices; i++)
-            //{
-            //    if (deviceName == MidiOut.DeviceInfo(i).ProductName)
-            //    {
-            //        _midiOut = new MidiOut(i);
-            //        break;
-            //    }
-            //}
-
-            //if (_midiOut is null)
-            //{
-            //    _logger.Error($"Invalid midi output device [{deviceName}]"); //TODO1 retry
-            //}
 
             ///// Init the channels and their corresponding controls. /////
             _settings.VkeyChannel.UpdatePresets();
@@ -317,10 +304,11 @@ namespace MidiGenerator
         /// <summary>
         /// Figure out which midi output device.
         /// </summary>
-        void ConnectDevice() //TODO1 retry
+        void ConnectDevice()
         {
             if (_midiOut == null)
             {
+                // Retry.
                 string deviceName = _settings.OutputDevice;
                 for (int i = 0; i < MidiOut.NumberOfDevices; i++)
                 {
@@ -333,11 +321,6 @@ namespace MidiGenerator
                         break;
                     }
                 }
-
-                //if (_midiOut is null)
-                //{
-                //    _logger.Error($"Invalid midi output device [{deviceName}]");
-                //}
             }
         }
 

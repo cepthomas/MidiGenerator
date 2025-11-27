@@ -38,7 +38,7 @@ namespace MidiGenerator
 
         #region Lifecycle
         /// <summary>
-        /// Initialize some collections. // TODO1 combine with Nebulua C#/lua, def files,...
+        /// Initialize some collections.
         /// </summary>
         public MidiDefs()
         {

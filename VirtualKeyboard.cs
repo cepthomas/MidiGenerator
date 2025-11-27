@@ -94,10 +94,6 @@ namespace MidiGenerator
             }
             base.Dispose(disposing);
         }
-
-        void InitializeComponent()
-        {
-        }
         #endregion
 
         #region Private functions
@@ -122,23 +118,22 @@ namespace MidiGenerator
                     if (kv.Key.Length != 1) { throw new InvalidOperationException($"Invalid key {kv.Key} in {fn}"); }
 
                     Keys chkey = Keys.None;
-                    switch (kv.Key[0])
+                    chkey = kv.Key[0] switch
                     {
-                        case ',': chkey = Keys.Oemcomma; break;
-                        case '=': chkey = Keys.Oemplus; break;
-                        case '-': chkey = Keys.OemMinus; break;
-                        case '/': chkey = Keys.OemQuestion; break;
-                        case '.': chkey = Keys.OemPeriod; break;
-                        case '\'': chkey = Keys.OemQuotes; break;
-                        case '\\': chkey = Keys.OemPipe; break;
-                        case ']': chkey = Keys.OemCloseBrackets; break;
-                        case '[': chkey = Keys.OemOpenBrackets; break;
-                        case '`': chkey = Keys.Oemtilde; break;
-                        case ';': chkey = Keys.OemSemicolon; break;
-                        case (>= 'A' and <= 'Z') or (>= '0' and <= '9'): chkey = (Keys)kv.Key[0]; break;
-                        default: throw new InvalidOperationException($"Invalid key {kv.Key} in {fn}");
-                    }
-
+                        ',' => Keys.Oemcomma,
+                        '=' => Keys.Oemplus,
+                        '-' => Keys.OemMinus,
+                        '/' => Keys.OemQuestion,
+                        '.' => Keys.OemPeriod,
+                        '\'' => Keys.OemQuotes,
+                        '\\' => Keys.OemPipe,
+                        ']' => Keys.OemCloseBrackets,
+                        '[' => Keys.OemOpenBrackets,
+                        '`' => Keys.Oemtilde,
+                        ';' => Keys.OemSemicolon,
+                        (>= 'A' and <= 'Z') or (>= '0' and <= '9') => (Keys)kv.Key[0],
+                        _ => throw new InvalidOperationException($"Invalid key {kv.Key} in {fn}"),
+                    };
                     var notes = MusicDefinitions.GetNotesFromString(kv.Value);
                     if (notes.Count != 1) { throw new InvalidOperationException($"Invalid key {kv.Key} in {fn}"); }
 
@@ -211,7 +206,7 @@ namespace MidiGenerator
                 VirtualKey pk = new(this, noteId) { ControlColor = ControlColor };
 
                 // Pass along an event from a virtual key.
-                pk.Vkey_Click += (object? sender, NoteEventArgs e) => OnNoteSend(e);
+                pk.Vkey_Click += (sender, e) => OnNoteSend(e);
 
                 _keys.Add(pk);
                 Controls.Add(pk);

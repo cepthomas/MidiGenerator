@@ -37,7 +37,7 @@ namespace MidiGenerator
             toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { btnLogMidi, toolStripSeparator1, btnKillMidi, toolStripSeparator2, btnSettings, toolStripSeparator3 });
             toolStrip1.Location = new System.Drawing.Point(0, 0);
             toolStrip1.Name = "toolStrip1";
-            toolStrip1.Size = new System.Drawing.Size(1103, 27);
+            toolStrip1.Size = new System.Drawing.Size(1081, 27);
             toolStrip1.TabIndex = 0;
             toolStrip1.Text = "toolStrip1";
             // 
@@ -97,7 +97,7 @@ namespace MidiGenerator
             txtViewer.MaxText = 5000;
             txtViewer.Name = "txtViewer";
             txtViewer.Prompt = "";
-            txtViewer.Size = new System.Drawing.Size(694, 253);
+            txtViewer.Size = new System.Drawing.Size(671, 253);
             txtViewer.TabIndex = 58;
             txtViewer.WordWrap = true;
             // 
@@ -113,7 +113,7 @@ namespace MidiGenerator
             VkeyControl.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             VkeyControl.Name = "VkeyControl";
             VkeyControl.ShowNoteNames = true;
-            VkeyControl.Size = new System.Drawing.Size(694, 154);
+            VkeyControl.Size = new System.Drawing.Size(671, 154);
             VkeyControl.TabIndex = 93;
             // 
             // ClClControl
@@ -124,14 +124,14 @@ namespace MidiGenerator
             ClClControl.ControlColor = System.Drawing.Color.Red;
             ClClControl.Location = new System.Drawing.Point(13, 39);
             ClClControl.Name = "ClClControl";
-            ClClControl.Size = new System.Drawing.Size(380, 416);
+            ClClControl.Size = new System.Drawing.Size(372, 416);
             ClClControl.TabIndex = 102;
             // 
             // MainForm
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(8F, 19F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            ClientSize = new System.Drawing.Size(1103, 461);
+            ClientSize = new System.Drawing.Size(1081, 461);
             Controls.Add(ClClControl);
             Controls.Add(VkeyControl);
             Controls.Add(txtViewer);
@@ -146,7 +146,6 @@ namespace MidiGenerator
             ResumeLayout(false);
             PerformLayout();
         }
-
         #endregion
 
         private System.Windows.Forms.ToolStrip toolStrip1;

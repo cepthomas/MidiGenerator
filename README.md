@@ -20,7 +20,7 @@ VirtualKeyboard
 ClickClack
 - Experimental UI component.
 
- # Terminology
+# Terminology
 
 - Channel numbers are 1-16.
 - Note and controller numbers are standard midi 0-127.
