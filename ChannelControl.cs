@@ -121,70 +121,20 @@ namespace MidiGenerator
         /// <param name="e"></param>
         protected override void OnLoad(EventArgs e)
         {
-
             sldVolume.Value = BoundChannel.Volume;
             sldVolume.DrawColor = ControlColor;
             sldVolume.BackColor = SystemColors.Control;
+
             sldControllerValue.Value = BoundChannel.ControllerValue;
             sldControllerValue.DrawColor = ControlColor;
             sldControllerValue.BackColor = SystemColors.Control;
+
             txtChannelInfo.BackColor = ControlColor;
-
-
-            //sldVolume.Minimum = 0.0;
-            //sldVolume.Maximum = Defs.MAX_VOLUME;
-            //sldVolume.Resolution = 0.05;
-            //sldVolume.Value = BoundChannel.Volume;
-            //sldVolume.DrawColor = ControlColor;
-            //sldVolume.ValueChanged += (object? sender, EventArgs e) => BoundChannel.Volume = (sender as Slider)!.Value;
-            //sldVolume.BackColor = SystemColors.Control;
-            //sldVolume.BorderStyle = BorderStyle.FixedSingle;
-            //// sldVolume.Label = "";
-            //sldVolume.Location = new(5, 5);
-            //sldVolume.Name = "sldVolume";
-            //sldVolume.Orientation = Orientation.Horizontal;
-            //sldVolume.Size = new(80, 32);
-
-            //sldControllerValue.Minimum = 0;
-            //sldControllerValue.Maximum = MidiDefs.MAX_MIDI;
-            //sldControllerValue.Resolution = 1;
-            //sldControllerValue.Value = BoundChannel.ControllerValue;
-            //sldControllerValue.DrawColor = ControlColor;
-            //sldControllerValue.ValueChanged += Controller_ValueChanged;
-            //sldControllerValue.BackColor = SystemColors.Control;
-            //sldControllerValue.BorderStyle = BorderStyle.FixedSingle;
-            //// sldControllerValue.Label = "";
-            //sldControllerValue.Location = new(95, 5);
-            //sldControllerValue.Name = "sldControllerValue";
-            //sldControllerValue.Orientation = Orientation.Horizontal;
-            //sldControllerValue.Size = new(80, 32);
-
-            //txtChannelInfo.Click += ChannelInfo_Click;
-            //txtChannelInfo.BackColor = ControlColor;
-            //txtChannelInfo.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            //txtChannelInfo.BorderStyle = BorderStyle.FixedSingle;
-            //txtChannelInfo.Location = new(185, 8);
-            //txtChannelInfo.Name = "txtChannelInfo";
-            //txtChannelInfo.ReadOnly = true;
-            //txtChannelInfo.Size = new(182, 26);
-
-
-            //// AutoScaleDimensions = new System.Drawing.SizeF(8F, 19F);
-            //// AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            //BackColor = SystemColors.Control;
-            //Controls.Add(txtChannelInfo);
-            //Controls.Add(sldControllerValue);
-            //Controls.Add(sldVolume);
-            //Name = "ChannelControl";
-            //Size = new(372, 42);
-
 
             UpdateUi();
 
             base.OnLoad(e);
         }
-
-
 
         /// <summary> 
         /// Clean up any resources being used.
@@ -198,8 +148,6 @@ namespace MidiGenerator
             }
             base.Dispose(disposing);
         }
-
-
         #endregion
 
         #region Handlers for user selections

@@ -69,7 +69,6 @@ namespace MidiGenerator
             ///// Init the channels and their corresponding controls. /////
             _settings.VkeyChannel.UpdatePresets();
             VkeyControl.BoundChannel = _settings.VkeyChannel;
-            ClClControl.BoundChannel = _settings.ClClChannel;
             VkeyControl.ControlColor = _settings.ControlColor;
             VkeyControl.Enabled = true;
             VkeyControl.LowNote = 36;
@@ -79,6 +78,7 @@ namespace MidiGenerator
             VkeyControl.ControllerSend += User_ControllerSend;
 
             _settings.ClClChannel.UpdatePresets();
+            ClClControl.BoundChannel = _settings.ClClChannel;
             ClClControl.ControlColor = _settings.ControlColor;
             ClClControl.Enabled = true;
             ClClControl.ChannelChange += User_ChannelChange;
