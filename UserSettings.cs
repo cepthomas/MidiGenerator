@@ -7,6 +7,7 @@ using System.Text.Json.Serialization;
 using System.Windows.Forms.Design;
 using System.IO;
 using Ephemera.NBagOfTricks;
+using Ephemera.NBagOfUis;
 
 
 namespace MidiGenerator
@@ -15,7 +16,7 @@ namespace MidiGenerator
     public sealed class UserSettings : SettingsCore
     {
         #region Persisted editable properties
-        [DisplayName("Control Color")]
+        [DisplayName("Draw Color")]
         [Description("The color used for active control surfaces.")]
         [Browsable(true)]
         [JsonConverter(typeof(JsonColorConverter))]
@@ -36,16 +37,16 @@ namespace MidiGenerator
         [DisplayName("Output Device")]
         [Description("Valid output device.")]
         [Browsable(true)]
-        [Editor(typeof(DeviceTypeEditor), typeof(UITypeEditor))]
+        [Editor(typeof(GenericListTypeEditor), typeof(UITypeEditor))]
         public string OutputDevice { get; set; } = "???";
         #endregion
 
         #region Persisted non-editable properties
-        [Browsable(false)]
-        public Channel VkeyChannel { get; set; } = new();
+        // [Browsable(false)]
+        // public Channel VkeyChannel { get; set; } = new();
 
-        [Browsable(false)]
-        public Channel ClClChannel { get; set; } = new();
+        // [Browsable(false)]
+        // public Channel ClClChannel { get; set; } = new();
 
         [Browsable(false)]
         public bool LogMidi { get; set; } = false;

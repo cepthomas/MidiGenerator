@@ -9,6 +9,7 @@ using System.IO;
 using NAudio.Midi;
 using Ephemera.NBagOfTricks;
 using Ephemera.NBagOfUis;
+using Ephemera.MidiLib;
 
 
 namespace MidiGenerator
@@ -48,7 +49,7 @@ namespace MidiGenerator
             LogManager.Run(Path.Combine(appDir, "log.txt"), 50000);
 
             ///// Configure UI. /////
-            toolStrip1.Renderer = new ToolStripCheckBoxRenderer() { SelectedColor = _settings.SelectedColor };
+            toolStrip1.Renderer = new ToolStripCheckBoxRenderer() { SelectedColor = _settings.DrawColor };
             txtViewer.Font = Font;
             txtViewer.MatchText.Add("ERR", Color.LightPink);
             txtViewer.MatchText.Add("WRN", Color.Plum);
@@ -152,6 +153,8 @@ namespace MidiGenerator
         /// </summary>
         void Settings_Click(object? sender, EventArgs e)
         {
+            GenericListTypeEditor.SetOptions("MidiDeviceName", MidiOutputDevice.GetAvailableDevices());
+
             var changes = SettingsEditor.Edit(_settings, "User Settings", 300);
 
             // Detect changes of interest.
@@ -205,7 +208,7 @@ namespace MidiGenerator
             if (e.PresetFileChange)
             {
                 // Update channel presets.
-                cc!.BoundChannel.UpdatePresets();
+                cc!.BoundChannel.AliasFile = "TODO1";
             }
         }
 

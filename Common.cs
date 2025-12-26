@@ -7,18 +7,19 @@ using System.Windows.Forms;
 using System.ComponentModel.DataAnnotations;
 using Ephemera.NBagOfTricks;
 using Ephemera.MusicLib;
+using Ephemera.MidiLib;
 
 
 namespace MidiGenerator
 {
-    public class Defs
-    {
-        /// <summary>Default value.</summary>
-        public const double DEFAULT_VOLUME = 0.8;
+    //public class Defs
+    //{
+    //    /// <summary>Default value.</summary>
+    //    public const double DEFAULT_VOLUME = 0.8;
 
-        /// <summary>Allow UI controls some more headroom.</summary>
-        public const double MAX_VOLUME = 2.0;
-    }
+    //    /// <summary>Allow UI controls some more headroom.</summary>
+    //    public const double MAX_VOLUME = 2.0;
+    //}
 
     #region Events
     /// <summary>Notify host of user clicks.</summary>
@@ -53,7 +54,7 @@ namespace MidiGenerator
         /// <summary>Read me.</summary>
         public override string ToString()
         {
-            return $"ControllerId:{MidiDefs.TheDefs.GetControllerName(ControllerId)}({ControllerId}):{Value}";
+            return $"ControllerId:{MidiDefs.Instance.GetControllerName(ControllerId)}({ControllerId}):{Value}";
         }
     }
 

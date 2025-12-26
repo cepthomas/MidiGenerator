@@ -4,8 +4,8 @@ using System.Drawing;
 using System.Windows.Forms;
 using System.Linq;
 using System.ComponentModel;
-using Ephemera.NBagOfTricks;
 using System.DirectoryServices.ActiveDirectory;
+using Ephemera.NBagOfTricks;
 using Ephemera.MusicLib;
 
 
@@ -109,11 +109,12 @@ namespace MidiGenerator
             try
             {
                 var fn = @"def_keymap.ini";
-                var ir = new IniReader(fn);
+                var ir = new IniReader();
+                ir.ParseFile(fn);
 
-                var defs = ir.Contents["keymap"];
+                var defs = ir.GetValues("keymap");
 
-                defs.Values.ForEach(kv =>
+                defs.ForEach(kv =>
                 {
                     // Z = C3
                     if (kv.Key.Length != 1) { throw new InvalidOperationException($"Invalid key {kv.Key} in {fn}"); }
@@ -135,7 +136,7 @@ namespace MidiGenerator
                         (>= 'A' and <= 'Z') or (>= '0' and <= '9') => (Keys)kv.Key[0],
                         _ => throw new InvalidOperationException($"Invalid key {kv.Key} in {fn}"),
                     };
-                    var notes = MusicDefs.GetNotesFromString(kv.Value);
+                    var notes = MusicDefs.Instance.GetNotesFromString(kv.Value);
                     if (notes.Count != 1) { throw new InvalidOperationException($"Invalid key {kv.Key} in {fn}"); }
 
                     var note = notes[0];
@@ -212,7 +213,7 @@ namespace MidiGenerator
                 _keys.Add(pk);
                 Controls.Add(pk);
 
-                if (!MusicDefinitions.IsNatural(noteId))
+                if (!MusicDefs.Instance.IsNatural(noteId))
                 {
                     pk.BringToFront();
                 }
@@ -226,7 +227,7 @@ namespace MidiGenerator
         {
             if (_keys.Count > 0)
             {
-                int whiteKeyWidth = _keys.Count * KeySize / _keys.Count(k => MusicDefinitions.IsNatural(k.NoteId));
+                int whiteKeyWidth = _keys.Count * KeySize / _keys.Count(k => MusicDefs.Instance.IsNatural(k.NoteId));
                 int blackKeyWidth = (int)(whiteKeyWidth * 0.6);
                 int whiteKeyHeight = DrawRect.Height;
                 int blackKeyHeight = (int)(whiteKeyHeight * 0.65);
@@ -238,7 +239,7 @@ namespace MidiGenerator
                     VirtualKey pk = _keys[i];
 
                     // Note that controls have to have integer width so resizing is a bit lumpy.
-                    if (MusicDefinitions.IsNatural(pk.NoteId)) // white key
+                    if (MusicDefs.Instance.IsNatural(pk.NoteId)) // white key
                     {
                         pk.Height = whiteKeyHeight;
                         pk.Width = whiteKeyWidth;
@@ -412,7 +413,7 @@ namespace MidiGenerator
             }
             else
             {
-                e.Graphics.FillRectangle(MusicDefinitions.IsNatural(NoteId) ? new SolidBrush(Color.White) : new SolidBrush(Color.Black), 0, 0, Size.Width, Size.Height);
+                e.Graphics.FillRectangle(MusicDefs.Instance.IsNatural(NoteId) ? new SolidBrush(Color.White) : new SolidBrush(Color.Black), 0, 0, Size.Width, Size.Height);
             }
 
             // Outline.
@@ -426,8 +427,8 @@ namespace MidiGenerator
 
                 if (root == 0)
                 {
-                    int x = MusicDefinitions.IsNatural(NoteId) ? 3 : 0;
-                    e.Graphics.DrawString($"{MusicDefinitions.NoteNumberToName(root, false)}", Font, Brushes.Black, x, 3);
+                    int x = MusicDefs.Instance.IsNatural(NoteId) ? 3 : 0;
+                    e.Graphics.DrawString($"{MusicDefs.Instance.NoteNumberToName(root, false)}", Font, Brushes.Black, x, 3);
                     e.Graphics.DrawString($"{octave}", Font, Brushes.Black, x, 13);
                 }
             }
