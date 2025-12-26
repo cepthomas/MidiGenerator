@@ -30,7 +30,7 @@ namespace MidiGenerator
         public Channel BoundChannel { get; set; } = new();
 
         /// <summary>Cosmetics.</summary>
-        public Color ControlColor { get; set; } = Color.Red;
+        public Color DrawColor { get; set; } = Color.Red;
 
         /// <summary>The graphics draw area.</summary>
         [Browsable(false)]
@@ -122,14 +122,14 @@ namespace MidiGenerator
         protected override void OnLoad(EventArgs e)
         {
             sldVolume.Value = BoundChannel.Volume;
-            sldVolume.DrawColor = ControlColor;
+            sldVolume.DrawColor = DrawColor;
             sldVolume.BackColor = SystemColors.Control;
 
             sldControllerValue.Value = BoundChannel.ControllerValue;
-            sldControllerValue.DrawColor = ControlColor;
+            sldControllerValue.DrawColor = DrawColor;
             sldControllerValue.BackColor = SystemColors.Control;
 
-            txtChannelInfo.BackColor = ControlColor;
+            txtChannelInfo.BackColor = DrawColor;
 
             UpdateUi();
 

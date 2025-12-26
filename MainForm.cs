@@ -48,7 +48,7 @@ namespace MidiGenerator
             LogManager.Run(Path.Combine(appDir, "log.txt"), 50000);
 
             ///// Configure UI. /////
-            toolStrip1.Renderer = new ToolStripCheckBoxRenderer() { SelectedColor = _settings.ControlColor };
+            toolStrip1.Renderer = new ToolStripCheckBoxRenderer() { SelectedColor = _settings.SelectedColor };
             txtViewer.Font = Font;
             txtViewer.MatchText.Add("ERR", Color.LightPink);
             txtViewer.MatchText.Add("WRN", Color.Plum);
@@ -69,7 +69,7 @@ namespace MidiGenerator
             ///// Init the channels and their corresponding controls. /////
             _settings.VkeyChannel.UpdatePresets();
             VkeyControl.BoundChannel = _settings.VkeyChannel;
-            VkeyControl.ControlColor = _settings.ControlColor;
+            VkeyControl.DrawColor = _settings.DrawColor;
             VkeyControl.Enabled = true;
             VkeyControl.LowNote = 36;
             VkeyControl.HighNote = 84;
@@ -79,7 +79,7 @@ namespace MidiGenerator
 
             _settings.ClClChannel.UpdatePresets();
             ClClControl.BoundChannel = _settings.ClClChannel;
-            ClClControl.ControlColor = _settings.ControlColor;
+            ClClControl.DrawColor = _settings.DrawColor;
             ClClControl.Enabled = true;
             ClClControl.ChannelChange += User_ChannelChange;
             ClClControl.NoteSend += User_NoteSend;
@@ -155,7 +155,7 @@ namespace MidiGenerator
             var changes = SettingsEditor.Edit(_settings, "User Settings", 300);
 
             // Detect changes of interest.
-            bool restart = changes.Any(ch => ch.name == "ControlColor" || ch.name == "OutputDevice");
+            bool restart = changes.Any(ch => ch.name == "DrawColor" || ch.name == "OutputDevice");
 
             if (restart)
             {

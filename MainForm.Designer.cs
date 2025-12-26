@@ -105,7 +105,7 @@ namespace MidiGenerator
             // 
             VkeyControl.BackColor = System.Drawing.SystemColors.Control;
             VkeyControl.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            VkeyControl.ControlColor = System.Drawing.Color.Red;
+            VkeyControl.DrawColor = System.Drawing.Color.Red;
             VkeyControl.HighNote = 108;
             VkeyControl.KeySize = 14;
             VkeyControl.Location = new System.Drawing.Point(399, 39);
@@ -121,7 +121,7 @@ namespace MidiGenerator
             ClClControl.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left;
             ClClControl.BackColor = System.Drawing.SystemColors.Control;
             ClClControl.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            ClClControl.ControlColor = System.Drawing.Color.Red;
+            ClClControl.DrawColor = System.Drawing.Color.Red;
             ClClControl.Location = new System.Drawing.Point(13, 39);
             ClClControl.Name = "ClClControl";
             ClClControl.Size = new System.Drawing.Size(372, 416);

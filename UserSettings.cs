@@ -19,7 +19,7 @@ namespace MidiGenerator
         [Description("The color used for active control surfaces.")]
         [Browsable(true)]
         [JsonConverter(typeof(JsonColorConverter))]
-        public Color ControlColor { get; set; } = Color.Red;
+        public Color DrawColor { get; set; } = Color.Red;
 
         [DisplayName("File Log Level")]
         [Description("Log level for file write.")]

@@ -6,6 +6,7 @@ using System.IO;
 using System.Windows.Forms;
 using System.ComponentModel.DataAnnotations;
 using Ephemera.NBagOfTricks;
+using Ephemera.MusicLib;
 
 
 namespace MidiGenerator
@@ -34,7 +35,7 @@ namespace MidiGenerator
         /// <summary>Read me.</summary>
         public override string ToString()
         {
-            return $"Note:{MusicDefinitions.NoteNumberToName(Note)}({Note}):{Velocity}";
+            return $"Note:{MusicDefs.Instance.NoteNumberToName(Note)}({Note}):{Velocity}";
         }
     }
 
@@ -65,25 +66,25 @@ namespace MidiGenerator
     }
     #endregion
 
-    public class Utils
-    {
-        // Load a standard midi def file.
-        public static Dictionary<int, string> LoadDefs(string fn)
-        {
-            Dictionary<int, string> res = [];
+    //public class Utils
+    //{
+    //    // Load a standard midi def file.
+    //    public static Dictionary<int, string> LoadDefs(string fn)
+    //    {
+    //        Dictionary<int, string> res = [];
 
-            var ir = new IniReader(fn);
+    //        var ir = new IniReader(fn);
 
-            var defs = ir.Contents["midi_defs"];
+    //        var defs = ir.Contents["midi_defs"];
 
-            defs.Values.ForEach(kv =>
-            {
-                int index = int.Parse(kv.Key); // can throw
-                if (index < 0 || index > MidiDefs.MAX_MIDI) { throw new InvalidOperationException($"Invalid def file {fn}"); }
-                res[index] = kv.Value.Length > 0 ? kv.Value : "";
-            });
+    //        defs.Values.ForEach(kv =>
+    //        {
+    //            int index = int.Parse(kv.Key); // can throw
+    //            if (index < 0 || index > MidiDefs.MAX_MIDI) { throw new InvalidOperationException($"Invalid def file {fn}"); }
+    //            res[index] = kv.Value.Length > 0 ? kv.Value : "";
+    //        });
 
-            return res;
-        }
-    }
+    //        return res;
+    //    }
+    //}
 }

@@ -6,6 +6,7 @@ using System.Linq;
 using System.ComponentModel;
 using Ephemera.NBagOfTricks;
 using System.DirectoryServices.ActiveDirectory;
+using Ephemera.MusicLib;
 
 
 namespace MidiGenerator
@@ -134,7 +135,7 @@ namespace MidiGenerator
                         (>= 'A' and <= 'Z') or (>= '0' and <= '9') => (Keys)kv.Key[0],
                         _ => throw new InvalidOperationException($"Invalid key {kv.Key} in {fn}"),
                     };
-                    var notes = MusicDefinitions.GetNotesFromString(kv.Value);
+                    var notes = MusicDefs.GetNotesFromString(kv.Value);
                     if (notes.Count != 1) { throw new InvalidOperationException($"Invalid key {kv.Key} in {fn}"); }
 
                     var note = notes[0];
@@ -203,7 +204,7 @@ namespace MidiGenerator
             for (int i = 0; i < HighNote - LowNote; i++)
             {
                 int noteId = i + LowNote;
-                VirtualKey pk = new(this, noteId) { ControlColor = ControlColor };
+                VirtualKey pk = new(this, noteId) { DrawColor = DrawColor };
 
                 // Pass along an event from a virtual key.
                 pk.Vkey_Click += (sender, e) => OnNoteSend(e);
@@ -267,7 +268,7 @@ namespace MidiGenerator
 
         #region Properties
         /// <summary>Make user pick a good color.</summary>
-        public Color ControlColor { get; set; } = Color.Red;
+        public Color DrawColor { get; set; } = Color.Red;
 
         /// <summary>Key status.</summary>
         public bool IsPressed { get; private set; } = false;
@@ -407,7 +408,7 @@ namespace MidiGenerator
         {
             if (IsPressed)
             {
-                e.Graphics.FillRectangle(new SolidBrush(ControlColor), 0, 0, Size.Width, Size.Height);
+                e.Graphics.FillRectangle(new SolidBrush(DrawColor), 0, 0, Size.Width, Size.Height);
             }
             else
             {
