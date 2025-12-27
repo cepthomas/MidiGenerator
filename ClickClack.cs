@@ -5,16 +5,23 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Ephemera.MidiLib;
 using Ephemera.NBagOfTricks;
 
 
 namespace MidiGenerator
 {
-    public class ClickClack : ChannelControl
+    public class ClickClack : UserControl
     {
         #region Fields
+        /// <summary>Required designer variable.</summary>
+        readonly Container components = new();
+
         /// <summary>Background image data.</summary>
         PixelBitmap? _bmp;
+
+        // /// <summary>This is me.</summary>
+        // int _channelNumber = 1;
 
         /// <summary>Last key down position in client coordinates.</summary>
         int _lastNote = -1;
@@ -32,6 +39,20 @@ namespace MidiGenerator
         const int MAX_Y = 128;
         #endregion
 
+        #region Properties
+        ///// <summary>Context.</summary>
+        //public int xxChannelHandle { get; init; }
+
+
+        /// <summary>Cosmetics.</summary>
+        public Color DrawColor { get; set; } = Color.Red;
+        #endregion
+
+        #region Events
+        /// <summary>UI midi send. Client must fill in the channel number.</summary>
+        public event EventHandler<BaseMidi>? SendMidi;
+        #endregion
+
         #region Lifecycle
         /// <summary>
         /// Normal constructor.
@@ -40,6 +61,8 @@ namespace MidiGenerator
         {
             SetStyle(ControlStyles.DoubleBuffer | ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint, true);
             Name = nameof(ClickClack);
+            _toolTip = new(components);
+            Size = new(231, 174);
         }
 
         /// <summary>
@@ -58,13 +81,19 @@ namespace MidiGenerator
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
+            if (disposing)
+            {
+                components.Dispose();
+            }
+
             _bmp?.Dispose();
             _pen.Dispose();
+
             base.Dispose(disposing);
         }
         #endregion
 
-        #region Event handlers
+        #region Drawing
         /// <summary>
         /// Paint the surface.
         /// </summary>
@@ -76,7 +105,7 @@ namespace MidiGenerator
             // Background?
             if (_bmp is not null)
             {
-                g.DrawImage(_bmp.ClientBitmap, DrawRect);
+                g.DrawImage(_bmp.ClientBitmap, ClientRectangle);
             }
 
             // Draw grid. X is octaves. Y is volume.
@@ -85,7 +114,7 @@ namespace MidiGenerator
                 if (gl >= MIN_X && gl <= MAX_X) // sanity - throw?
                 {
                     int x = MathUtils.Map(gl, MIN_X, MAX_X, 0, Width);
-                    g.DrawLine(_pen, x, 0, x, Height);
+                    g.DrawLine(_pen, x, 0, x, ClientRectangle.Height);
                 }
             }
 
@@ -94,12 +123,34 @@ namespace MidiGenerator
                 if (gl >= MIN_Y && gl <= MAX_Y)
                 {
                     int y = MathUtils.Map(gl, MIN_Y, MAX_Y, Height, 0);
-                    g.DrawLine(_pen, 0, y, Width, y);
+                    g.DrawLine(_pen, 0, y, ClientRectangle.Width, y);
                 }
             }
 
             base.OnPaint(pe);
         }
+        //protected override void OnPaint(PaintEventArgs pe)
+        //{
+        //    Graphics g = pe.Graphics;
+        //    var r = DrawRect;
+        //    //g.Clear(Color.LightCoral);
+        //    g.FillRectangle(Brushes.LightCoral, r);
+        //    // Border.
+        //    g.DrawLine(Pens.Red, r.Left, r.Top, r.Right, r.Top);
+        //    g.DrawLine(Pens.Red, r.Left, r.Bottom, r.Right, r.Bottom);
+        //    g.DrawLine(Pens.Red, r.Left, r.Top, r.Left, r.Bottom);
+        //    g.DrawLine(Pens.Red, r.Right, r.Top, r.Right, r.Bottom);
+        //    // Grid.
+        //    for (int x = r.Left; x < r.Right; x += 25)
+        //    {
+        //        g.DrawLine(Pens.White, x, r.Top, x, r.Bottom);
+        //    }
+        //    base.OnPaint(pe);
+        //}
+        #endregion
+
+        #region Event handlers
+
 
         /// <summary>
         /// Show the pixel info.
@@ -107,30 +158,59 @@ namespace MidiGenerator
         /// <param name="e"></param>
         protected override void OnMouseMove(MouseEventArgs e)
         {
-            var (ux, uy) = MouseToUser();
-            NoteEventArgs args = new() { Note = ux, Velocity = uy };
-            _toolTip.SetToolTip(this, args.ToString());
+            var res = MouseToUser();
 
-            // Also gen click?
-            if (e.Button == MouseButtons.Left)
+            if (res is not null)
             {
-                // Dragging. Did it change?
-                if (_lastNote != ux)
-                {
-                    if (_lastNote != -1)
-                    {
-                        // Turn off last note.
-                        OnNoteSend(new() { Note = _lastNote, Velocity = 0 });
-                    }
+                _toolTip.SetToolTip(this, $"X:{res.Value.ux} Y:{res.Value.uy}");
 
-                    // Start the new note.
-                    _lastNote = ux;
-                    OnNoteSend(new() { Note = ux, Velocity = uy });
+                // Also gen click?
+                if (e.Button == MouseButtons.Left)
+                {
+                    // Dragging. Did it change?
+                    if (_lastNote != res.Value.ux)
+                    {
+                        if (_lastNote != -1)
+                        {
+                            // Turn off last note.
+                            SendMidi?.Invoke(this, new NoteOff(-1, _lastNote));
+                        }
+
+                        // Start the new note.
+                        _lastNote = res.Value.ux;
+                        SendMidi?.Invoke(this, new NoteOn(-1, res.Value.ux, res.Value.uy));
+                    }
                 }
             }
 
-            base.OnMouseMove(e);
+           base.OnMouseMove(e);
         }
+        // protected override void OnMouseMove(MouseEventArgs e)
+        // {
+        //     var (ux, uy) = MouseToUser();
+        //     NoteEventArgs args = new() { Note = ux, Velocity = uy };
+        //     _toolTip.SetToolTip(this, args.ToString());
+
+        //     // Also gen click?
+        //     if (e.Button == MouseButtons.Left)
+        //     {
+        //         // Dragging. Did it change?
+        //         if (_lastNote != ux)
+        //         {
+        //             if (_lastNote != -1)
+        //             {
+        //                 // Turn off last note.
+        //                 OnNoteSend(new() { Note = _lastNote, Velocity = 0 });
+        //             }
+
+        //             // Start the new note.
+        //             _lastNote = ux;
+        //             OnNoteSend(new() { Note = ux, Velocity = uy });
+        //         }
+        //     }
+
+        //     base.OnMouseMove(e);
+        // }
 
         /// <summary>
         /// Send info to client.
@@ -138,12 +218,24 @@ namespace MidiGenerator
         /// <param name="e"></param>
         protected override void OnMouseDown(MouseEventArgs e)
         {
-            var (ux, uy) = MouseToUser();
-            _lastNote = ux;
-            OnNoteSend(new() { Note = ux, Velocity = uy });
+            var res = MouseToUser();
+            if (res is not null)
+            {
+                _lastNote = res.Value.ux;
+                SendMidi?.Invoke(this, new NoteOn(-1, res.Value.ux, res.Value.uy));
+            }
 
             base.OnMouseDown(e);
         }
+        // protected override void OnMouseDown(MouseEventArgs e)
+        // {
+        //     var (ux, uy) = MouseToUser();
+        //     _lastNote = ux;
+        //     OnNoteSend(new() { Note = ux, Velocity = uy });
+
+        //     base.OnMouseDown(e);
+        // }
+
 
         /// <summary>
         /// 
@@ -153,12 +245,23 @@ namespace MidiGenerator
         {
             if (_lastNote != -1)
             {
-                OnNoteSend(new() { Note = _lastNote, Velocity = 0 });
+                SendMidi?.Invoke(this, new NoteOff(-1, _lastNote));
                 _lastNote = -1;
             }
 
             base.OnMouseUp(e);
         }
+        // protected override void OnMouseUp(MouseEventArgs e)
+        // {
+        //     if (_lastNote != -1)
+        //     {
+        //         OnNoteSend(new() { Note = _lastNote, Velocity = 0 });
+        //         _lastNote = -1;
+        //     }
+
+        //     base.OnMouseUp(e);
+        // }
+
 
         /// <summary>
         /// Disable control
@@ -169,28 +272,42 @@ namespace MidiGenerator
             // Turn off last click.
             if (_lastNote != -1)
             {
-                OnNoteSend(new() { Note = _lastNote, Velocity = 0 });
+                SendMidi?.Invoke(this, new NoteOff(-1, _lastNote));
             }
 
             // Reset and tell client.
             _lastNote = -1;
 
-            _toolTip.SetToolTip(this, "");
-
             base.OnMouseLeave(e);
         }
+        // protected override void OnMouseLeave(EventArgs e)
+        // {
+        //     // Turn off last click.
+        //     if (_lastNote != -1)
+        //     {
+        //         OnNoteSend(new() { Note = _lastNote, Velocity = 0 });
+        //     }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="e"></param>
-        protected override void OnResize(EventArgs e)
-        {
-            DrawBitmap();
-            Invalidate();
+        //     // Reset and tell client.
+        //     _lastNote = -1;
 
-            base.OnResize(e);
-        }
+        //     _toolTip.SetToolTip(this, "");
+
+        //     base.OnMouseLeave(e);
+        // }
+
+
+        // /// <summary>
+        // /// 
+        // /// </summary>
+        // /// <param name="e"></param>
+        // protected override void OnResize(EventArgs e)
+        // {
+        //     DrawBitmap();
+        //     Invalidate();
+
+        //     base.OnResize(e);
+        // }
         #endregion
 
         #region Private functions
@@ -203,8 +320,8 @@ namespace MidiGenerator
             _bmp?.Dispose();
 
             // Draw background.
-            var w = DrawRect.Width;
-            var h = DrawRect.Height;
+            var w = ClientRectangle.Width;
+            var h = ClientRectangle.Height;
             _bmp = new(w, h);
             for (var y = 0; y < h; y++)
             {
@@ -215,22 +332,52 @@ namespace MidiGenerator
             }
         }
 
+
+        /// <summary>
+        /// Get mouse x and y mapped to useful coordinates.
+        /// </summary>
+        /// <returns>Tuple of x and y.</returns>
+        (int ux, int uy)? MouseToUser()
+        {
+            // Map and check.
+            var mp = PointToClient(MousePosition);
+            int x = MathUtils.Map(mp.X, ClientRectangle.Left, ClientRectangle.Right, 0, MidiDefs.MAX_MIDI);
+            int y = MathUtils.Map(mp.Y, ClientRectangle.Bottom, ClientRectangle.Top, 0, MidiDefs.MAX_MIDI);
+            return (x, y);
+        }
+
+
+
         /// <summary>
         /// Get mouse x and y mapped to user coordinates.
         /// </summary>
         /// <returns>Tuple of x and y.</returns>
-        (int ux, int uy) MouseToUser()
-        {
-            var mp = PointToClient(MousePosition);
+        //(int ux, int uy)? MouseToUser()
+        //{
+        //    var mp = PointToClient(MousePosition);
+        //    var r = DrawRect;
 
-            // Map and check.
-            int x = MathUtils.Map(mp.X, 0, Width, MIN_X, MAX_X);
-            int ux = x >= 0 && x < Width ? x : -1;
-            int y = MathUtils.Map(mp.Y, Height, DrawRect.Top, MIN_Y, MAX_Y);
-            int uy = y >= 0 && y < Height ? y : -1;
+        //    // Map and check.
+        //    int x = MathUtils.Map(mp.X, 0, r.Width, 0, MidiDefs.MAX_MIDI);
+        //    int y = MathUtils.Map(mp.Y, r.Bottom, r.Top, 0, MidiDefs.MAX_MIDI);
 
-            return (ux, uy);
-        }
+        //    return (x >= 0 && x < MidiDefs.MAX_MIDI && y >= 0 && y < MidiDefs.MAX_MIDI) ?
+        //        (x, y) :
+        //        null;
+        //}
+
+        // (int ux, int uy) MouseToUser()
+        // {
+        //     var mp = PointToClient(MousePosition);
+
+        //     // Map and check.
+        //     int x = MathUtils.Map(mp.X, 0, Width, MIN_X, MAX_X);
+        //     int ux = x >= 0 && x < Width ? x : -1;
+        //     int y = MathUtils.Map(mp.Y, Height, DrawRect.Top, MIN_Y, MAX_Y);
+        //     int uy = y >= 0 && y < Height ? y : -1;
+
+        //     return (ux, uy);
+        // }
         #endregion
     }
 }

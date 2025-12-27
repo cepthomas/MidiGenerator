@@ -7,13 +7,31 @@ using System.ComponentModel;
 using System.DirectoryServices.ActiveDirectory;
 using Ephemera.NBagOfTricks;
 using Ephemera.MusicLib;
+using Ephemera.MidiLib;
 
 
 namespace MidiGenerator
 {
     /// <summary>Virtual keyboard control borrowed from Leslie Sanford with extras.</summary>
-    public class VirtualKeyboard : ChannelControl
+    public class VirtualKeyboard : UserControl
     {
+        #region Fields
+        /// <summary>Required designer variable.</summary>
+        readonly Container components = new();
+
+        /// <summary>This is me.</summary>
+        int _channelNumber = 1;
+
+        /// <summary>All the created piano keys.</summary>
+        readonly List<VirtualKey> _keys = [];
+
+        /// <summary>Map from Keys value to the index in _keys.</summary>
+        readonly Dictionary<Keys, int> _keyMap = [];
+
+        /// <summary>Known bug?</summary>
+        bool _keyDown = false;
+        #endregion
+
         #region Properties
         /// <summary>Draw the names on the keys.</summary>
         public bool ShowNoteNames { get; set; } = false;
@@ -26,6 +44,9 @@ namespace MidiGenerator
 
         /// <summary>Highest key.</summary>
         public int HighNote { get; set; } = 108; // C8 for 88 keyboard.
+
+        /// <summary>Cosmetics.</summary>
+        public Color DrawColor { get; set; } = Color.Red;
         #endregion
 
         #region Constants
@@ -33,15 +54,9 @@ namespace MidiGenerator
         const int MIDDLE_C = 60;
         #endregion
 
-        #region Fields
-        /// <summary>All the created piano keys.</summary>
-        readonly List<VirtualKey> _keys = [];
-
-        /// <summary>Map from Keys value to the index in _keys.</summary>
-        readonly Dictionary<Keys, int> _keyMap = [];
-
-        /// <summary>Known bug?</summary>
-        bool _keyDown = false;
+        #region Events
+        /// <summary>UI midi send. Client must fill in the channel number.</summary>
+        public event EventHandler<BaseMidi>? SendMidi;
         #endregion
 
         #region Lifecycle
@@ -108,16 +123,13 @@ namespace MidiGenerator
 
             try
             {
-                var fn = @"def_keymap.ini";
                 var ir = new IniReader();
-                ir.ParseFile(fn);
+                ir.ParseString(Properties.Resources.def_keymap);
 
-                var defs = ir.GetValues("keymap");
-
-                defs.ForEach(kv =>
+                ir.GetValues("keymap").ForEach(kv =>
                 {
                     // Z = C3
-                    if (kv.Key.Length != 1) { throw new InvalidOperationException($"Invalid key {kv.Key} in {fn}"); }
+                    if (kv.Key.Length != 1) { throw new InvalidOperationException($"Invalid key {kv.Key}"); }
 
                     Keys chkey = Keys.None;
                     chkey = kv.Key[0] switch
@@ -134,10 +146,10 @@ namespace MidiGenerator
                         '`' => Keys.Oemtilde,
                         ';' => Keys.OemSemicolon,
                         (>= 'A' and <= 'Z') or (>= '0' and <= '9') => (Keys)kv.Key[0],
-                        _ => throw new InvalidOperationException($"Invalid key {kv.Key} in {fn}"),
+                        _ => throw new InvalidOperationException($"Invalid key {kv.Key}"),
                     };
                     var notes = MusicDefs.Instance.GetNotesFromString(kv.Value);
-                    if (notes.Count != 1) { throw new InvalidOperationException($"Invalid key {kv.Key} in {fn}"); }
+                    if (notes.Count != 1) { throw new InvalidOperationException($"Invalid key {kv.Key}"); }
 
                     var note = notes[0];
                     _keyMap.Add(chkey, note);
@@ -208,7 +220,7 @@ namespace MidiGenerator
                 VirtualKey pk = new(this, noteId) { DrawColor = DrawColor };
 
                 // Pass along an event from a virtual key.
-                pk.Vkey_Click += (sender, e) => OnNoteSend(e);
+                pk.SendMidi += (sender, e) => SendMidi?.Invoke(this, e);
 
                 _keys.Add(pk);
                 Controls.Add(pk);
@@ -229,7 +241,7 @@ namespace MidiGenerator
             {
                 int whiteKeyWidth = _keys.Count * KeySize / _keys.Count(k => MusicDefs.Instance.IsNatural(k.NoteId));
                 int blackKeyWidth = (int)(whiteKeyWidth * 0.6);
-                int whiteKeyHeight = DrawRect.Height;
+                int whiteKeyHeight = ClientRectangle.Height;
                 int blackKeyHeight = (int)(whiteKeyHeight * 0.65);
                 int offset = whiteKeyWidth - blackKeyWidth / 2;
                 int numWhiteKeys = 0;
@@ -243,14 +255,14 @@ namespace MidiGenerator
                     {
                         pk.Height = whiteKeyHeight;
                         pk.Width = whiteKeyWidth;
-                        pk.Location = new Point(numWhiteKeys * whiteKeyWidth, DrawRect.Top);
+                        pk.Location = new Point(numWhiteKeys * whiteKeyWidth, ClientRectangle.Top);
                         numWhiteKeys++;
                     }
                     else // black key
                     {
                         pk.Height = blackKeyHeight;
                         pk.Width = blackKeyWidth;
-                        pk.Location = new Point(offset + (numWhiteKeys - 1) * whiteKeyWidth, DrawRect.Top);
+                        pk.Location = new Point(offset + (numWhiteKeys - 1) * whiteKeyWidth, ClientRectangle.Top);
                         pk.BringToFront();
                     }
                 }
@@ -279,8 +291,13 @@ namespace MidiGenerator
         #endregion
 
         #region Events
-        /// <summary>Notify handlers of key change.</summary>
-        public event EventHandler<NoteEventArgs>? Vkey_Click;
+        ///// <summary>Notify handlers of key change.</summary>
+        //public event EventHandler<NoteEventArgs>? Vkey_Click;
+
+
+        /// <summary>UI midi send. Client must fill in the channel number.</summary>
+        public event EventHandler<BaseMidi>? SendMidi;
+
         #endregion
 
         #region Lifecycle
@@ -307,7 +324,7 @@ namespace MidiGenerator
         {
             IsPressed = true;
             Invalidate();
-            Vkey_Click?.Invoke(this, new() { Note = NoteId, Velocity = velocity });
+            SendMidi?.Invoke(this, new NoteOn(-1, NoteId, velocity));
         }
 
         /// <summary>
@@ -317,7 +334,7 @@ namespace MidiGenerator
         {
             IsPressed = false;
             Invalidate();
-            Vkey_Click?.Invoke(this, new() { Note = NoteId, Velocity = 0 });
+            SendMidi?.Invoke(this, new NoteOff(-1, NoteId));
         }
         #endregion
 

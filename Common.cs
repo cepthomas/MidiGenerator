@@ -21,51 +21,51 @@ namespace MidiGenerator
     //    public const double MAX_VOLUME = 2.0;
     //}
 
-    #region Events
-    /// <summary>Notify host of user clicks.</summary>
-    public class NoteEventArgs : EventArgs
-    {
-        /// <summary>The note number to play.</summary>
-        [Required]
-        public int Note { get; set; }
+    //#region Events
+    ///// <summary>Notify host of user clicks.</summary>
+    //public class NoteEventArgs : EventArgs
+    //{
+    //    /// <summary>The note number to play.</summary>
+    //    [Required]
+    //    public int Note { get; set; }
 
-        /// <summary>0 to 127.</summary>
-        [Required]
-        public int Velocity { get; set; }
+    //    /// <summary>0 to 127.</summary>
+    //    [Required]
+    //    public int Velocity { get; set; }
 
-        /// <summary>Read me.</summary>
-        public override string ToString()
-        {
-            return $"Note:{MusicDefs.Instance.NoteNumberToName(Note)}({Note}):{Velocity}";
-        }
-    }
+    //    /// <summary>Read me.</summary>
+    //    public override string ToString()
+    //    {
+    //        return $"Note:{MusicDefs.Instance.NoteNumberToName(Note)}({Note}):{Velocity}";
+    //    }
+    //}
 
-    /// <summary>Notify host of user clicks.</summary>
-    public class ControllerEventArgs : EventArgs
-    {
-        /// <summary>Specific controller id.</summary>
-        [Required]
-        public int ControllerId { get; set; }
+    ///// <summary>Notify host of user clicks.</summary>
+    //public class ControllerEventArgs : EventArgs
+    //{
+    //    /// <summary>Specific controller id.</summary>
+    //    [Required]
+    //    public int ControllerId { get; set; }
 
-        /// <summary>Payload.</summary>
-        [Required]
-        public int Value { get; set; }
+    //    /// <summary>Payload.</summary>
+    //    [Required]
+    //    public int Value { get; set; }
 
-        /// <summary>Read me.</summary>
-        public override string ToString()
-        {
-            return $"ControllerId:{MidiDefs.Instance.GetControllerName(ControllerId)}({ControllerId}):{Value}";
-        }
-    }
+    //    /// <summary>Read me.</summary>
+    //    public override string ToString()
+    //    {
+    //        return $"ControllerId:{MidiDefs.Instance.GetControllerName(ControllerId)}({ControllerId}):{Value}";
+    //    }
+    //}
 
-    /// <summary>Notify host of user clicks.</summary>
-    public class ChannelEventArgs : EventArgs
-    {
-        public bool PatchChange { get; set; } = false;
-        public bool ChannelNumberChange { get; set; } = false;
-        public bool PresetFileChange { get; set; } = false;
-    }
-    #endregion
+    ///// <summary>Notify host of user clicks.</summary>
+    //public class ChannelEventArgs : EventArgs
+    //{
+    //    public bool PatchChange { get; set; } = false;
+    //    public bool ChannelNumberChange { get; set; } = false;
+    //    public bool PresetFileChange { get; set; } = false;
+    //}
+    //#endregion
 
     //public class Utils
     //{

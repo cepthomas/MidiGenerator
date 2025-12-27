@@ -19,7 +19,7 @@ namespace MidiGenerator.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -57,6 +57,52 @@ namespace MidiGenerator.Properties {
             }
             set {
                 resourceCulture = value;
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ; Virtual keyboard keymap.
+        ///
+        ///[keymap]
+        ///Z = C3
+        ///S = C#3
+        ///X = D3
+        ///D = D#3
+        ///C = E3
+        ///V = F3
+        ///G = F#3
+        ///B = G3
+        ///H = G#3
+        ///N = A3
+        ///J = A#3
+        ///M = B3
+        ///, = C4
+        ///L = C#4
+        ///. = D4
+        ///; = D#4
+        //// = E4
+        ///Q = C4
+        ///2 = C#4
+        ///W = D4
+        ///3 = D#
+        ///E = E4
+        ///R = F4
+        ///5 = F#4
+        ///T = G4
+        ///6 = G#4
+        ///Y = A4
+        ///7 = A#4
+        ///U = B4
+        ///I = C5
+        ///9 = C#5
+        ///O = D5
+        ///0 = D#5
+        ///P = E5
+        ///.
+        /// </summary>
+        internal static string def_keymap {
+            get {
+                return ResourceManager.GetString("def_keymap", resourceCulture);
             }
         }
         
