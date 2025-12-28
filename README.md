@@ -25,6 +25,6 @@ ClickClack
 
 # External Components
 
-- [NAudio](https://github.com/naudio/NAudio) (Microsoft Public License).
+- [NAudio](https://github.com/naudio/NAudio) (MIT).
 - Application icon: [Charlotte Schmidt](http://pattedemouche.free.fr/) (Copyright © 2009 of Charlotte Schmidt).
 - Button icons: [Glyphicons Free](http://glyphicons.com/) (CC BY 3.0).

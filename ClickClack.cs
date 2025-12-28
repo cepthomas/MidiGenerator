@@ -11,7 +11,7 @@ using Ephemera.NBagOfTricks;
 
 namespace MidiGenerator
 {
-    public class ClickClack : UserControl
+    public class ClickClack : UserRenderer
     {
         #region Fields
         /// <summary>Required designer variable.</summary>
@@ -39,11 +39,6 @@ namespace MidiGenerator
         #region Properties
         /// <summary>Cosmetics.</summary>
         public Color DrawColor { get; set; } = Color.Red;
-        #endregion
-
-        #region Events
-        /// <summary>UI midi send. Client must fill in the channel number.</summary>
-        public event EventHandler<BaseMidi>? SendMidi;
         #endregion
 
         #region Lifecycle
@@ -146,12 +141,12 @@ namespace MidiGenerator
                         if (_lastNote != -1)
                         {
                             // Turn off last note.
-                            Send(new NoteOff(0, _lastNote));
+                            OnSendMidi(new NoteOff(ChannelNumber, _lastNote));
                         }
 
                         // Start the new note.
                         _lastNote = res.Value.ux;
-                        Send(new NoteOn(0, res.Value.ux, res.Value.uy));
+                        OnSendMidi(new NoteOn(ChannelNumber, res.Value.ux, res.Value.uy));
                     }
                 }
             }
@@ -169,7 +164,7 @@ namespace MidiGenerator
             if (res is not null)
             {
                 _lastNote = res.Value.ux;
-                Send(new NoteOn(0, res.Value.ux, res.Value.uy));
+                OnSendMidi(new NoteOn(ChannelNumber, res.Value.ux, res.Value.uy));
             }
 
             base.OnMouseDown(e);
@@ -183,7 +178,7 @@ namespace MidiGenerator
         {
             if (_lastNote != -1)
             {
-                Send(new NoteOff(0, _lastNote));
+                OnSendMidi(new NoteOff(ChannelNumber, _lastNote));
                 _lastNote = -1;
             }
 
@@ -199,7 +194,7 @@ namespace MidiGenerator
             // Turn off last click.
             if (_lastNote != -1)
             {
-                Send(new NoteOff(0, _lastNote));
+                OnSendMidi(new NoteOff(ChannelNumber, _lastNote));
             }
 
             // Reset and tell client.
@@ -254,16 +249,6 @@ namespace MidiGenerator
             int x = MathUtils.Map(mp.X, ClientRectangle.Left, ClientRectangle.Right, 0, MidiDefs.MAX_MIDI);
             int y = MathUtils.Map(mp.Y, ClientRectangle.Bottom, ClientRectangle.Top, 0, MidiDefs.MAX_MIDI);
             return (x, y);
-        }
-
-        /// <summary>
-        /// Helper.
-        /// </summary>
-        /// <param name="e"></param>
-        void Send(BaseMidi e)
-        {
-            // Send from parent ChannelControl!
-            SendMidi?.Invoke(Parent, e);
         }
         #endregion
     }

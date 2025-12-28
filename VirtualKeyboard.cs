@@ -13,7 +13,7 @@ using Ephemera.MidiLib;
 namespace MidiGenerator
 {
     /// <summary>Virtual keyboard control borrowed from Leslie Sanford with extras.</summary>
-    public class VirtualKeyboard : UserControl
+    public class VirtualKeyboard : UserRenderer
     {
         #region Fields
         /// <summary>Required designer variable.</summary>
@@ -49,11 +49,6 @@ namespace MidiGenerator
         #region Constants
         /// <summary>Standard 88 keyboard - reference C4.</summary>
         const int MIDDLE_C = 60;
-        #endregion
-
-        #region Events
-        /// <summary>UI midi send. Client must fill in the channel number.</summary>
-        public event EventHandler<BaseMidi>? SendMidi;
         #endregion
 
         #region Lifecycle
@@ -159,16 +154,6 @@ namespace MidiGenerator
 
             return valid;
         }
-
-        /// <summary>
-        /// Helper.
-        /// </summary>
-        /// <param name="e"></param>
-        void Send(BaseMidi e)
-        {
-            // Send from parent ChannelControl!
-            SendMidi?.Invoke(Parent, e);
-        }
         #endregion
 
         #region User alpha keyboard handlers
@@ -224,10 +209,10 @@ namespace MidiGenerator
             for (int i = 0; i < HighNote - LowNote; i++)
             {
                 int noteId = i + LowNote;
-                VirtualKey pk = new(this, noteId) { DrawColor = DrawColor };
+                VirtualKey pk = new(this, ChannelNumber, noteId) { DrawColor = DrawColor };
 
                 // Pass along an event from a virtual key.
-                pk.SendMidi += (sender, e) => Send(e);
+                pk.SendMidi += (sender, e) => OnSendMidi(e);
 
                 _keys.Add(pk);
                 Controls.Add(pk);
@@ -284,6 +269,9 @@ namespace MidiGenerator
         #region Fields
         /// <summary>Hook to owner.</summary>
         readonly VirtualKeyboard _owner;
+
+        /// <summary>For event gen.</summary>
+        readonly int _channelNumber = 0;
         #endregion
 
         #region Properties
@@ -298,7 +286,7 @@ namespace MidiGenerator
         #endregion
 
         #region Events
-        /// <summary>UI midi send. Client must fill in the channel number.</summary>
+        /// <summary>UI midi send.</summary>
         public event EventHandler<BaseMidi>? SendMidi;
         #endregion
 
@@ -307,10 +295,12 @@ namespace MidiGenerator
         /// Normal constructor.
         /// </summary>
         /// <param name="owner"></param>
+        /// <param name="channelNumber"></param>
         /// <param name="noteId"></param>
-        public VirtualKey(VirtualKeyboard owner, int noteId)
+        public VirtualKey(VirtualKeyboard owner, int channelNumber, int noteId)
         {
             _owner = owner;
+            _channelNumber = channelNumber;
             TabStop = false;
             NoteId = noteId;
             Font = new Font("Consolas", 8F, FontStyle.Regular, GraphicsUnit.Point, 0);
@@ -326,7 +316,7 @@ namespace MidiGenerator
         {
             IsPressed = true;
             Invalidate();
-            SendMidi?.Invoke(this, new NoteOn(0, NoteId, velocity));
+            SendMidi?.Invoke(this, new NoteOn(_channelNumber, NoteId, velocity));
         }
 
         /// <summary>
@@ -336,7 +326,7 @@ namespace MidiGenerator
         {
             IsPressed = false;
             Invalidate();
-            SendMidi?.Invoke(this, new NoteOff(0, NoteId));
+            SendMidi?.Invoke(this, new NoteOff(_channelNumber, NoteId));
         }
         #endregion
 

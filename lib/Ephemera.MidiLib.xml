@@ -85,14 +85,26 @@
         <member name="M:Ephemera.MidiLib.OutputChannel.LoadAliases">
             <summary>Load aliases.</summary>
         </member>
-        <member name="T:Ephemera.MidiLib.ChannelControl.ChannelState">
+        <member name="T:Ephemera.MidiLib.UserRenderer">
+            <summary>Base class for custom renderers. Probably should have a better home.</summary>
+        </member>
+        <member name="P:Ephemera.MidiLib.UserRenderer.ChannelNumber">
+            <summary>For midi sends.</summary>
+        </member>
+        <member name="E:Ephemera.MidiLib.UserRenderer.SendMidi">
+            <summary>Parent hooks this.</summary>
+        </member>
+        <member name="M:Ephemera.MidiLib.UserRenderer.OnSendMidi(Ephemera.MidiLib.BaseMidi)">
+            <summary>Derived control helper.</summary>
+        </member>
+        <member name="T:Ephemera.MidiLib.ChannelState">
             <summary>Channel playing.</summary>
         </member>
-        <member name="T:Ephemera.MidiLib.ChannelControl.ChannelChangeEventArgs">
-            <summary>Notify host of UI changes.</summary>
-        </member>
-        <member name="T:Ephemera.MidiLib.ChannelControl.DisplayOptions">
+        <member name="T:Ephemera.MidiLib.DisplayOptions">
             <summary>Some flavors of control may need to be defeatured.</summary>
+        </member>
+        <member name="T:Ephemera.MidiLib.ChannelChangeEventArgs">
+            <summary>Notify host of UI changes.</summary>
         </member>
         <member name="P:Ephemera.MidiLib.ChannelControl.BoundChannel">
             <summary>My channel.</summary>
@@ -126,9 +138,6 @@
         </member>
         <member name="E:Ephemera.MidiLib.ChannelControl.SendMidi">
             <summary>UI midi send.</summary>
-        </member>
-        <member name="M:Ephemera.MidiLib.ChannelControl.OnSendMidi(Ephemera.MidiLib.BaseMidi)">
-            <summary>Derived class helper.</summary>
         </member>
         <member name="M:Ephemera.MidiLib.ChannelControl.#ctor">
             <summary>
@@ -286,7 +295,7 @@
             <summary>
             Helper.
             </summary>
-            <param name="chnd"></param>
+            <param name="chnum"></param>
             <returns>The channel or null if invalid handle.</returns>
         </member>
         <member name="M:Ephemera.MidiLib.Manager.Kill(Ephemera.MidiLib.OutputChannel)">

@@ -69,6 +69,7 @@ namespace MidiGenerator
 
             var rend1 = new VirtualKeyboard()
             {
+                ChannelNumber = vkeyChannel.ChannelNumber,
                 DrawColor = _settings.DrawColor,
                 KeySize = 12,
                 HighNote = 108,
@@ -87,6 +88,7 @@ namespace MidiGenerator
 
             var rend2 = new ClickClack()
             {
+                ChannelNumber = clclChannel.ChannelNumber,
                 DrawColor = _settings.DrawColor
             };
             rend2.SendMidi += ChannelControl_SendMidi;
@@ -138,6 +140,33 @@ namespace MidiGenerator
         }
         #endregion
 
+
+
+
+
+        List<string> CreateOrderedMidiList(Dictionary<int, string> source, bool addKey, bool fill) //TODO1 put in MidiDefs???
+        {
+            List<string> res = [];
+
+            for (int i = 0; i < MidiDefs.MAX_MIDI; i++)
+            {
+                if (source.ContainsKey(i))
+                {
+                    res.Add(addKey ? $"{i:000} {source[i]}" : $"{source[i]}");
+                }
+                else if (fill)
+                {
+                    res.Add($"{i:000}");
+                }
+            }
+
+            return res;
+        }
+
+
+
+
+
         #region User settings
         /// <summary>
         /// Edit the options in a property grid.
@@ -145,6 +174,13 @@ namespace MidiGenerator
         void Settings_Click(object? sender, EventArgs e)
         {
             GenericListTypeEditor.SetOptions("OutputDevice", MidiOutputDevice.GetAvailableDevices());
+
+
+            Dictionary<int, string> vals = [];
+            Enumerable.Range(0, MidiDefs.MAX_MIDI + 1).ForEach(i => vals.Add(i, MidiDefs.Instance.GetInstrumentName(i)));
+
+            var instList = CreateOrderedMidiList(vals, true, true);
+            GenericListTypeEditor.SetOptions("Patch", instList);
 
             var changes = SettingsEditor.Edit(_settings, "User Settings", 300);
 
@@ -177,12 +213,15 @@ namespace MidiGenerator
         /// <param name="e"></param>
         void ChannelControl_SendMidi(object? sender, BaseMidi e)
         {
-            var channel = (sender as ChannelControl)!.BoundChannel;
-
-            if (channel is not null && channel.Enable)
+            var channel = sender switch
             {
-                // Fill in the channel number.
-                e.ChannelNumber = channel.ChannelNumber;
+                ChannelControl => (sender as ChannelControl)!.BoundChannel,
+                UserRenderer => _mgr.GetOutputChannel((sender as UserRenderer)!.ChannelNumber),
+                _ => throw new InvalidOperationException("should never happen!")
+            };
+
+            if (channel.Enable)
+            {
                 _logger.Debug($"Channel send [{e}]");
                 channel.Device.Send(e);
             }
