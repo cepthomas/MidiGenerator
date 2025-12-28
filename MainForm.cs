@@ -140,47 +140,18 @@ namespace MidiGenerator
         }
         #endregion
 
-
-
-
-
-        List<string> CreateOrderedMidiList(Dictionary<int, string> source, bool addKey, bool fill) //TODO1 put in MidiDefs???
-        {
-            List<string> res = [];
-
-            for (int i = 0; i < MidiDefs.MAX_MIDI; i++)
-            {
-                if (source.ContainsKey(i))
-                {
-                    res.Add(addKey ? $"{i:000} {source[i]}" : $"{source[i]}");
-                }
-                else if (fill)
-                {
-                    res.Add($"{i:000}");
-                }
-            }
-
-            return res;
-        }
-
-
-
-
-
         #region User settings
         /// <summary>
         /// Edit the options in a property grid.
         /// </summary>
         void Settings_Click(object? sender, EventArgs e)
         {
-            GenericListTypeEditor.SetOptions("OutputDevice", MidiOutputDevice.GetAvailableDevices());
-
-
             Dictionary<int, string> vals = [];
             Enumerable.Range(0, MidiDefs.MAX_MIDI + 1).ForEach(i => vals.Add(i, MidiDefs.Instance.GetInstrumentName(i)));
+            var instList = MidiDefs.Instance.CreateOrderedMidiList(vals, true, true);
 
-            var instList = CreateOrderedMidiList(vals, true, true);
             GenericListTypeEditor.SetOptions("Patch", instList);
+            GenericListTypeEditor.SetOptions("OutputDevice", MidiOutputDevice.GetAvailableDevices());
 
             var changes = SettingsEditor.Edit(_settings, "User Settings", 300);
 
