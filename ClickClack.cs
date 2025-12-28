@@ -20,9 +20,6 @@ namespace MidiGenerator
         /// <summary>Background image data.</summary>
         PixelBitmap? _bmp;
 
-        // /// <summary>This is me.</summary>
-        // int _channelNumber = 1;
-
         /// <summary>Last key down position in client coordinates.</summary>
         int _lastNote = -1;
 
@@ -40,10 +37,6 @@ namespace MidiGenerator
         #endregion
 
         #region Properties
-        ///// <summary>Context.</summary>
-        //public int xxChannelHandle { get; init; }
-
-
         /// <summary>Cosmetics.</summary>
         public Color DrawColor { get; set; } = Color.Red;
         #endregion
@@ -62,7 +55,7 @@ namespace MidiGenerator
             SetStyle(ControlStyles.DoubleBuffer | ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint, true);
             Name = nameof(ClickClack);
             _toolTip = new(components);
-            Size = new(231, 174);
+            Size = new(300, 190);
         }
 
         /// <summary>
@@ -129,29 +122,9 @@ namespace MidiGenerator
 
             base.OnPaint(pe);
         }
-        //protected override void OnPaint(PaintEventArgs pe)
-        //{
-        //    Graphics g = pe.Graphics;
-        //    var r = DrawRect;
-        //    //g.Clear(Color.LightCoral);
-        //    g.FillRectangle(Brushes.LightCoral, r);
-        //    // Border.
-        //    g.DrawLine(Pens.Red, r.Left, r.Top, r.Right, r.Top);
-        //    g.DrawLine(Pens.Red, r.Left, r.Bottom, r.Right, r.Bottom);
-        //    g.DrawLine(Pens.Red, r.Left, r.Top, r.Left, r.Bottom);
-        //    g.DrawLine(Pens.Red, r.Right, r.Top, r.Right, r.Bottom);
-        //    // Grid.
-        //    for (int x = r.Left; x < r.Right; x += 25)
-        //    {
-        //        g.DrawLine(Pens.White, x, r.Top, x, r.Bottom);
-        //    }
-        //    base.OnPaint(pe);
-        //}
         #endregion
 
         #region Event handlers
-
-
         /// <summary>
         /// Show the pixel info.
         /// </summary>
@@ -173,44 +146,18 @@ namespace MidiGenerator
                         if (_lastNote != -1)
                         {
                             // Turn off last note.
-                            SendMidi?.Invoke(this, new NoteOff(-1, _lastNote));
+                            Send(new NoteOff(0, _lastNote));
                         }
 
                         // Start the new note.
                         _lastNote = res.Value.ux;
-                        SendMidi?.Invoke(this, new NoteOn(-1, res.Value.ux, res.Value.uy));
+                        Send(new NoteOn(0, res.Value.ux, res.Value.uy));
                     }
                 }
             }
 
            base.OnMouseMove(e);
         }
-        // protected override void OnMouseMove(MouseEventArgs e)
-        // {
-        //     var (ux, uy) = MouseToUser();
-        //     NoteEventArgs args = new() { Note = ux, Velocity = uy };
-        //     _toolTip.SetToolTip(this, args.ToString());
-
-        //     // Also gen click?
-        //     if (e.Button == MouseButtons.Left)
-        //     {
-        //         // Dragging. Did it change?
-        //         if (_lastNote != ux)
-        //         {
-        //             if (_lastNote != -1)
-        //             {
-        //                 // Turn off last note.
-        //                 OnNoteSend(new() { Note = _lastNote, Velocity = 0 });
-        //             }
-
-        //             // Start the new note.
-        //             _lastNote = ux;
-        //             OnNoteSend(new() { Note = ux, Velocity = uy });
-        //         }
-        //     }
-
-        //     base.OnMouseMove(e);
-        // }
 
         /// <summary>
         /// Send info to client.
@@ -222,46 +169,26 @@ namespace MidiGenerator
             if (res is not null)
             {
                 _lastNote = res.Value.ux;
-                SendMidi?.Invoke(this, new NoteOn(-1, res.Value.ux, res.Value.uy));
+                Send(new NoteOn(0, res.Value.ux, res.Value.uy));
             }
 
             base.OnMouseDown(e);
         }
-        // protected override void OnMouseDown(MouseEventArgs e)
-        // {
-        //     var (ux, uy) = MouseToUser();
-        //     _lastNote = ux;
-        //     OnNoteSend(new() { Note = ux, Velocity = uy });
-
-        //     base.OnMouseDown(e);
-        // }
-
 
         /// <summary>
-        /// 
+        /// Send info to client.
         /// </summary>
         /// <param name="e"></param>
         protected override void OnMouseUp(MouseEventArgs e)
         {
             if (_lastNote != -1)
             {
-                SendMidi?.Invoke(this, new NoteOff(-1, _lastNote));
+                Send(new NoteOff(0, _lastNote));
                 _lastNote = -1;
             }
 
             base.OnMouseUp(e);
         }
-        // protected override void OnMouseUp(MouseEventArgs e)
-        // {
-        //     if (_lastNote != -1)
-        //     {
-        //         OnNoteSend(new() { Note = _lastNote, Velocity = 0 });
-        //         _lastNote = -1;
-        //     }
-
-        //     base.OnMouseUp(e);
-        // }
-
 
         /// <summary>
         /// Disable control
@@ -272,7 +199,7 @@ namespace MidiGenerator
             // Turn off last click.
             if (_lastNote != -1)
             {
-                SendMidi?.Invoke(this, new NoteOff(-1, _lastNote));
+                Send(new NoteOff(0, _lastNote));
             }
 
             // Reset and tell client.
@@ -280,34 +207,18 @@ namespace MidiGenerator
 
             base.OnMouseLeave(e);
         }
-        // protected override void OnMouseLeave(EventArgs e)
-        // {
-        //     // Turn off last click.
-        //     if (_lastNote != -1)
-        //     {
-        //         OnNoteSend(new() { Note = _lastNote, Velocity = 0 });
-        //     }
 
-        //     // Reset and tell client.
-        //     _lastNote = -1;
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="e"></param>
+        protected override void OnResize(EventArgs e)
+        {
+            DrawBitmap();
+            Invalidate();
 
-        //     _toolTip.SetToolTip(this, "");
-
-        //     base.OnMouseLeave(e);
-        // }
-
-
-        // /// <summary>
-        // /// 
-        // /// </summary>
-        // /// <param name="e"></param>
-        // protected override void OnResize(EventArgs e)
-        // {
-        //     DrawBitmap();
-        //     Invalidate();
-
-        //     base.OnResize(e);
-        // }
+            base.OnResize(e);
+        }
         #endregion
 
         #region Private functions
@@ -332,7 +243,6 @@ namespace MidiGenerator
             }
         }
 
-
         /// <summary>
         /// Get mouse x and y mapped to useful coordinates.
         /// </summary>
@@ -346,38 +256,15 @@ namespace MidiGenerator
             return (x, y);
         }
 
-
-
         /// <summary>
-        /// Get mouse x and y mapped to user coordinates.
+        /// Helper.
         /// </summary>
-        /// <returns>Tuple of x and y.</returns>
-        //(int ux, int uy)? MouseToUser()
-        //{
-        //    var mp = PointToClient(MousePosition);
-        //    var r = DrawRect;
-
-        //    // Map and check.
-        //    int x = MathUtils.Map(mp.X, 0, r.Width, 0, MidiDefs.MAX_MIDI);
-        //    int y = MathUtils.Map(mp.Y, r.Bottom, r.Top, 0, MidiDefs.MAX_MIDI);
-
-        //    return (x >= 0 && x < MidiDefs.MAX_MIDI && y >= 0 && y < MidiDefs.MAX_MIDI) ?
-        //        (x, y) :
-        //        null;
-        //}
-
-        // (int ux, int uy) MouseToUser()
-        // {
-        //     var mp = PointToClient(MousePosition);
-
-        //     // Map and check.
-        //     int x = MathUtils.Map(mp.X, 0, Width, MIN_X, MAX_X);
-        //     int ux = x >= 0 && x < Width ? x : -1;
-        //     int y = MathUtils.Map(mp.Y, Height, DrawRect.Top, MIN_Y, MAX_Y);
-        //     int uy = y >= 0 && y < Height ? y : -1;
-
-        //     return (ux, uy);
-        // }
+        /// <param name="e"></param>
+        void Send(BaseMidi e)
+        {
+            // Send from parent ChannelControl!
+            SendMidi?.Invoke(Parent, e);
+        }
         #endregion
     }
 }

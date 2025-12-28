@@ -19,9 +19,6 @@ namespace MidiGenerator
         /// <summary>Required designer variable.</summary>
         readonly Container components = new();
 
-        /// <summary>This is me.</summary>
-        int _channelNumber = 1;
-
         /// <summary>All the created piano keys.</summary>
         readonly List<VirtualKey> _keys = [];
 
@@ -37,13 +34,13 @@ namespace MidiGenerator
         public bool ShowNoteNames { get; set; } = false;
 
         /// <summary>Determines the overall size.</summary>
-        public int KeySize { get; set; } = 14;
+        public int KeySize { get; set; } = 10;
 
         /// <summary>Lowest key.</summary>
-        public int LowNote { get; set; } = 21; // A0 for 88 keyboard.
+        public int LowNote { get; set; } = 21; // 21 = A0 for 88 keyboard.
 
         /// <summary>Highest key.</summary>
-        public int HighNote { get; set; } = 108; // C8 for 88 keyboard.
+        public int HighNote { get; set; } = 108; // 108 = C8 for 88 keyboard.
 
         /// <summary>Cosmetics.</summary>
         public Color DrawColor { get; set; } = Color.Red;
@@ -68,8 +65,8 @@ namespace MidiGenerator
             // Intercept all keyboard events.
             // KeyPreview = true;
 
-            Name = "VirtualKeyboard";
-            Text = "Virtual Keyboard";
+            Name = nameof(VirtualKeyboard);
+            Size = new(1000, 100);
         }
 
         /// <summary>
@@ -162,6 +159,16 @@ namespace MidiGenerator
 
             return valid;
         }
+
+        /// <summary>
+        /// Helper.
+        /// </summary>
+        /// <param name="e"></param>
+        void Send(BaseMidi e)
+        {
+            // Send from parent ChannelControl!
+            SendMidi?.Invoke(Parent, e);
+        }
         #endregion
 
         #region User alpha keyboard handlers
@@ -220,7 +227,7 @@ namespace MidiGenerator
                 VirtualKey pk = new(this, noteId) { DrawColor = DrawColor };
 
                 // Pass along an event from a virtual key.
-                pk.SendMidi += (sender, e) => SendMidi?.Invoke(this, e);
+                pk.SendMidi += (sender, e) => Send(e);
 
                 _keys.Add(pk);
                 Controls.Add(pk);
@@ -291,13 +298,8 @@ namespace MidiGenerator
         #endregion
 
         #region Events
-        ///// <summary>Notify handlers of key change.</summary>
-        //public event EventHandler<NoteEventArgs>? Vkey_Click;
-
-
         /// <summary>UI midi send. Client must fill in the channel number.</summary>
         public event EventHandler<BaseMidi>? SendMidi;
-
         #endregion
 
         #region Lifecycle
@@ -324,7 +326,7 @@ namespace MidiGenerator
         {
             IsPressed = true;
             Invalidate();
-            SendMidi?.Invoke(this, new NoteOn(-1, NoteId, velocity));
+            SendMidi?.Invoke(this, new NoteOn(0, NoteId, velocity));
         }
 
         /// <summary>
@@ -334,7 +336,7 @@ namespace MidiGenerator
         {
             IsPressed = false;
             Invalidate();
-            SendMidi?.Invoke(this, new NoteOff(-1, NoteId));
+            SendMidi?.Invoke(this, new NoteOff(0, NoteId));
         }
         #endregion
 

@@ -1,4 +1,6 @@
 ﻿
+using Ephemera.MidiLib;
+
 namespace MidiGenerator
 {
     partial class MainForm
@@ -25,9 +27,8 @@ namespace MidiGenerator
             btnSettings = new System.Windows.Forms.ToolStripButton();
             toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             txtViewer = new Ephemera.NBagOfUis.TextViewer();
-            VkeyControl = new VirtualKeyboard();
-            ClClControl = new ClickClack();
-            timer1 = new System.Windows.Forms.Timer(components);
+            VkeyControl = new ChannelControl();
+            ClClControl = new ChannelControl();
             toolStrip1.SuspendLayout();
             SuspendLayout();
             // 
@@ -103,16 +104,13 @@ namespace MidiGenerator
             // 
             // VkeyControl
             // 
+            VkeyControl.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left;
             VkeyControl.BackColor = System.Drawing.SystemColors.Control;
             VkeyControl.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             VkeyControl.DrawColor = System.Drawing.Color.Red;
-            VkeyControl.HighNote = 108;
-            VkeyControl.KeySize = 14;
             VkeyControl.Location = new System.Drawing.Point(399, 39);
-            VkeyControl.LowNote = 21;
             VkeyControl.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             VkeyControl.Name = "VkeyControl";
-            VkeyControl.ShowNoteNames = true;
             VkeyControl.Size = new System.Drawing.Size(671, 154);
             VkeyControl.TabIndex = 93;
             // 
@@ -156,11 +154,8 @@ namespace MidiGenerator
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
-        //private ChannelControl VkeyChannelControl;
-        //private ChannelControl ClClChannelControl;
-        private ClickClack ClClControl;
-        private VirtualKeyboard VkeyControl;
-        private System.Windows.Forms.Timer timer1;
+        private ChannelControl VkeyControl;
+        private ChannelControl ClClControl;
     }
 }
 

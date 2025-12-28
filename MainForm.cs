@@ -20,10 +20,12 @@ namespace MidiGenerator
         /// <summary>My logger.</summary>
         readonly Logger _logger = LogManager.CreateLogger("Main");
 
+        /// <summary>Midi boss.</summary>
+        readonly Manager _mgr = new();
+
         /// <summary>User settings.</summary>
         readonly UserSettings _settings;
 
-        /// <summary>Midi output device.</summary>
         /// <summary>Low level midi output device.</summary>
         MidiOut? _midiOut = null;
         #endregion
@@ -55,66 +57,54 @@ namespace MidiGenerator
             txtViewer.MatchText.Add("WRN", Color.Plum);
 
             btnLogMidi.Checked = _settings.LogMidi;
-            btnKillMidi.Click += (_, __) =>
+            btnKillMidi.Click += (_, __) => _mgr.Kill();
+
+            _mgr.MessageReceive += Mgr_MessageReceive;
+            _mgr.MessageSend += Mgr_MessageSend;
+
+            ///// Init the device and channels.
+            var dev = _mgr.GetOutputDevice(_settings.OutputDevice);
+            var vkeyChannel = _mgr.OpenMidiOutput(_settings.OutputDevice, 1, "Virtual Key", _settings.VkeyChannel.ChannelNumber);
+            var clclChannel = _mgr.OpenMidiOutput(_settings.OutputDevice, 2, "Click Clack", _settings.ClClChannel.ChannelNumber);
+
+            var rend1 = new VirtualKeyboard()
             {
-                Kill(_settings.VkeyChannel.ChannelNumber);
-                Kill(_settings.ClClChannel.ChannelNumber);
+                DrawColor = _settings.DrawColor,
+                KeySize = 12,
+                HighNote = 108,
+                LowNote = 21,
+                ShowNoteNames = true
             };
-
-            ///// Determine midi output device. /////
-            Text = "Midi Generator - no output device";
-            timer1.Interval = 1000;
-            timer1.Tick += (sender, e) => ConnectDevice();
-            timer1.Start();
-
-            ///// Init the channels and their corresponding controls. /////
-            _settings.VkeyChannel.UpdatePresets();
-            VkeyControl.BoundChannel = _settings.VkeyChannel;
+            rend1.SendMidi += ChannelControl_SendMidi;
+            VkeyControl.UserRenderer = rend1;
+            VkeyControl.BorderStyle = BorderStyle.FixedSingle;
             VkeyControl.DrawColor = _settings.DrawColor;
-            VkeyControl.Enabled = true;
-            VkeyControl.LowNote = 36;
-            VkeyControl.HighNote = 84;
-            VkeyControl.ChannelChange += User_ChannelChange;
-            VkeyControl.NoteSend += User_NoteSend;
-            VkeyControl.ControllerSend += User_ControllerSend;
+            VkeyControl.SelectedColor = _settings.SelectedColor;
+            VkeyControl.Volume = Defs.DEFAULT_VOLUME;
+            VkeyControl.ChannelChange += ChannelControl_ChannelChange;
+            VkeyControl.SendMidi += ChannelControl_SendMidi;
+            VkeyControl.BoundChannel = vkeyChannel;
 
-            _settings.ClClChannel.UpdatePresets();
-            ClClControl.BoundChannel = _settings.ClClChannel;
+            var rend2 = new ClickClack()
+            {
+                DrawColor = _settings.DrawColor
+            };
+            rend2.SendMidi += ChannelControl_SendMidi;
+            ClClControl.UserRenderer = rend2;
+            ClClControl.BorderStyle = BorderStyle.FixedSingle;
             ClClControl.DrawColor = _settings.DrawColor;
-            ClClControl.Enabled = true;
-            ClClControl.ChannelChange += User_ChannelChange;
-            ClClControl.NoteSend += User_NoteSend;
-            ClClControl.ControllerSend += User_ControllerSend;
+            ClClControl.SelectedColor = _settings.SelectedColor;
+            ClClControl.Volume = Defs.DEFAULT_VOLUME;
+            ClClControl.ChannelChange += ChannelControl_ChannelChange;
+            ClClControl.SendMidi += ChannelControl_SendMidi;
+            ClClControl.BoundChannel = clclChannel;
 
             ///// Finish up. /////
-            SendPatch(VkeyControl.BoundChannel.ChannelNumber, VkeyControl.BoundChannel.Patch);
-            SendPatch(ClClControl.BoundChannel.ChannelNumber, ClClControl.BoundChannel.Patch);
+            SendPatch(vkeyChannel.ChannelNumber, vkeyChannel.Patch);
+            SendPatch(clclChannel.ChannelNumber, clclChannel.Patch);
 
             Location = _settings.FormGeometry.Location;
             Size = _settings.FormGeometry.Size;
-        }
-
-        /// <summary>
-        /// Form is legal now. Tie up some loose ends.
-        /// </summary>
-        /// <param name="e"></param>
-        protected override void OnLoad(EventArgs e)
-        {
-            _logger.Info($"It's alive!");
-
-            base.OnLoad(e);
-        }
-
-        /// <summary>
-        /// Save stuff.
-        /// </summary>
-        /// <param name="e"></param>
-        protected override void OnFormClosing(FormClosingEventArgs e)
-        {
-            LogManager.Stop();
-            SaveSettings();
-
-            base.OnFormClosing(e);
         }
 
         /// <summary>
@@ -136,24 +126,25 @@ namespace MidiGenerator
 
             base.Dispose(disposing);
         }
+
+        /// <summary>
+        /// Clean up.
+        /// </summary>
+        /// <param name="e"></param>
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            SaveSettings();
+            base.OnFormClosing(e);
+        }
         #endregion
 
         #region User settings
         /// <summary>
-        /// Collect and save user settings.
-        /// </summary>
-        void SaveSettings()
-        {
-            _settings.FormGeometry = new Rectangle(Location, Size);
-            _settings.Save();
-        }
-
-        /// <summary>
-        /// Edit the common options in a property grid.
+        /// Edit the options in a property grid.
         /// </summary>
         void Settings_Click(object? sender, EventArgs e)
         {
-            GenericListTypeEditor.SetOptions("MidiDeviceName", MidiOutputDevice.GetAvailableDevices());
+            GenericListTypeEditor.SetOptions("OutputDevice", MidiOutputDevice.GetAvailableDevices());
 
             var changes = SettingsEditor.Edit(_settings, "User Settings", 300);
 
@@ -167,51 +158,101 @@ namespace MidiGenerator
 
             SaveSettings();
         }
+
+        /// <summary>
+        /// Collect and save user settings.
+        /// </summary>
+        void SaveSettings()
+        {
+            _settings.FormGeometry = new Rectangle(Location, Size);
+            _settings.Save();
+        }
         #endregion
 
         #region Event handlers
         /// <summary>
-        /// User clicked something. Send some midi.
+        /// Send some midi. Works for different sources.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void User_NoteSend(object? sender, NoteEventArgs e)
+        void ChannelControl_SendMidi(object? sender, BaseMidi e)
         {
-            var cc = sender as ChannelControl;
-            SendNote(cc!.BoundChannel.ChannelNumber, e.Note, e.Velocity);
-        }
+            var channel = (sender as ChannelControl)!.BoundChannel;
 
-        /// <summary>
-        /// User clicked something. Send some midi.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        void User_ControllerSend(object? sender, ControllerEventArgs e)
-        {
-            var cc = sender as ChannelControl;
-            SendController(cc!.BoundChannel.ChannelNumber, (MidiController)e.ControllerId, e.Value);
-        }
-
-        /// <summary>
-        /// User edits the channel params.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        void User_ChannelChange(object? sender, ChannelEventArgs e)
-        {
-            var cc = sender as ChannelControl;
-            if (e.PatchChange || e.ChannelNumberChange)
+            if (channel is not null && channel.Enable)
             {
-                SendPatch(cc!.BoundChannel.ChannelNumber, cc.BoundChannel.Patch);
-            }
-
-            if (e.PresetFileChange)
-            {
-                // Update channel presets.
-                cc!.BoundChannel.AliasFile = "TODO1";
+                // Fill in the channel number.
+                e.ChannelNumber = channel.ChannelNumber;
+                _logger.Debug($"Channel send [{e}]");
+                channel.Device.Send(e);
             }
         }
 
+        /// <summary>
+        /// UI clicked something to configure channel.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void ChannelControl_ChannelChange(object? sender, ChannelChangeEventArgs e)
+        {
+            var cc = sender as ChannelControl;
+            var channel = cc!.BoundChannel!;
+
+            //if (e.StateChange) // TODO1
+            //{
+            //    // Update all channels.
+            //    bool anySolo = _channelControls.Where(c => c.State == ChannelControl.ChannelState.Solo).Any();
+
+            //    foreach (var cciter in _channelControls)
+            //    {
+            //        bool enable = anySolo ?
+            //            cciter.State == ChannelControl.ChannelState.Solo :
+            //            cciter.State != ChannelControl.ChannelState.Mute;
+
+            //        channel.Enable = enable;
+            //        if (!enable)
+            //        {
+            //            // Kill just in case.
+            //            _mgr.Kill(channel);
+            //        }
+            //    }
+            //}
+
+            //if (e.PatchChange)
+            //{
+            //    _logger.Debug(INFO, $"PatchChange [{channel.Patch}]");
+            //    channel.Device.Send(new Patch(channel.ChannelNumber, channel.Patch));
+            //}
+
+            //if (e.AliasFileChange)
+            //{
+            //    _logger.Debug(INFO, $"AliasFileChange [{channel.AliasFile}]");
+            //}
+        }
+
+        /// <summary>
+        /// Something arrived from a midi device.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void Mgr_MessageReceive(object? sender, BaseMidi e)
+        {
+            _logger.Debug($"Receive [{e}]");
+        }
+
+        /// <summary>
+        /// Something sent to a midi device. This is what was actually sent, not what the
+        /// channel thought it was sending.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void Mgr_MessageSend(object? sender, BaseMidi e)
+        {
+            _logger.Debug($"Send actual [{e}]");
+        }
+        #endregion
+
+        #region Event handlers
         /// <summary>
         /// Show log events.
         /// </summary>
@@ -222,7 +263,7 @@ namespace MidiGenerator
             // Usually come from a different thread.
             if (IsHandleCreated)
             {
-                this.InvokeIfRequired(_ => { Tell($"{e.Message}"); });
+                this.InvokeIfRequired(_ => { txtViewer.AppendLine($"{e.Message}"); });
             }
         }
 
@@ -276,84 +317,12 @@ namespace MidiGenerator
         }
 
         /// <summary>
-        /// Send midi all notes off.
-        /// </summary>
-        void Kill(int chanNum)
-        {
-            ControlChangeEvent evt = new(0, chanNum, MidiController.AllNotesOff, 0);
-            SendEvent(evt);
-        }
-
-        /// <summary>
         /// Send the event.
         /// </summary>
         /// <param name="evt"></param>
         void SendEvent(MidiEvent evt)
         {
             _midiOut?.Send(evt.GetAsShortMessage());
-        }
-        #endregion
-
-        #region Stuff
-        /// <summary>
-        /// Tell me something good.
-        /// </summary>
-        /// <param name="s"></param>
-        void Tell(string s)
-        {
-            txtViewer.AppendLine($"{s}");
-        }
-
-        /// <summary>
-        /// Figure out which midi output device.
-        /// </summary>
-        void ConnectDevice()
-        {
-            if (_midiOut == null)
-            {
-                // Retry.
-                string deviceName = _settings.OutputDevice;
-                for (int i = 0; i < MidiOut.NumberOfDevices; i++)
-                {
-                    if (deviceName == MidiOut.DeviceInfo(i).ProductName)
-                    {
-                        _midiOut = new MidiOut(i);
-                        Text = $"Midi Generator - {deviceName}";
-                        Tell($"Connect to {deviceName}");
-                        timer1.Stop();
-                        break;
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// The meaning of life.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        void About_Click(object? sender, EventArgs e)
-        {
-            // Show the builtin definitions and user devices.
-            List<string> ls = [];
-
-            // Show them what they have.
-            ls.Add($"Your Midi Outputs");
-            ls.Add($"");
-            for (int i = 0; i < MidiOut.NumberOfDevices; i++)
-            {
-                ls.Add($"- [{MidiOut.DeviceInfo(i).ProductName}]");
-            }
-
-            ls.Add($"");
-            ls.Add($"Your Midi Inputs");
-            ls.Add($"");
-            for (int i = 0; i < MidiIn.NumberOfDevices; i++)
-            {
-                ls.Add($"- [{MidiIn.DeviceInfo(i).ProductName}]");
-            }
-
-            MessageBox.Show(string.Join(Environment.NewLine, ls));
         }
         #endregion
     }

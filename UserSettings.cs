@@ -6,21 +6,56 @@ using System.Drawing.Design;
 using System.Text.Json.Serialization;
 using System.Windows.Forms.Design;
 using System.IO;
+using System.ComponentModel.DataAnnotations;
 using Ephemera.NBagOfTricks;
 using Ephemera.NBagOfUis;
+using Ephemera.MidiLib;
 
 
 namespace MidiGenerator
 {
     [Serializable]
+    public sealed class ChannelConfig
+    {
+        [DisplayName("Channel Number")]
+        [Description("Actual 1-based midi channel number.")]
+        [Browsable(true)]
+        [Editor(typeof(MidiValueTypeEditor), typeof(UITypeEditor))]
+        public int ChannelNumber { get; set; } = 1;
+    }
+
+    [Serializable]
     public sealed class UserSettings : SettingsCore
     {
-        #region Persisted editable properties
+        [DisplayName("Output Device")]
+        [Description("Valid output device.")]
+        [Browsable(true)]
+        [Editor(typeof(GenericListTypeEditor), typeof(UITypeEditor))]
+        public string OutputDevice { get; set; } = "???";
+
+        [DisplayName("Virtual Keyboard")]
+        [Description("Config.")]
+        [Browsable(true)]
+        [TypeConverter(typeof(ExpandableObjectConverter))]
+        public ChannelConfig VkeyChannel { get; set; } = new();
+
+        [DisplayName("Click Clack")]
+        [Description("Config.")]
+        [Browsable(true)]
+        [TypeConverter(typeof(ExpandableObjectConverter))]
+        public ChannelConfig ClClChannel { get; set; } = new();
+
         [DisplayName("Draw Color")]
         [Description("The color used for active control surfaces.")]
         [Browsable(true)]
         [JsonConverter(typeof(JsonColorConverter))]
         public Color DrawColor { get; set; } = Color.Red;
+
+        [DisplayName("Selected Color")]
+        [Description("The color used for when control is selected.")]
+        [Browsable(true)]
+        [JsonConverter(typeof(JsonColorConverter))]
+        public Color SelectedColor { get; set; } = Color.Blue;
 
         [DisplayName("File Log Level")]
         [Description("Log level for file write.")]
@@ -34,22 +69,7 @@ namespace MidiGenerator
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public LogLevel NotifLogLevel { get; set; } = LogLevel.Debug;
 
-        [DisplayName("Output Device")]
-        [Description("Valid output device.")]
-        [Browsable(true)]
-        [Editor(typeof(GenericListTypeEditor), typeof(UITypeEditor))]
-        public string OutputDevice { get; set; } = "???";
-        #endregion
-
-        #region Persisted non-editable properties
-        // [Browsable(false)]
-        // public Channel VkeyChannel { get; set; } = new();
-
-        // [Browsable(false)]
-        // public Channel ClClChannel { get; set; } = new();
-
         [Browsable(false)]
         public bool LogMidi { get; set; } = false;
-        #endregion
     }
 }

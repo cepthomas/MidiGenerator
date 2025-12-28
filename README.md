@@ -9,10 +9,6 @@ Emulated midi controllers:
 
 # Components
 
-ChannelControl
-- Simple dumb UI control.
-- Provides volume, channel, patch selection, and one controller.
-
 VirtualKeyboard
 - Piano control based loosely on Leslie Sanford's [Midi Toolkit](https://github.com/tebjan/Sanford.Multimedia.Midi).
 - Computer keyboard also supported.
