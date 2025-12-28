@@ -42,12 +42,9 @@
         <Reference Include="Ephemera.NBagOfUis">
             <HintPath>lib\Ephemera.NBagOfUis.dll</HintPath>
         </Reference>
-        <!-- <Reference Include="Ephemera.MidiLib">
+        <Reference Include="Ephemera.MidiLib">
           <HintPath>lib\Ephemera.MidiLib.dll</HintPath>
-        </Reference> -->
-        <!-- <Reference Include="Ephemera.MidiLibEx">
-          <HintPath>lib\Ephemera.MidiLibEx.dll</HintPath>
-        </Reference> -->
+        </Reference>
         <Reference Include="Ephemera.MusicLib">
           <HintPath>lib\Ephemera.MusicLib.dll</HintPath>
         </Reference>
@@ -70,10 +67,6 @@
 
     <ItemGroup>
         <Folder Include="Resources\" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\..\Libs\MidiLib\MidiLib.csproj" />
     </ItemGroup>
 
 </Project>
