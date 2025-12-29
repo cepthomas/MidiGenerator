@@ -64,8 +64,8 @@ namespace MidiGenerator
 
             ///// Init the device and channels.
             var dev = _mgr.GetOutputDevice(_settings.OutputDevice);
-            var vkeyChannel = _mgr.OpenMidiOutput(_settings.OutputDevice, 1, "Virtual Key", _settings.VkeyChannel.ChannelNumber);
-            var clclChannel = _mgr.OpenMidiOutput(_settings.OutputDevice, 2, "Click Clack", _settings.ClClChannel.ChannelNumber);
+            var vkeyChannel = _mgr.OpenMidiOutput(_settings.OutputDevice, _settings.VkeyChannel.ChannelNumber, "Virtual Key", _settings.VkeyChannel.Patch);
+            var clclChannel = _mgr.OpenMidiOutput(_settings.OutputDevice, _settings.ClClChannel.ChannelNumber, "Click Clack", _settings.ClClChannel.Patch);
 
             var rend1 = new VirtualKeyboard()
             {
@@ -78,13 +78,14 @@ namespace MidiGenerator
             };
             rend1.SendMidi += ChannelControl_SendMidi;
             VkeyControl.UserRenderer = rend1;
+            VkeyControl.BoundChannel = vkeyChannel;
+            VkeyControl.Options = DisplayOptions.None;
             VkeyControl.BorderStyle = BorderStyle.FixedSingle;
             VkeyControl.DrawColor = _settings.DrawColor;
             VkeyControl.SelectedColor = _settings.SelectedColor;
             VkeyControl.Volume = Defs.DEFAULT_VOLUME;
             VkeyControl.ChannelChange += ChannelControl_ChannelChange;
             VkeyControl.SendMidi += ChannelControl_SendMidi;
-            VkeyControl.BoundChannel = vkeyChannel;
 
             var rend2 = new ClickClack()
             {
@@ -93,13 +94,14 @@ namespace MidiGenerator
             };
             rend2.SendMidi += ChannelControl_SendMidi;
             ClClControl.UserRenderer = rend2;
+            ClClControl.BoundChannel = clclChannel;
+            ClClControl.Options = DisplayOptions.None;
             ClClControl.BorderStyle = BorderStyle.FixedSingle;
             ClClControl.DrawColor = _settings.DrawColor;
             ClClControl.SelectedColor = _settings.SelectedColor;
             ClClControl.Volume = Defs.DEFAULT_VOLUME;
             ClClControl.ChannelChange += ChannelControl_ChannelChange;
             ClClControl.SendMidi += ChannelControl_SendMidi;
-            ClClControl.BoundChannel = clclChannel;
 
             ///// Finish up. /////
             SendPatch(vkeyChannel.ChannelNumber, vkeyChannel.Patch);
@@ -208,36 +210,9 @@ namespace MidiGenerator
             var cc = sender as ChannelControl;
             var channel = cc!.BoundChannel!;
 
-            //if (e.StateChange) // TODO1
-            //{
-            //    // Update all channels.
-            //    bool anySolo = _channelControls.Where(c => c.State == ChannelControl.ChannelState.Solo).Any();
-
-            //    foreach (var cciter in _channelControls)
-            //    {
-            //        bool enable = anySolo ?
-            //            cciter.State == ChannelControl.ChannelState.Solo :
-            //            cciter.State != ChannelControl.ChannelState.Mute;
-
-            //        channel.Enable = enable;
-            //        if (!enable)
-            //        {
-            //            // Kill just in case.
-            //            _mgr.Kill(channel);
-            //        }
-            //    }
-            //}
-
-            //if (e.PatchChange)
-            //{
-            //    _logger.Debug(INFO, $"PatchChange [{channel.Patch}]");
-            //    channel.Device.Send(new Patch(channel.ChannelNumber, channel.Patch));
-            //}
-
-            //if (e.AliasFileChange)
-            //{
-            //    _logger.Debug(INFO, $"AliasFileChange [{channel.AliasFile}]");
-            //}
+            if (e.State)
+            {
+            }
         }
 
         /// <summary>
