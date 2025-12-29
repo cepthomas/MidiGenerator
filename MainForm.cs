@@ -6,7 +6,6 @@ using System.Text;
 using System.Windows.Forms;
 using System.Diagnostics;
 using System.IO;
-using NAudio.Midi;
 using Ephemera.NBagOfTricks;
 using Ephemera.NBagOfUis;
 using Ephemera.MidiLib;
@@ -25,9 +24,6 @@ namespace MidiGenerator
 
         /// <summary>User settings.</summary>
         readonly UserSettings _settings;
-
-        /// <summary>Low level midi output device.</summary>
-        MidiOut? _midiOut = null;
         #endregion
 
         #region Lifecycle
@@ -104,9 +100,6 @@ namespace MidiGenerator
             ClClControl.SendMidi += ChannelControl_SendMidi;
 
             ///// Finish up. /////
-            SendPatch(vkeyChannel.ChannelNumber, vkeyChannel.Patch);
-            SendPatch(clclChannel.ChannelNumber, clclChannel.Patch);
-
             Location = _settings.FormGeometry.Location;
             Size = _settings.FormGeometry.Size;
         }
@@ -118,7 +111,7 @@ namespace MidiGenerator
         protected override void Dispose(bool disposing)
         {
             // Resources.
-            _midiOut?.Dispose();
+            _mgr.DestroyDevices();
 
             // Wait a bit in case there are some lingering events.
             System.Threading.Thread.Sleep(100);
@@ -260,54 +253,6 @@ namespace MidiGenerator
         void LogMidi_Click(object? sender, EventArgs e)
         {
             _settings.LogMidi = btnLogMidi.Checked;
-        }
-        #endregion
-
-        #region Send midi
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="chan"></param>
-        /// <param name="note"></param>
-        /// <param name="velocity"></param>
-        void SendNote(int chanNum, int note, int velocity)
-        {
-            _logger.Trace($"Note Ch:{chanNum} N:{note} V:{velocity}");
-            NoteEvent evt = velocity > 0 ?
-               new NoteOnEvent(0, chanNum, note, velocity, 0) :
-               new NoteEvent(0, chanNum, MidiCommandCode.NoteOff, note, 0);
-           SendEvent(evt);
-        }
-
-        /// <summary>
-        /// Patch sender.
-        /// </summary>
-        void SendPatch(int chanNum, int patch)
-        {
-            _logger.Trace($"Patch Ch:{chanNum} P:{patch}");
-            PatchChangeEvent evt = new(0, chanNum, patch);
-           SendEvent(evt);
-        }
-
-        /// <summary>
-        /// Send a controller.
-        /// </summary>
-        /// <param name="controller"></param>
-        /// <param name="val"></param>
-        void SendController(int chanNum, MidiController controller, int val)
-        {
-            _logger.Trace($"Controller Ch:{chanNum} C:{controller} V:{val}");
-            ControlChangeEvent evt = new(0, chanNum, controller, val);
-           SendEvent(evt);
-        }
-
-        /// <summary>
-        /// Send the event.
-        /// </summary>
-        /// <param name="evt"></param>
-        void SendEvent(MidiEvent evt)
-        {
-            _midiOut?.Send(evt.GetAsShortMessage());
         }
         #endregion
     }
