@@ -53,6 +53,7 @@ namespace MidiGenerator
             txtViewer.MatchText.Add("WRN", Color.Plum);
 
             btnLogMidi.Checked = _settings.LogMidi;
+            btnLogMidi.Click += (_, __) => _settings.LogMidi = btnLogMidi.Checked;
             btnKillMidi.Click += (_, __) => _mgr.Kill();
 
             _mgr.MessageReceive += Mgr_MessageReceive;
@@ -243,16 +244,6 @@ namespace MidiGenerator
             {
                 this.InvokeIfRequired(_ => { txtViewer.AppendLine($"{e.Message}"); });
             }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        void LogMidi_Click(object? sender, EventArgs e)
-        {
-            _settings.LogMidi = btnLogMidi.Checked;
         }
         #endregion
     }
