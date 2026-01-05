@@ -6,7 +6,6 @@ using System.Drawing.Design;
 using System.Text.Json.Serialization;
 using System.Windows.Forms.Design;
 using System.IO;
-using System.ComponentModel.DataAnnotations;
 using Ephemera.NBagOfTricks;
 using Ephemera.NBagOfUis;
 using Ephemera.MidiLib;
