@@ -25,7 +25,6 @@ namespace MidiGenerator
         [DisplayName("Channel Patch")]
         [Description("Current instrument/patch number.")]
         [Browsable(true)]
-        [Range(0, MidiDefs.MAX_MIDI)]
         [Editor(typeof(GenericListTypeEditor), typeof(UITypeEditor))]
         [TypeConverter(typeof(GenericConverter))]
         public int Patch { get; set; } = 0;

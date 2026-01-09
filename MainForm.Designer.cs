@@ -52,7 +52,6 @@ namespace MidiGenerator
             btnLogMidi.Size = new System.Drawing.Size(26, 24);
             btnLogMidi.Text = "log";
             btnLogMidi.ToolTipText = "Enable logging midi events";
-            btnLogMidi.Click += LogMidi_Click;
             // 
             // toolStripSeparator1
             // 
