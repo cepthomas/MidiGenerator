@@ -19,9 +19,6 @@ namespace MidiGenerator
         /// <summary>My logger.</summary>
         readonly Logger _logger = LogManager.CreateLogger("Main");
 
-        /// <summary>Midi boss.</summary>
-        readonly Manager _mgr = new();
-
         /// <summary>User settings.</summary>
         readonly UserSettings _settings;
         #endregion
@@ -54,15 +51,15 @@ namespace MidiGenerator
 
             btnLogMidi.Checked = _settings.LogMidi;
             btnLogMidi.Click += (_, __) => _settings.LogMidi = btnLogMidi.Checked;
-            btnKillMidi.Click += (_, __) => _mgr.Kill();
+            btnKillMidi.Click += (_, __) => MidiManager.Instance.Kill();
 
-            _mgr.MessageReceive += Mgr_MessageReceive;
-            _mgr.MessageSend += Mgr_MessageSend;
+            MidiManager.Instance.MessageReceive += Mgr_MessageReceive;
+            MidiManager.Instance.MessageSend += Mgr_MessageSend;
 
             ///// Init the device and channels.
-            var dev = _mgr.GetOutputDevice(_settings.OutputDevice);
-            var vkeyChannel = _mgr.OpenMidiOutput(_settings.OutputDevice, _settings.VkeyChannel.ChannelNumber, "Virtual Key", _settings.VkeyChannel.Patch);
-            var clclChannel = _mgr.OpenMidiOutput(_settings.OutputDevice, _settings.ClClChannel.ChannelNumber, "Click Clack", _settings.ClClChannel.Patch);
+            var dev = MidiManager.Instance.GetOutputDevice(_settings.OutputDevice);
+            var vkeyChannel = MidiManager.Instance.OpenOutputChannel(_settings.OutputDevice, _settings.VkeyChannel.ChannelNumber, "Virtual Key", _settings.VkeyChannel.Patch);
+            var clclChannel = MidiManager.Instance.OpenMidiOutput(_settings.OutputDevice, _settings.ClClChannel.ChannelNumber, "Click Clack", _settings.ClClChannel.Patch);
 
             var rend1 = new VirtualKeyboard()
             {
@@ -112,7 +109,7 @@ namespace MidiGenerator
         protected override void Dispose(bool disposing)
         {
             // Resources.
-            _mgr.DestroyDevices();
+            MidiManager.Instance.DestroyDevices();
 
             // Wait a bit in case there are some lingering events.
             System.Threading.Thread.Sleep(100);
@@ -143,8 +140,8 @@ namespace MidiGenerator
         void Settings_Click(object? sender, EventArgs e)
         {
             Dictionary<int, string> vals = [];
-            Enumerable.Range(0, MidiDefs.MAX_MIDI + 1).ForEach(i => vals.Add(i, MidiDefs.Instance.GetInstrumentName(i)));
-            var instList = MidiDefs.Instance.CreateOrderedMidiList(vals, true, true);
+            Enumerable.Range(0, MidiDefs.MAX_MIDI + 1).ForEach(i => vals.Add(i, MidiDefs.GetInstrumentName(i)));
+            var instList = MidiDefs.CreateOrderedMidiList(vals, true, true);
 
             GenericListTypeEditor.SetOptions("Patch", instList);
             GenericListTypeEditor.SetOptions("OutputDevice", MidiOutputDevice.GetAvailableDevices());
@@ -178,12 +175,12 @@ namespace MidiGenerator
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void ChannelControl_SendMidi(object? sender, BaseMidi e)
+        void ChannelControl_SendMidi(object? sender, BaseEvent e)
         {
             var channel = sender switch
             {
                 ChannelControl => (sender as ChannelControl)!.BoundChannel,
-                UserRenderer => _mgr.GetOutputChannel((sender as UserRenderer)!.ChannelNumber),
+                UserRenderer => MidiManager.Instance.GetOutputChannel((sender as UserRenderer)!.ChannelNumber),
                 _ => throw new InvalidOperationException("should never happen!")
             };
 
@@ -214,7 +211,7 @@ namespace MidiGenerator
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void Mgr_MessageReceive(object? sender, BaseMidi e)
+        void Mgr_MessageReceive(object? sender, BaseEvent e)
         {
             _logger.Debug($"Receive [{e}]");
         }
@@ -225,7 +222,7 @@ namespace MidiGenerator
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void Mgr_MessageSend(object? sender, BaseMidi e)
+        void Mgr_MessageSend(object? sender, BaseEvent e)
         {
             _logger.Debug($"Send actual [{e}]");
         }
