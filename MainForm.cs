@@ -57,46 +57,54 @@ namespace MidiGenerator
             MidiManager.Instance.MessageSend += Mgr_MessageSend;
 
             ///// Init the device and channels.
-            var dev = MidiManager.Instance.GetOutputDevice(_settings.OutputDevice);
-            var vkeyChannel = MidiManager.Instance.OpenOutputChannel(_settings.OutputDevice, _settings.VkeyChannel.ChannelNumber, "Virtual Key", _settings.VkeyChannel.Patch);
-            var clclChannel = MidiManager.Instance.OpenMidiOutput(_settings.OutputDevice, _settings.ClClChannel.ChannelNumber, "Click Clack", _settings.ClClChannel.Patch);
-
-            var rend1 = new VirtualKeyboard()
+            try
             {
-                ChannelNumber = vkeyChannel.ChannelNumber,
-                DrawColor = _settings.DrawColor,
-                KeySize = 12,
-                HighNote = 108,
-                LowNote = 21,
-                ShowNoteNames = true
-            };
-            rend1.SendMidi += ChannelControl_SendMidi;
-            VkeyControl.UserRenderer = rend1;
-            VkeyControl.BoundChannel = vkeyChannel;
-            VkeyControl.Options = DisplayOptions.None;
-            VkeyControl.BorderStyle = BorderStyle.FixedSingle;
-            VkeyControl.DrawColor = _settings.DrawColor;
-            VkeyControl.SelectedColor = _settings.SelectedColor;
-            VkeyControl.Volume = Defs.DEFAULT_VOLUME;
-            VkeyControl.ChannelChange += ChannelControl_ChannelChange;
-            VkeyControl.SendMidi += ChannelControl_SendMidi;
+                var dev = MidiManager.Instance.GetOutputDevice(_settings.OutputDevice);
+                var vkeyChannel = MidiManager.Instance.OpenOutputChannel(_settings.OutputDevice, _settings.VkeyChannel.ChannelNumber, "Virtual Key", _settings.VkeyChannel.Patch);
+                var clclChannel = MidiManager.Instance.OpenOutputChannel(_settings.OutputDevice, _settings.ClClChannel.ChannelNumber, "Click Clack", _settings.ClClChannel.Patch);
 
-            var rend2 = new ClickClack()
+                var rend1 = new VirtualKeyboard()
+                {
+                    ChannelNumber = vkeyChannel.ChannelNumber,
+                    DrawColor = _settings.DrawColor,
+                    KeySize = 12,
+                    HighNote = 108,
+                    LowNote = 21,
+                    ShowNoteNames = true
+                };
+                rend1.SendMidi += ChannelControl_SendMidi;
+                VkeyControl.UserRenderer = rend1;
+                VkeyControl.BoundChannel = vkeyChannel;
+                VkeyControl.Options = DisplayOptions.None;
+                VkeyControl.BorderStyle = BorderStyle.FixedSingle;
+                VkeyControl.DrawColor = _settings.DrawColor;
+                VkeyControl.SelectedColor = _settings.SelectedColor;
+                VkeyControl.Volume = VolumeDefs.DEFAULT_VOLUME;
+                VkeyControl.ChannelChange += ChannelControl_ChannelChange;
+                VkeyControl.SendMidi += ChannelControl_SendMidi;
+
+                var rend2 = new ClickClack()
+                {
+                    ChannelNumber = clclChannel.ChannelNumber,
+                    DrawColor = _settings.DrawColor
+                };
+                rend2.SendMidi += ChannelControl_SendMidi;
+                ClClControl.UserRenderer = rend2;
+                ClClControl.BoundChannel = clclChannel;
+                ClClControl.Options = DisplayOptions.None;
+                ClClControl.BorderStyle = BorderStyle.FixedSingle;
+                ClClControl.DrawColor = _settings.DrawColor;
+                ClClControl.SelectedColor = _settings.SelectedColor;
+                ClClControl.Volume = VolumeDefs.DEFAULT_VOLUME;
+                ClClControl.ChannelChange += ChannelControl_ChannelChange;
+                ClClControl.SendMidi += ChannelControl_SendMidi;
+            }
+            catch (Exception ex)
             {
-                ChannelNumber = clclChannel.ChannelNumber,
-                DrawColor = _settings.DrawColor
-            };
-            rend2.SendMidi += ChannelControl_SendMidi;
-            ClClControl.UserRenderer = rend2;
-            ClClControl.BoundChannel = clclChannel;
-            ClClControl.Options = DisplayOptions.None;
-            ClClControl.BorderStyle = BorderStyle.FixedSingle;
-            ClClControl.DrawColor = _settings.DrawColor;
-            ClClControl.SelectedColor = _settings.SelectedColor;
-            ClClControl.Volume = Defs.DEFAULT_VOLUME;
-            ClClControl.ChannelChange += ChannelControl_ChannelChange;
-            ClClControl.SendMidi += ChannelControl_SendMidi;
-
+                txtViewer.AppendLine($"Something went wrong");
+                txtViewer.AppendLine(ex.Message);
+            }
+            
             ///// Finish up. /////
             Location = _settings.FormGeometry.Location;
             Size = _settings.FormGeometry.Size;
@@ -141,7 +149,7 @@ namespace MidiGenerator
         {
             Dictionary<int, string> vals = [];
             Enumerable.Range(0, MidiDefs.MAX_MIDI + 1).ForEach(i => vals.Add(i, MidiDefs.GetInstrumentName(i)));
-            var instList = MidiDefs.CreateOrderedMidiList(vals, true, true);
+            var instList = MidiDefs.CreateOrderedMidiList(vals, false, true);
 
             GenericListTypeEditor.SetOptions("Patch", instList);
             GenericListTypeEditor.SetOptions("OutputDevice", MidiOutputDevice.GetAvailableDevices());
@@ -187,7 +195,7 @@ namespace MidiGenerator
             if (channel.Enable)
             {
                 _logger.Debug($"Channel send [{e}]");
-                channel.Device.Send(e);
+                channel.Send(e);
             }
         }
 

@@ -140,7 +140,7 @@ namespace MidiGenerator
                         (>= 'A' and <= 'Z') or (>= '0' and <= '9') => (Keys)kv.Key[0],
                         _ => throw new InvalidOperationException($"Invalid key {kv.Key}"),
                     };
-                    var notes = MusicDefs.Instance.GetNotesFromString(kv.Value);
+                    var notes = MusicDefs.GetNotesFromString(kv.Value);
                     if (notes.Count != 1) { throw new InvalidOperationException($"Invalid key {kv.Key}"); }
 
                     var note = notes[0];
@@ -217,7 +217,7 @@ namespace MidiGenerator
                 _keys.Add(pk);
                 Controls.Add(pk);
 
-                if (!MusicDefs.Instance.IsNatural(noteId))
+                if (!MusicDefs.IsNatural(noteId))
                 {
                     pk.BringToFront();
                 }
@@ -231,7 +231,7 @@ namespace MidiGenerator
         {
             if (_keys.Count > 0)
             {
-                int whiteKeyWidth = _keys.Count * KeySize / _keys.Count(k => MusicDefs.Instance.IsNatural(k.NoteId));
+                int whiteKeyWidth = _keys.Count * KeySize / _keys.Count(k => MusicDefs.IsNatural(k.NoteId));
                 int blackKeyWidth = (int)(whiteKeyWidth * 0.6);
                 int whiteKeyHeight = ClientRectangle.Height;
                 int blackKeyHeight = (int)(whiteKeyHeight * 0.65);
@@ -243,7 +243,7 @@ namespace MidiGenerator
                     VirtualKey pk = _keys[i];
 
                     // Note that controls have to have integer width so resizing is a bit lumpy.
-                    if (MusicDefs.Instance.IsNatural(pk.NoteId)) // white key
+                    if (MusicDefs.IsNatural(pk.NoteId)) // white key
                     {
                         pk.Height = whiteKeyHeight;
                         pk.Width = whiteKeyWidth;
@@ -287,7 +287,7 @@ namespace MidiGenerator
 
         #region Events
         /// <summary>UI midi send.</summary>
-        public event EventHandler<BaseMidi>? SendMidi;
+        public event EventHandler<BaseEvent>? SendMidi;
         #endregion
 
         #region Lifecycle
@@ -422,7 +422,7 @@ namespace MidiGenerator
             }
             else
             {
-                e.Graphics.FillRectangle(MusicDefs.Instance.IsNatural(NoteId) ? new SolidBrush(Color.White) : new SolidBrush(Color.Black), 0, 0, Size.Width, Size.Height);
+                e.Graphics.FillRectangle(MusicDefs.IsNatural(NoteId) ? new SolidBrush(Color.White) : new SolidBrush(Color.Black), 0, 0, Size.Width, Size.Height);
             }
 
             // Outline.
@@ -436,8 +436,8 @@ namespace MidiGenerator
 
                 if (root == 0)
                 {
-                    int x = MusicDefs.Instance.IsNatural(NoteId) ? 3 : 0;
-                    e.Graphics.DrawString($"{MusicDefs.Instance.NoteNumberToName(root, false)}", Font, Brushes.Black, x, 3);
+                    int x = MusicDefs.IsNatural(NoteId) ? 3 : 0;
+                    e.Graphics.DrawString($"{MusicDefs.NoteNumberToName(root, false)}", Font, Brushes.Black, x, 3);
                     e.Graphics.DrawString($"{octave}", Font, Brushes.Black, x, 13);
                 }
             }

@@ -23,11 +23,10 @@ namespace MidiGenerator
         public int ChannelNumber { get; set; } = 1;
 
         [DisplayName("Channel Patch")]
-        [Description("Current instrument/patch number.")]
+        [Description("Current instrument/patch.")]
         [Browsable(true)]
         [Editor(typeof(GenericListTypeEditor), typeof(UITypeEditor))]
-        [TypeConverter(typeof(GenericConverter))]
-        public int Patch { get; set; } = 0;
+        public string Patch { get; set; } = "???";
     }
 
     [Serializable]
