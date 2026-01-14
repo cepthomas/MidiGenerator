@@ -148,8 +148,8 @@ namespace MidiGenerator
         void Settings_Click(object? sender, EventArgs e)
         {
             Dictionary<int, string> vals = [];
-            Enumerable.Range(0, MidiDefs.MAX_MIDI + 1).ForEach(i => vals.Add(i, MidiDefs.GetInstrumentName(i)));
-            var instList = MidiDefs.CreateOrderedMidiList(vals, false, true);
+            Enumerable.Range(0, MidiDefs.MAX_MIDI + 1).ForEach(i => vals.Add(i, MidiDefs.Instruments.GetName(i)));
+            var instList = MidiUtils.CreateOrderedMidiList(vals, false, true);
 
             GenericListTypeEditor.SetOptions("Patch", instList);
             GenericListTypeEditor.SetOptions("OutputDevice", MidiOutputDevice.GetAvailableDevices());
@@ -192,7 +192,7 @@ namespace MidiGenerator
                 _ => throw new InvalidOperationException("should never happen!")
             };
 
-            if (channel.Enable)
+            if (channel!.Enable)
             {
                 _logger.Debug($"Channel send [{e}]");
                 channel.Send(e);
