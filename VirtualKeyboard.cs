@@ -209,7 +209,7 @@ namespace MidiGenerator
             for (int i = 0; i < HighNote - LowNote; i++)
             {
                 int noteId = i + LowNote;
-                VirtualKey pk = new(this, ChannelNumber, noteId) { DrawColor = DrawColor };
+                VirtualKey pk = new(this, MidiDefs.TEMP_CHANNEL, noteId) { DrawColor = DrawColor };
 
                 // Pass along an event from a virtual key.
                 pk.SendMidi += (sender, e) => OnSendMidi(e);

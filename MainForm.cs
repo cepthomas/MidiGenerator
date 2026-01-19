@@ -53,8 +53,8 @@ namespace MidiGenerator
             btnLogMidi.Click += (_, __) => _settings.LogMidi = btnLogMidi.Checked;
             btnKillMidi.Click += (_, __) => MidiManager.Instance.Kill();
 
-            MidiManager.Instance.MessageReceive += Mgr_MessageReceive;
-            MidiManager.Instance.MessageSend += Mgr_MessageSend;
+            MidiManager.Instance.MessageReceived += Mgr_MessageReceived;
+            MidiManager.Instance.MessageSent += Mgr_MessageSent;
 
             ///// Init the device and channels.
             try
@@ -65,39 +65,33 @@ namespace MidiGenerator
 
                 var rend1 = new VirtualKeyboard()
                 {
-                    ChannelNumber = vkeyChannel.ChannelNumber,
                     DrawColor = _settings.DrawColor,
                     KeySize = 12,
                     HighNote = 108,
                     LowNote = 21,
                     ShowNoteNames = true
                 };
-                rend1.SendMidi += ChannelControl_SendMidi;
-                VkeyControl.UserRenderer = rend1;
                 VkeyControl.BoundChannel = vkeyChannel;
                 VkeyControl.Options = DisplayOptions.None;
                 VkeyControl.BorderStyle = BorderStyle.FixedSingle;
                 VkeyControl.DrawColor = _settings.DrawColor;
                 VkeyControl.SelectedColor = _settings.SelectedColor;
                 VkeyControl.Volume = VolumeDefs.DEFAULT_VOLUME;
+                VkeyControl.SetRenderer(rend1);
                 VkeyControl.ChannelChange += ChannelControl_ChannelChange;
-                VkeyControl.SendMidi += ChannelControl_SendMidi;
 
                 var rend2 = new ClickClack()
                 {
-                    ChannelNumber = clclChannel.ChannelNumber,
                     DrawColor = _settings.DrawColor
                 };
-                rend2.SendMidi += ChannelControl_SendMidi;
-                ClClControl.UserRenderer = rend2;
                 ClClControl.BoundChannel = clclChannel;
                 ClClControl.Options = DisplayOptions.None;
                 ClClControl.BorderStyle = BorderStyle.FixedSingle;
                 ClClControl.DrawColor = _settings.DrawColor;
                 ClClControl.SelectedColor = _settings.SelectedColor;
                 ClClControl.Volume = VolumeDefs.DEFAULT_VOLUME;
+                ClClControl.SetRenderer(rend2);
                 ClClControl.ChannelChange += ChannelControl_ChannelChange;
-                ClClControl.SendMidi += ChannelControl_SendMidi;
             }
             catch (Exception ex)
             {
@@ -179,27 +173,6 @@ namespace MidiGenerator
 
         #region Event handlers
         /// <summary>
-        /// Send some midi. Works for different sources.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        void ChannelControl_SendMidi(object? sender, BaseEvent e)
-        {
-            var channel = sender switch
-            {
-                ChannelControl => (sender as ChannelControl)!.BoundChannel,
-                UserRenderer => MidiManager.Instance.GetOutputChannel((sender as UserRenderer)!.ChannelNumber),
-                _ => throw new InvalidOperationException("should never happen!")
-            };
-
-            if (channel!.Enable)
-            {
-                _logger.Debug($"Channel send [{e}]");
-                channel.Send(e);
-            }
-        }
-
-        /// <summary>
         /// UI clicked something to configure channel.
         /// </summary>
         /// <param name="sender"></param>
@@ -219,20 +192,19 @@ namespace MidiGenerator
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void Mgr_MessageReceive(object? sender, BaseEvent e)
+        void Mgr_MessageReceived(object? sender, BaseEvent e)
         {
-            _logger.Debug($"Receive [{e}]");
+            _logger.Debug($"MM Received [{e}]");
         }
 
         /// <summary>
-        /// Something sent to a midi device. This is what was actually sent, not what the
-        /// channel thought it was sending.
+        /// Something sent to a midi device.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void Mgr_MessageSend(object? sender, BaseEvent e)
+        void Mgr_MessageSent(object? sender, BaseEvent e)
         {
-            _logger.Debug($"Send actual [{e}]");
+            _logger.Debug($"MM Sent [{e}]");
         }
         #endregion
 
