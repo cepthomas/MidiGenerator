@@ -26,7 +26,7 @@ namespace MidiGenerator
             toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             btnSettings = new System.Windows.Forms.ToolStripButton();
             toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
-            txtViewer = new Ephemera.NBagOfUis.TextViewer();
+            tvInfo = new Ephemera.NBagOfUis.TextViewer();
             VkeyControl = new ChannelControl();
             ClClControl = new ChannelControl();
             toolStrip1.SuspendLayout();
@@ -90,16 +90,16 @@ namespace MidiGenerator
             // 
             // txtViewer
             // 
-            txtViewer.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left;
-            txtViewer.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            txtViewer.Location = new System.Drawing.Point(399, 202);
-            txtViewer.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            txtViewer.MaxText = 5000;
-            txtViewer.Name = "txtViewer";
-            txtViewer.Prompt = "";
-            txtViewer.Size = new System.Drawing.Size(671, 253);
-            txtViewer.TabIndex = 58;
-            txtViewer.WordWrap = true;
+            tvInfo.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left;
+            tvInfo.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            tvInfo.Location = new System.Drawing.Point(399, 202);
+            tvInfo.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            tvInfo.MaxText = 5000;
+            tvInfo.Name = "txtViewer";
+            tvInfo.Prompt = "";
+            tvInfo.Size = new System.Drawing.Size(671, 253);
+            tvInfo.TabIndex = 58;
+            tvInfo.WordWrap = true;
             // 
             // VkeyControl
             // 
@@ -131,7 +131,7 @@ namespace MidiGenerator
             ClientSize = new System.Drawing.Size(1081, 461);
             Controls.Add(ClClControl);
             Controls.Add(VkeyControl);
-            Controls.Add(txtViewer);
+            Controls.Add(tvInfo);
             Controls.Add(toolStrip1);
             Location = new System.Drawing.Point(300, 50);
             Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
@@ -146,7 +146,7 @@ namespace MidiGenerator
         #endregion
 
         private System.Windows.Forms.ToolStrip toolStrip1;
-        private Ephemera.NBagOfUis.TextViewer txtViewer;
+        private Ephemera.NBagOfUis.TextViewer tvInfo;
         private System.Windows.Forms.ToolStripButton btnLogMidi;
         private System.Windows.Forms.ToolStripButton btnKillMidi;
         private System.Windows.Forms.ToolStripButton btnSettings;

@@ -45,9 +45,13 @@ namespace MidiGenerator
 
             ///// Configure UI. /////
             toolStrip1.Renderer = new ToolStripCheckBoxRenderer() { SelectedColor = _settings.DrawColor };
-            txtViewer.Font = Font;
-            txtViewer.MatchText.Add("ERR", Color.LightPink);
-            txtViewer.MatchText.Add("WRN", Color.Plum);
+            tvInfo.Font = Font;
+            List<TextViewer.Matcher> matchers =
+            [
+                new("ERR", Color.Red),
+                new("WRN", Color.Green),
+            ];
+            tvInfo.Matchers = matchers;
 
             btnLogMidi.Checked = _settings.LogMidi;
             btnLogMidi.Click += (_, __) => _settings.LogMidi = btnLogMidi.Checked;
@@ -95,8 +99,8 @@ namespace MidiGenerator
             }
             catch (Exception ex)
             {
-                txtViewer.AppendLine($"Something went wrong");
-                txtViewer.AppendLine(ex.Message);
+                tvInfo.Append($"Something went wrong");
+                tvInfo.Append(ex.Message);
             }
             
             ///// Finish up. /////
@@ -219,7 +223,7 @@ namespace MidiGenerator
             // Usually come from a different thread.
             if (IsHandleCreated)
             {
-                this.InvokeIfRequired(_ => { txtViewer.AppendLine($"{e.Message}"); });
+                this.InvokeIfRequired(_ => { tvInfo.Append($"{e.Message}"); });
             }
         }
         #endregion
