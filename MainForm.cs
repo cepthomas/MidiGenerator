@@ -46,12 +46,11 @@ namespace MidiGenerator
             ///// Configure UI. /////
             toolStrip1.Renderer = new ToolStripCheckBoxRenderer() { SelectedColor = _settings.DrawColor };
             tvInfo.Font = Font;
-            List<TextViewer.Matcher> matchers =
+            tvInfo.Matchers =
             [
                 new("ERR", Color.Red),
                 new("WRN", Color.Green),
             ];
-            tvInfo.Matchers = matchers;
 
             btnLogMidi.Checked = _settings.LogMidi;
             btnLogMidi.Click += (_, __) => _settings.LogMidi = btnLogMidi.Checked;
