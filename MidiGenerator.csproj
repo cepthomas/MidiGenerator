@@ -16,7 +16,7 @@
         <Nullable>enable</Nullable>
         <!--<GenerateDocumentationFile>true</GenerateDocumentationFile>-->
         <SatelliteResourceLanguages>none</SatelliteResourceLanguages>
-        <ApplicationIcon>Resources\toro.ico</ApplicationIcon>
+        <ApplicationIcon>toro.ico</ApplicationIcon>
         <!-- en none -->
         <!-- <DefineConstants>DEBUG;TRACE</DefineConstants> -->
         <WarningLevel>4</WarningLevel>

@@ -6,6 +6,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using Ephemera.NBagOfTricks;
 using Ephemera.NBagOfUis;
 using Ephemera.MidiLib;
@@ -35,7 +36,7 @@ namespace MidiGenerator
 
             InitializeComponent();
 
-            Icon = Properties.Resources.toro;
+            Icon = Icon.ExtractAssociatedIcon(Assembly.GetExecutingAssembly().Location);
 
             // Init logging.
             LogManager.MinLevelFile = _settings.FileLogLevel;
