@@ -93,7 +93,7 @@ namespace MidiGenerator
             // Background?
             if (_bmp is not null)
             {
-                g.DrawImage(_bmp.ClientBitmap, ClientRectangle);
+                g.DrawImage(_bmp.GetBitmap(), ClientRectangle);
             }
 
             // Draw grid. X is octaves. Y is volume.
