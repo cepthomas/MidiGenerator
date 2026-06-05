@@ -18,10 +18,7 @@ namespace MidiGenerator
         /// </summary>
         private void InitializeComponent()
         {
-            components = new System.ComponentModel.Container();
             toolStrip1 = new System.Windows.Forms.ToolStrip();
-            btnLogMidi = new System.Windows.Forms.ToolStripButton();
-            toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             btnKillMidi = new System.Windows.Forms.ToolStripButton();
             toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             btnSettings = new System.Windows.Forms.ToolStripButton();
@@ -35,28 +32,12 @@ namespace MidiGenerator
             // toolStrip1
             // 
             toolStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
-            toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { btnLogMidi, toolStripSeparator1, btnKillMidi, toolStripSeparator2, btnSettings, toolStripSeparator3 });
+            toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { btnKillMidi, toolStripSeparator2, btnSettings, toolStripSeparator3 });
             toolStrip1.Location = new System.Drawing.Point(0, 0);
             toolStrip1.Name = "toolStrip1";
             toolStrip1.Size = new System.Drawing.Size(1081, 27);
             toolStrip1.TabIndex = 0;
             toolStrip1.Text = "toolStrip1";
-            // 
-            // btnLogMidi
-            // 
-            btnLogMidi.CheckOnClick = true;
-            btnLogMidi.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            btnLogMidi.Image = Properties.Resources.glyphicons_170_record;
-            btnLogMidi.ImageTransparentColor = System.Drawing.Color.Magenta;
-            btnLogMidi.Name = "btnLogMidi";
-            btnLogMidi.Size = new System.Drawing.Size(26, 24);
-            btnLogMidi.Text = "log";
-            btnLogMidi.ToolTipText = "Enable logging midi events";
-            // 
-            // toolStripSeparator1
-            // 
-            toolStripSeparator1.Name = "toolStripSeparator1";
-            toolStripSeparator1.Size = new System.Drawing.Size(6, 27);
             // 
             // btnKillMidi
             // 
@@ -88,14 +69,15 @@ namespace MidiGenerator
             toolStripSeparator3.Name = "toolStripSeparator3";
             toolStripSeparator3.Size = new System.Drawing.Size(6, 27);
             // 
-            // txtViewer
+            // tvInfo
             // 
             tvInfo.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left;
             tvInfo.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             tvInfo.Location = new System.Drawing.Point(399, 202);
             tvInfo.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            tvInfo.MatchUseBackground = true;
             tvInfo.MaxText = 5000;
-            tvInfo.Name = "txtViewer";
+            tvInfo.Name = "tvInfo";
             tvInfo.Prompt = "";
             tvInfo.Size = new System.Drawing.Size(671, 253);
             tvInfo.TabIndex = 58;
@@ -103,14 +85,14 @@ namespace MidiGenerator
             // 
             // VkeyControl
             // 
-            VkeyControl.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left;
             VkeyControl.BackColor = System.Drawing.SystemColors.Control;
             VkeyControl.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            VkeyControl.DrawColor = System.Drawing.Color.Red;
+            VkeyControl.Controller = 0;
+            VkeyControl.ControllerValue = 0;
             VkeyControl.Location = new System.Drawing.Point(399, 39);
             VkeyControl.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             VkeyControl.Name = "VkeyControl";
-            VkeyControl.Size = new System.Drawing.Size(671, 154);
+            VkeyControl.Size = new System.Drawing.Size(305, 50);
             VkeyControl.TabIndex = 93;
             // 
             // ClClControl
@@ -118,10 +100,11 @@ namespace MidiGenerator
             ClClControl.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left;
             ClClControl.BackColor = System.Drawing.SystemColors.Control;
             ClClControl.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            ClClControl.DrawColor = System.Drawing.Color.Red;
+            ClClControl.Controller = 0;
+            ClClControl.ControllerValue = 0;
             ClClControl.Location = new System.Drawing.Point(13, 39);
             ClClControl.Name = "ClClControl";
-            ClClControl.Size = new System.Drawing.Size(372, 416);
+            ClClControl.Size = new System.Drawing.Size(305, 50);
             ClClControl.TabIndex = 102;
             // 
             // MainForm
@@ -147,10 +130,8 @@ namespace MidiGenerator
 
         private System.Windows.Forms.ToolStrip toolStrip1;
         private Ephemera.NBagOfUis.TextViewer tvInfo;
-        private System.Windows.Forms.ToolStripButton btnLogMidi;
         private System.Windows.Forms.ToolStripButton btnKillMidi;
         private System.Windows.Forms.ToolStripButton btnSettings;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private ChannelControl VkeyControl;

@@ -73,8 +73,5 @@ namespace MidiGenerator
         [Browsable(true)]
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public LogLevel NotifLogLevel { get; set; } = LogLevel.Debug;
-
-        [Browsable(false)]
-        public bool LogMidi { get; set; } = false;
     }
 }

@@ -53,8 +53,6 @@ namespace MidiGenerator
                 new("WRN", Color.Green),
             ];
 
-            btnLogMidi.Checked = _settings.LogMidi;
-            btnLogMidi.Click += (_, __) => _settings.LogMidi = btnLogMidi.Checked;
             btnKillMidi.Click += (_, __) => MidiManager.Instance.Kill();
 
             MidiManager.Instance.MessageReceived += Mgr_MessageReceived;
