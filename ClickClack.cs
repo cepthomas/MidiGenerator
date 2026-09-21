@@ -38,6 +38,7 @@ namespace MidiGenerator
 
         #region Properties
         /// <summary>Cosmetics.</summary>
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public Color DrawColor { get; set; } = Color.Red;
         #endregion
 

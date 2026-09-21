@@ -31,18 +31,23 @@ namespace MidiGenerator
 
         #region Properties
         /// <summary>Draw the names on the keys.</summary>
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool ShowNoteNames { get; set; } = false;
 
         /// <summary>Determines the overall size.</summary>
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public int KeySize { get; set; } = 10;
 
         /// <summary>Lowest key.</summary>
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public int LowNote { get; set; } = 21; // 21 = A0 for 88 keyboard.
 
         /// <summary>Highest key.</summary>
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public int HighNote { get; set; } = 108; // 108 = C8 for 88 keyboard.
 
         /// <summary>Cosmetics.</summary>
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public Color DrawColor { get; set; } = Color.Red;
         #endregion
 
@@ -276,6 +281,7 @@ namespace MidiGenerator
 
         #region Properties
         /// <summary>Make user pick a good color.</summary>
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public Color DrawColor { get; set; } = Color.Red;
 
         /// <summary>Key status.</summary>
