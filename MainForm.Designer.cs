@@ -24,8 +24,10 @@ namespace MidiGenerator
             btnSettings = new System.Windows.Forms.ToolStripButton();
             toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             tvInfo = new Ephemera.NBagOfUis.TextViewer();
-            VkeyControl = new ChannelControl();
-            ClClControl = new ChannelControl();
+            vkeyChannelControl = new ChannelControl();
+            clclChannelControl = new ChannelControl();
+            clclControl = new ClickClack();
+            vkeyControl = new VirtualKeyboard();
             toolStrip1.SuspendLayout();
             SuspendLayout();
             // 
@@ -35,7 +37,7 @@ namespace MidiGenerator
             toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { btnKillMidi, toolStripSeparator2, btnSettings, toolStripSeparator3 });
             toolStrip1.Location = new System.Drawing.Point(0, 0);
             toolStrip1.Name = "toolStrip1";
-            toolStrip1.Size = new System.Drawing.Size(1081, 27);
+            toolStrip1.Size = new System.Drawing.Size(1004, 27);
             toolStrip1.TabIndex = 0;
             toolStrip1.Text = "toolStrip1";
             // 
@@ -73,47 +75,55 @@ namespace MidiGenerator
             // 
             tvInfo.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left;
             tvInfo.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            tvInfo.Location = new System.Drawing.Point(399, 202);
+            tvInfo.Location = new System.Drawing.Point(12, 305);
             tvInfo.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            tvInfo.MatchUseBackground = true;
-            tvInfo.MaxText = 5000;
             tvInfo.Name = "tvInfo";
-            tvInfo.Prompt = "";
-            tvInfo.Size = new System.Drawing.Size(671, 253);
+            tvInfo.Size = new System.Drawing.Size(979, 179);
             tvInfo.TabIndex = 58;
-            tvInfo.WordWrap = true;
             // 
-            // VkeyControl
+            // vkeyChannelControl
             // 
-            VkeyControl.BackColor = System.Drawing.SystemColors.Control;
-            VkeyControl.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            VkeyControl.Controller = 0;
-            VkeyControl.ControllerValue = 0;
-            VkeyControl.Location = new System.Drawing.Point(399, 39);
-            VkeyControl.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            VkeyControl.Name = "VkeyControl";
-            VkeyControl.Size = new System.Drawing.Size(305, 50);
-            VkeyControl.TabIndex = 93;
+            vkeyChannelControl.BackColor = System.Drawing.SystemColors.Control;
+            vkeyChannelControl.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            vkeyChannelControl.Location = new System.Drawing.Point(234, 39);
+            vkeyChannelControl.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            vkeyChannelControl.Name = "vkeyChannelControl";
+            vkeyChannelControl.Size = new System.Drawing.Size(116, 74);
+            vkeyChannelControl.TabIndex = 93;
             // 
-            // ClClControl
+            // clclChannelControl
             // 
-            ClClControl.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left;
-            ClClControl.BackColor = System.Drawing.SystemColors.Control;
-            ClClControl.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            ClClControl.Controller = 0;
-            ClClControl.ControllerValue = 0;
-            ClClControl.Location = new System.Drawing.Point(13, 39);
-            ClClControl.Name = "ClClControl";
-            ClClControl.Size = new System.Drawing.Size(305, 50);
-            ClClControl.TabIndex = 102;
+            clclChannelControl.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left;
+            clclChannelControl.BackColor = System.Drawing.SystemColors.Control;
+            clclChannelControl.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            clclChannelControl.Location = new System.Drawing.Point(13, 39);
+            clclChannelControl.Name = "clclChannelControl";
+            clclChannelControl.Size = new System.Drawing.Size(116, 110);
+            clclChannelControl.TabIndex = 102;
+            // 
+            // clclControl
+            // 
+            clclControl.Location = new System.Drawing.Point(13, 119);
+            clclControl.Name = "clclControl";
+            clclControl.Size = new System.Drawing.Size(197, 171);
+            clclControl.TabIndex = 103;
+            // 
+            // virtualKeyboard1
+            // 
+            vkeyControl.Location = new System.Drawing.Point(234, 121);
+            vkeyControl.Name = "virtualKeyboard1";
+            vkeyControl.Size = new System.Drawing.Size(757, 115);
+            vkeyControl.TabIndex = 104;
             // 
             // MainForm
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(8F, 19F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            ClientSize = new System.Drawing.Size(1081, 461);
-            Controls.Add(ClClControl);
-            Controls.Add(VkeyControl);
+            ClientSize = new System.Drawing.Size(1004, 497);
+            Controls.Add(vkeyControl);
+            Controls.Add(clclControl);
+            Controls.Add(clclChannelControl);
+            Controls.Add(vkeyChannelControl);
             Controls.Add(tvInfo);
             Controls.Add(toolStrip1);
             Location = new System.Drawing.Point(300, 50);
@@ -134,8 +144,10 @@ namespace MidiGenerator
         private System.Windows.Forms.ToolStripButton btnSettings;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
-        private ChannelControl VkeyControl;
-        private ChannelControl ClClControl;
+        private ChannelControl vkeyChannelControl;
+        private ChannelControl clclChannelControl;
+        private ClickClack clclControl;
+        private VirtualKeyboard vkeyControl;
     }
 }
 

@@ -58,40 +58,42 @@ namespace MidiGenerator
             MidiManager.Instance.MessageReceived += Mgr_MessageReceived;
             MidiManager.Instance.MessageSent += Mgr_MessageSent;
 
-            ///// Init the device and channels.
             try
             {
+                // Init the device.
                 var dev = MidiManager.Instance.GetOutputDevice(_settings.OutputDevice);
+
+                // Init the channels.
                 var vkeyChannel = MidiManager.Instance.OpenOutputChannel(_settings.OutputDevice, _settings.VkeyChannel.ChannelNumber, "Virtual Key", _settings.VkeyChannel.Patch);
                 var clclChannel = MidiManager.Instance.OpenOutputChannel(_settings.OutputDevice, _settings.ClClChannel.ChannelNumber, "Click Clack", _settings.ClClChannel.Patch);
 
-                var rend1 = new VirtualKeyboard()
-                {
-                    DrawColor = _settings.DrawColor,
-                    KeySize = 12,
-                    HighNote = 108,
-                    LowNote = 21,
-                    ShowNoteNames = true
-                };
-                VkeyControl.BoundChannel = vkeyChannel;
-                VkeyControl.BorderStyle = BorderStyle.FixedSingle;
-                VkeyControl.DrawColor = _settings.DrawColor;
-                VkeyControl.SelectedColor = _settings.SelectedColor;
-                VkeyControl.Volume = VolumeDefs.DEFAULT_VOLUME;
-                VkeyControl.SetRenderer(rend1);
-                VkeyControl.ChannelChange += ChannelControl_ChannelChange;
+                // Init the vkey controls..
+                vkeyChannelControl.BoundChannel = vkeyChannel;
+                vkeyChannelControl.DrawColor = _settings.DrawColor;
+                vkeyChannelControl.SelectedColor = _settings.SelectedColor;
+                vkeyChannelControl.Volume = VolumeDefs.DEFAULT_VOLUME;
+                vkeyChannelControl.ChannelChange += ChannelControl_ChannelChange;
 
-                var rend2 = new ClickClack()
+                vkeyControl.DrawColor = _settings.DrawColor;
+                vkeyControl.SendMidi += (object? sender, BaseEvent e) =>
                 {
-                    DrawColor = _settings.DrawColor
+                    e.ChannelNumber = _settings.VkeyChannel.ChannelNumber;
+                    vkeyChannel.Send(e);
                 };
-                ClClControl.BoundChannel = clclChannel;
-                ClClControl.BorderStyle = BorderStyle.FixedSingle;
-                ClClControl.DrawColor = _settings.DrawColor;
-                ClClControl.SelectedColor = _settings.SelectedColor;
-                ClClControl.Volume = VolumeDefs.DEFAULT_VOLUME;
-                ClClControl.SetRenderer(rend2);
-                ClClControl.ChannelChange += ChannelControl_ChannelChange;
+
+                // Init the clickclack controls..
+                clclChannelControl.BoundChannel = clclChannel;
+                clclChannelControl.DrawColor = _settings.DrawColor;
+                clclChannelControl.SelectedColor = _settings.SelectedColor;
+                clclChannelControl.Volume = VolumeDefs.DEFAULT_VOLUME;
+                clclChannelControl.ChannelChange += ChannelControl_ChannelChange;
+
+                clclControl.DrawColor = _settings.DrawColor;
+                clclControl.SendMidi += (object? sender, BaseEvent e) =>
+                {
+                    e.ChannelNumber = _settings.ClClChannel.ChannelNumber;
+                    clclChannel.Send(e);
+                };
             }
             catch (Exception ex)
             {
@@ -177,12 +179,12 @@ namespace MidiGenerator
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void ChannelControl_ChannelChange(object? sender, ChannelChangeEventArgs e) // TODO does???
+        void ChannelControl_ChannelChange(object? sender, ChannelChangeEventArgs e)
         {
             var cc = sender as ChannelControl;
             var channel = cc!.BoundChannel!;
 
-            if (e.State)
+            if (e.State) // TODO1 does???
             {
             }
         }

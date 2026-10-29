@@ -13,7 +13,7 @@ using Ephemera.MidiLib;
 namespace MidiGenerator
 {
     /// <summary>Virtual keyboard control borrowed from Leslie Sanford with extras.</summary>
-    public class VirtualKeyboard : UserRenderer
+    public class VirtualKeyboard : UserControl
     {
         #region Fields
         /// <summary>Required designer variable.</summary>
@@ -27,6 +27,14 @@ namespace MidiGenerator
 
         /// <summary>Known bug?</summary>
         bool _keyDown = false;
+
+        /// <summary>Standard 88 keyboard - reference C4.</summary>
+        const int MIDDLE_C = 60;
+        #endregion
+
+        #region Events
+        /// <summary>Midi send request.</summary>
+        public event EventHandler<BaseEvent>? SendMidi;
         #endregion
 
         #region Properties
@@ -49,11 +57,6 @@ namespace MidiGenerator
         /// <summary>Cosmetics.</summary>
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public Color DrawColor { get; set; } = Color.Red;
-        #endregion
-
-        #region Constants
-        /// <summary>Standard 88 keyboard - reference C4.</summary>
-        const int MIDDLE_C = 60;
         #endregion
 
         #region Lifecycle
@@ -217,7 +220,7 @@ namespace MidiGenerator
                 VirtualKey pk = new(this, MidiDefs.TEMP_CHANNEL, noteId) { DrawColor = DrawColor };
 
                 // Pass along an event from a virtual key.
-                pk.SendMidi += (sender, e) => OnSendMidi(e);
+                pk.SendMidi += (sender, e) => SendMidi?.Invoke(this, e);
 
                 _keys.Add(pk);
                 Controls.Add(pk);
