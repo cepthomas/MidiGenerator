@@ -38,11 +38,17 @@
         <member name="F:Ephemera.MidiLib.OutputChannel._device">
             <summary>Associated device.</summary>
         </member>
-        <member name="F:Ephemera.MidiLib.OutputChannel._aliases">
-            <summary>Instruments from alias file.</summary>
+        <member name="F:Ephemera.MidiLib.OutputChannel._instruments">
+            <summary>Channel instruments. May be from alias file.</summary>
         </member>
-        <member name="F:Ephemera.MidiLib.OutputChannel._anonymous">
-            <summary>True if the channel doesn't support named instruments/patches.</summary>
+        <member name="F:Ephemera.MidiLib.OutputChannel._controllers">
+            <summary>Channel controllers.</summary>
+        </member>
+        <member name="F:Ephemera.MidiLib.OutputChannel._drums">
+            <summary>Channel drums.</summary>
+        </member>
+        <member name="F:Ephemera.MidiLib.OutputChannel._drumKits">
+            <summary>Channel drum kits.</summary>
         </member>
         <member name="P:Ephemera.MidiLib.OutputChannel.ChannelName">
             <summary>Channel name - optional.</summary>
@@ -86,6 +92,14 @@
             <param name="channelNumber"></param>
             <param name="patch"></param>
         </member>
+        <member name="M:Ephemera.MidiLib.OutputChannel.InitInstruments(System.String,System.String)">
+            <summary>
+            Fix up instrument/patch names - depends on flavor: GM/drums/aliased.
+            </summary>
+            <param name="patchName"></param>
+            <param name="aliasFile">Custom patch names for this channel</param>
+            <exception cref="T:Ephemera.MidiLib.MidiLibException"></exception>
+        </member>
         <member name="M:Ephemera.MidiLib.OutputChannel.GetInstrumentName(System.Int32)">
             <summary>
             Get instrument name from id.
@@ -93,32 +107,14 @@
             <param name="id"></param>
             <returns>The instrument name or a fabricated one if unknown.</returns>
         </member>
-        <member name="M:Ephemera.MidiLib.OutputChannel.InitInstruments(System.String,System.String)">
-            <summary>
-            Fix up instrument and patch names - depends on flavor is GM/drums/aliased.
-            </summary>
-            <param name="patchName"></param>
-            <param name="aliasFile"></param>
-            <exception cref="T:Ephemera.MidiLib.MidiLibException"></exception>
-        </member>
         <member name="M:Ephemera.MidiLib.OutputChannel.Send(Ephemera.MidiLib.BaseEvent)">
             <summary>
             Hide direct device access.
             </summary>
             <param name="evt"></param>
         </member>
-        <member name="M:Ephemera.MidiLib.OutputChannel.GetInstrumentId(System.String)">
-            <summary>
-            Sort out possible sources of id.
-            </summary>
-            <param name="name"></param>
-            <returns></returns>
-        </member>
         <member name="T:Ephemera.MidiLib.ChannelState">
             <summary>Channel playing.</summary>
-        </member>
-        <member name="T:Ephemera.MidiLib.DisplayOptions">
-            <summary>Some flavors of control may need to be defeatured.</summary>
         </member>
         <member name="T:Ephemera.MidiLib.ChannelChangeEventArgs">
             <summary>Notify host of UI changes.</summary>
@@ -129,11 +125,17 @@
         <member name="P:Ephemera.MidiLib.ChannelChangeEventArgs.State">
             <summary>Solo/mute.</summary>
         </member>
+        <member name="T:Ephemera.MidiLib.UserRenderer">
+            <summary>Base class for custom renderers.</summary>
+        </member>
+        <member name="E:Ephemera.MidiLib.UserRenderer.SendMidi">
+            <summary>Parent hooks this.</summary>
+        </member>
+        <member name="M:Ephemera.MidiLib.UserRenderer.OnSendMidi(Ephemera.MidiLib.BaseEvent)">
+            <summary>Derived control helper.</summary>
+        </member>
         <member name="P:Ephemera.MidiLib.ChannelControl.BoundChannel">
             <summary>My channel.</summary>
-        </member>
-        <member name="P:Ephemera.MidiLib.ChannelControl.Options">
-            <summary>Display options.</summary>
         </member>
         <member name="P:Ephemera.MidiLib.ChannelControl.DrawColor">
             <summary>Drawing the active elements of a control.</summary>
@@ -222,30 +224,6 @@
         </member>
         <member name="F:Ephemera.MidiLib.VolumeDefs.MAX_VOLUME">
             <summary>Allow UI controls some more headroom.</summary>
-        </member>
-        <member name="T:Ephemera.MidiLib.BiLut">
-            <summary>Both ways luts.</summary>
-        </member>
-        <member name="F:Ephemera.MidiLib.BiLut._lut1">
-            <summary>Both ways luts.</summary>
-        </member>
-        <member name="P:Ephemera.MidiLib.BiLut.Contents">
-            <summary>Iterate everything.</summary>
-        </member>
-        <member name="M:Ephemera.MidiLib.BiLut.Add(System.Int32,System.String)">
-            <summary>Add entry.</summary>
-            <param name="id"></param>
-            <param name="name"></param>
-        </member>
-        <member name="M:Ephemera.MidiLib.BiLut.GetName(System.Int32)">
-            <summary>Get name.</summary>
-            <param name="id"></param>
-            <returns>The name if valid else throws.</returns>
-        </member>
-        <member name="M:Ephemera.MidiLib.BiLut.GetId(System.String)">
-            <summary>Get id.</summary>
-            <param name="name"></param>
-            <returns>The id if valid else -1.</returns>
         </member>
         <member name="M:Ephemera.MidiLib.MidiUtils.CreateOrderedMidiList(System.Collections.Generic.Dictionary{System.Int32,System.String},System.Boolean,System.Boolean)">
             <summary>
@@ -369,7 +347,7 @@
             <summary>All the GM instruments.</summary>
         </member>
         <member name="P:Ephemera.MidiLib.MidiDefs.Controllers">
-            <summary>All the known GM controllers.</summary>
+            <summary>All the common/known GM controllers.</summary>
         </member>
         <member name="P:Ephemera.MidiLib.MidiDefs.Drums">
             <summary>All the GM drums.</summary>
@@ -379,6 +357,15 @@
         </member>
         <member name="M:Ephemera.MidiLib.MidiDefs.#cctor">
             <summary>Initialize some collections.</summary>
+        </member>
+        <member name="M:Ephemera.MidiLib.MidiDefs.ReadDefs(Ephemera.NBagOfTricks.IniReader,System.String)">
+            <summary>
+            Read one section of midi definitions.
+            </summary>
+            <param name="ir">Ini reader</param>
+            <param name="section">Section name</param>
+            <returns>The lut or null if invalid section.</returns>
+            <exception cref="T:System.InvalidOperationException"></exception>
         </member>
         <member name="M:Ephemera.MidiLib.MidiDefs.GenMarkdown">
             <summary>
@@ -520,7 +507,7 @@
             <param name="channelNumber"></param>
             <param name="channelName"></param>
             <param name="patchName"></param>
-            <param name="aliasFile"></param>
+            <param name="aliasFile">Alternate patch names from an ini file.</param>
             <returns></returns>
         </member>
         <member name="M:Ephemera.MidiLib.MidiManager.OpenOutputChannel(System.String,System.Int32,System.String,System.Int32)">
@@ -580,6 +567,15 @@
         <member name="T:Ephemera.MidiLib.MusicTime">
             <summary>Sort of like DateTime but for musical terminology in midi.</summary>
         </member>
+        <member name="F:Ephemera.MidiLib.MusicTime._beatsPerBar">
+            <summary>Only 4/4 time supported currently.</summary>
+        </member>
+        <member name="F:Ephemera.MidiLib.MusicTime._subbeatsPerBeat">
+            <summary>Tick resolution - 8 gives 32nd note res.</summary>
+        </member>
+        <member name="F:Ephemera.MidiLib.MusicTime._subbeatsPerBar">
+            <summary>Convenience.</summary>
+        </member>
         <member name="F:Ephemera.MidiLib.MusicTime._id">
             <summary>For hashing comparable.</summary>
         </member>
@@ -593,13 +589,13 @@
             <summary>Only 4/4 time supported currently.</summary>
         </member>
         <member name="P:Ephemera.MidiLib.MusicTime.SubbeatsPerBeat">
-            <summary>Our resolution where 8 => 32nd note.</summary>
+            <summary>Tick resolution.</summary>
         </member>
         <member name="P:Ephemera.MidiLib.MusicTime.SubbeatsPerBar">
             <summary>Convenience.</summary>
         </member>
         <member name="P:Ephemera.MidiLib.MusicTime.Tick">
-            <summary>Absolute tick => total Subbeats. Zero-based.</summary>
+            <summary>Absolute tick = total Subbeats. Zero-based.</summary>
         </member>
         <member name="P:Ephemera.MidiLib.MusicTime.Id">
             <summary>Accessor.</summary>
@@ -957,7 +953,7 @@
             Reset everything.
             </summary>
         </member>
-        <member name="M:Ephemera.MidiLib.TimeBar.InitSectionInfo(System.Collections.Generic.Dictionary{System.Int32,System.String})">
+        <member name="M:Ephemera.MidiLib.TimeBar.InitSectionInfo(System.Collections.Generic.Dictionary{Ephemera.MidiLib.MusicTime,System.String})">
             <summary>
             Client supplies metadata about sections in the time range.
             </summary>
@@ -1021,15 +1017,6 @@
         </member>
         <member name="T:Ephemera.MidiLib.MidiValueTypeEditor">
             <summary>Select a midi value from a range. Handles special case of channel number.</summary>
-        </member>
-        <member name="T:Ephemera.MidiLib.UserRenderer">
-            <summary>Base class for custom renderers.</summary>
-        </member>
-        <member name="E:Ephemera.MidiLib.UserRenderer.SendMidi">
-            <summary>Parent hooks this.</summary>
-        </member>
-        <member name="M:Ephemera.MidiLib.UserRenderer.OnSendMidi(Ephemera.MidiLib.BaseEvent)">
-            <summary>Derived control helper.</summary>
         </member>
     </members>
 </doc>

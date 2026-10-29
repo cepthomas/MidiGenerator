@@ -74,7 +74,6 @@ namespace MidiGenerator
                     ShowNoteNames = true
                 };
                 VkeyControl.BoundChannel = vkeyChannel;
-                VkeyControl.Options = DisplayOptions.None;
                 VkeyControl.BorderStyle = BorderStyle.FixedSingle;
                 VkeyControl.DrawColor = _settings.DrawColor;
                 VkeyControl.SelectedColor = _settings.SelectedColor;
@@ -87,7 +86,6 @@ namespace MidiGenerator
                     DrawColor = _settings.DrawColor
                 };
                 ClClControl.BoundChannel = clclChannel;
-                ClClControl.Options = DisplayOptions.None;
                 ClClControl.BorderStyle = BorderStyle.FixedSingle;
                 ClClControl.DrawColor = _settings.DrawColor;
                 ClClControl.SelectedColor = _settings.SelectedColor;
@@ -144,7 +142,7 @@ namespace MidiGenerator
         void Settings_Click(object? sender, EventArgs e)
         {
             Dictionary<int, string> vals = [];
-            Enumerable.Range(0, MidiDefs.MAX_MIDI + 1).ForEach(i => vals.Add(i, MidiDefs.Instruments.GetName(i)));
+            Enumerable.Range(0, MidiDefs.MAX_MIDI + 1).ForEach(i => vals.Add(i, MidiDefs.Instruments.GetName(i) ?? "UNKNOWN"));
             var instList = MidiUtils.CreateOrderedMidiList(vals, false, true);
 
             GenericListTypeEditor.SetOptions("Patch", instList);
@@ -179,7 +177,7 @@ namespace MidiGenerator
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void ChannelControl_ChannelChange(object? sender, ChannelChangeEventArgs e)
+        void ChannelControl_ChannelChange(object? sender, ChannelChangeEventArgs e) // TODO does???
         {
             var cc = sender as ChannelControl;
             var channel = cc!.BoundChannel!;
