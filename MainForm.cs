@@ -22,6 +22,9 @@ namespace MidiGenerator
 
         /// <summary>User settings.</summary>
         readonly UserSettings _settings;
+
+        /// <summary>Shorthand.</summary>
+        readonly ChannelManager CM = ChannelManager.Instance;
         #endregion
 
         #region Lifecycle
@@ -53,57 +56,105 @@ namespace MidiGenerator
                 new("WRN", Color.Green),
             ];
 
-            btnKillMidi.Click += (_, __) => MidiManager.Instance.Kill();
+            btnKillMidi.Click += (_, __) => CM.KillAll();
 
-            MidiManager.Instance.MessageReceived += Mgr_MessageReceived;
-            MidiManager.Instance.MessageSent += Mgr_MessageSent;
+            CM.MessageReceived += Mgr_MessageReceived;
+            CM.MessageSent += Mgr_MessageSent;
+            
+            ///// Finish up. /////
+            Location = _settings.FormGeometry.Location;
+            Size = _settings.FormGeometry.Size;
+        }
 
+        /// <summary>
+        /// Configure channels defined in designer.
+        /// </summary>
+        /// <param name="e"></param>
+        protected override void OnLoad(EventArgs e)
+        {
             try
             {
-                // Init the device.
-                var dev = MidiManager.Instance.GetOutputDevice(_settings.OutputDevice);
+                var chan = CM.OpenOutputChannel(_settings.OutputDevice, _settings.VkeyChannel.ChannelNumber, _settings.VkeyChannel.Patch);
+                CM.Bind(chan, vkeyCC);
+                // Init ChannelControl.
+                vkeyCC.Name = "Virtual Key";
+                vkeyCC.Volume = VolumeDefs.DEFAULT_VOLUME;
+                vkeyCC.State = ChannelState.Normal;
+                vkeyCC.DrawColor = _settings.DrawColor;
+                vkeyCC.SelectedColor = _settings.SelectedColor;
+                vkeyCC.Info = ($"Ch {_settings.VkeyChannel.ChannelNumber} {vkeyCC.Name}", $"{chan}");
+                // vkeyCC.InfoClick += ChannelControl_InfoClick;
+                // Init UI surface.
+                vkeyControl.ChannelNumber = _settings.VkeyChannel.ChannelNumber;
+                vkeyControl.SendMidi += SendMidiVkey;
 
-                // Init the channels.
-                var vkeyChannel = MidiManager.Instance.OpenOutputChannel(_settings.OutputDevice, _settings.VkeyChannel.ChannelNumber, "Virtual Key", _settings.VkeyChannel.Patch);
-                var clclChannel = MidiManager.Instance.OpenOutputChannel(_settings.OutputDevice, _settings.ClClChannel.ChannelNumber, "Click Clack", _settings.ClClChannel.Patch);
-
-                // Init the vkey controls..
-                vkeyChannelControl.BoundChannel = vkeyChannel;
-                vkeyChannelControl.DrawColor = _settings.DrawColor;
-                vkeyChannelControl.SelectedColor = _settings.SelectedColor;
-                vkeyChannelControl.Volume = VolumeDefs.DEFAULT_VOLUME;
-                vkeyChannelControl.ChannelChange += ChannelControl_ChannelChange;
-
-                vkeyControl.DrawColor = _settings.DrawColor;
-                vkeyControl.SendMidi += (object? sender, BaseEvent e) =>
-                {
-                    e.ChannelNumber = _settings.VkeyChannel.ChannelNumber;
-                    vkeyChannel.Send(e);
-                };
-
-                // Init the clickclack controls..
-                clclChannelControl.BoundChannel = clclChannel;
-                clclChannelControl.DrawColor = _settings.DrawColor;
-                clclChannelControl.SelectedColor = _settings.SelectedColor;
-                clclChannelControl.Volume = VolumeDefs.DEFAULT_VOLUME;
-                clclChannelControl.ChannelChange += ChannelControl_ChannelChange;
-
-                clclControl.DrawColor = _settings.DrawColor;
-                clclControl.SendMidi += (object? sender, BaseEvent e) =>
-                {
-                    e.ChannelNumber = _settings.ClClChannel.ChannelNumber;
-                    clclChannel.Send(e);
-                };
+                chan = CM.OpenOutputChannel(_settings.OutputDevice, _settings.ClClChannel.ChannelNumber, _settings.ClClChannel.Patch);
+                CM.Bind(chan, clclCC);
+                // Init ChannelControl.
+                clclCC.Name = "Click Clack";
+                clclCC.Volume = VolumeDefs.DEFAULT_VOLUME;
+                clclCC.State = ChannelState.Normal;
+                clclCC.DrawColor = _settings.DrawColor;
+                clclCC.SelectedColor = _settings.SelectedColor;
+                clclCC.Info = ($"Ch {_settings.ClClChannel.ChannelNumber} {clclCC.Name}", $"{chan}");
+                // clclCC.InfoClick += ChannelControl_InfoClick;
+                // Init UI surface.
+                clclControl.ChannelNumber = _settings.ClClChannel.ChannelNumber;
+                clclControl.SendMidi += SendMidiClCl;
             }
             catch (Exception ex)
             {
                 tvInfo.Append($"Something went wrong");
                 tvInfo.Append(ex.Message);
             }
-            
-            ///// Finish up. /////
-            Location = _settings.FormGeometry.Location;
-            Size = _settings.FormGeometry.Size;
+
+            CM.UpdateState();
+
+            base.OnLoad(e);
+        }
+
+        /// <summary>
+        /// Midi sender. Adjusts volume as needed.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// <exception cref="MidiLibException"></exception>
+        void SendMidiVkey(object? sender, BaseEvent e)
+        {
+            if (sender is not VirtualKeyboard) throw new MidiLibException("Unknown/null control");
+            var chan = CM.GetChannel(vkeyCC) ?? throw new MidiLibException("Unknown/null channel");
+
+            if (e is NoteOn)
+            {
+                var non = e as NoteOn;
+                // Adjust volume.
+                var vol = vkeyCC.Volume * non!.Velocity;
+                non.Velocity = MathUtils.Constrain((int)vol, 0, MidiDefs.MAX_MIDI);
+            }
+
+            chan.Send(e);
+        }
+
+        /// <summary>
+        /// Midi sender. Adjusts volume as needed.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// <exception cref="MidiLibException"></exception>
+        void SendMidiClCl(object? sender, BaseEvent e)
+        {
+            if (sender is not ClickClack) throw new MidiLibException("Unknown/null control");
+            var chan = CM.GetChannel(clclCC) ?? throw new MidiLibException("Unknown/null channel");
+
+            if (e is NoteOn)
+            {
+                var non = e as NoteOn;
+                // Adjust volume.
+                var vol = clclCC.Volume * non!.Velocity;
+                non.Velocity = MathUtils.Constrain((int)vol, 0, MidiDefs.MAX_MIDI);
+            }
+
+            chan.Send(e);
         }
 
         /// <summary>
@@ -112,14 +163,12 @@ namespace MidiGenerator
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
-            // Resources.
-            MidiManager.Instance.DestroyDevices();
-
             // Wait a bit in case there are some lingering events.
             System.Threading.Thread.Sleep(100);
 
             if (disposing && (components is not null))
             {
+                CM.Destroy(Controls);
                 components.Dispose();
             }
 
@@ -143,9 +192,12 @@ namespace MidiGenerator
         /// </summary>
         void Settings_Click(object? sender, EventArgs e)
         {
-            Dictionary<int, string> vals = [];
-            Enumerable.Range(0, MidiDefs.MAX_MIDI + 1).ForEach(i => vals.Add(i, MidiDefs.Instruments.GetName(i) ?? "UNKNOWN"));
-            var instList = MidiUtils.CreateOrderedMidiList(vals, false, true);
+            // Make ordered list of patch names.
+            //Dictionary<int, string> vals = [];
+            //Enumerable.Range(0, MidiDefs.MAX_MIDI + 1).ForEach(i => vals.Add(i, MidiDefs.Instruments.GetName(i) ?? "UNKNOWN"));
+
+            List<string> instList = [];
+            Enumerable.Range(0, MidiDefs.MAX_MIDI + 1).ForEach(i => instList.Add(MidiDefs.Instruments.GetName(i) ?? $"{i:000}"));
 
             GenericListTypeEditor.SetOptions("Patch", instList);
             GenericListTypeEditor.SetOptions("OutputDevice", MidiOutputDevice.GetAvailableDevices());
@@ -175,28 +227,13 @@ namespace MidiGenerator
 
         #region Event handlers
         /// <summary>
-        /// UI clicked something to configure channel.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        void ChannelControl_ChannelChange(object? sender, ChannelChangeEventArgs e)
-        {
-            var cc = sender as ChannelControl;
-            var channel = cc!.BoundChannel!;
-
-            if (e.State) // TODO1 does???
-            {
-            }
-        }
-
-        /// <summary>
         /// Something arrived from a midi device.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         void Mgr_MessageReceived(object? sender, BaseEvent e)
         {
-            _logger.Debug($"MM Received [{e}]");
+            _logger.Debug($"Midi Received [{e}]");
         }
 
         /// <summary>
@@ -206,7 +243,7 @@ namespace MidiGenerator
         /// <param name="e"></param>
         void Mgr_MessageSent(object? sender, BaseEvent e)
         {
-            _logger.Debug($"MM Sent [{e}]");
+            _logger.Debug($"Midi Sent [{e}]");
         }
         #endregion
 
@@ -218,11 +255,7 @@ namespace MidiGenerator
         /// <param name="e"></param>
         void LogManager_LogMessage(object? sender, LogMessageEventArgs e)
         {
-            // Usually come from a different thread.
-            if (IsHandleCreated)
-            {
-                this.InvokeIfRequired(_ => { tvInfo.Append($"{e.Message}"); });
-            }
+            this.InvokeIfRequired(_ => { tvInfo.Append($"{e.Message}"); });
         }
         #endregion
     }

@@ -24,8 +24,8 @@ namespace MidiGenerator
             btnSettings = new System.Windows.Forms.ToolStripButton();
             toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             tvInfo = new Ephemera.NBagOfUis.TextViewer();
-            vkeyChannelControl = new ChannelControl();
-            clclChannelControl = new ChannelControl();
+            vkeyCC = new ChannelControl();
+            clclCC = new ChannelControl();
             clclControl = new ClickClack();
             vkeyControl = new VirtualKeyboard();
             toolStrip1.SuspendLayout();
@@ -81,25 +81,25 @@ namespace MidiGenerator
             tvInfo.Size = new System.Drawing.Size(979, 179);
             tvInfo.TabIndex = 58;
             // 
-            // vkeyChannelControl
+            // vkeyCC
             // 
-            vkeyChannelControl.BackColor = System.Drawing.SystemColors.Control;
-            vkeyChannelControl.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            vkeyChannelControl.Location = new System.Drawing.Point(234, 39);
-            vkeyChannelControl.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            vkeyChannelControl.Name = "vkeyChannelControl";
-            vkeyChannelControl.Size = new System.Drawing.Size(116, 74);
-            vkeyChannelControl.TabIndex = 93;
+            vkeyCC.BackColor = System.Drawing.SystemColors.Control;
+            vkeyCC.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            vkeyCC.Location = new System.Drawing.Point(234, 39);
+            vkeyCC.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            vkeyCC.Name = "vkeyCC";
+            vkeyCC.Size = new System.Drawing.Size(116, 74);
+            vkeyCC.TabIndex = 93;
             // 
-            // clclChannelControl
+            // clclCC
             // 
-            clclChannelControl.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left;
-            clclChannelControl.BackColor = System.Drawing.SystemColors.Control;
-            clclChannelControl.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            clclChannelControl.Location = new System.Drawing.Point(13, 39);
-            clclChannelControl.Name = "clclChannelControl";
-            clclChannelControl.Size = new System.Drawing.Size(116, 110);
-            clclChannelControl.TabIndex = 102;
+            clclCC.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left;
+            clclCC.BackColor = System.Drawing.SystemColors.Control;
+            clclCC.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            clclCC.Location = new System.Drawing.Point(13, 39);
+            clclCC.Name = "clclCC";
+            clclCC.Size = new System.Drawing.Size(116, 110);
+            clclCC.TabIndex = 102;
             // 
             // clclControl
             // 
@@ -122,8 +122,8 @@ namespace MidiGenerator
             ClientSize = new System.Drawing.Size(1004, 497);
             Controls.Add(vkeyControl);
             Controls.Add(clclControl);
-            Controls.Add(clclChannelControl);
-            Controls.Add(vkeyChannelControl);
+            Controls.Add(clclCC);
+            Controls.Add(vkeyCC);
             Controls.Add(tvInfo);
             Controls.Add(toolStrip1);
             Location = new System.Drawing.Point(300, 50);
@@ -144,8 +144,8 @@ namespace MidiGenerator
         private System.Windows.Forms.ToolStripButton btnSettings;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
-        private ChannelControl vkeyChannelControl;
-        private ChannelControl clclChannelControl;
+        private ChannelControl vkeyCC;
+        private ChannelControl clclCC;
         private ClickClack clclControl;
         private VirtualKeyboard vkeyControl;
     }

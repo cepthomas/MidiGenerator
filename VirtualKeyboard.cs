@@ -38,6 +38,10 @@ namespace MidiGenerator
         #endregion
 
         #region Properties
+        /// <summary>Assigned channel. Must be set before using.</summary>
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public int ChannelNumber { get; set; } = 0;
+
         /// <summary>Draw the names on the keys.</summary>
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool ShowNoteNames { get; set; } = false;
@@ -217,7 +221,7 @@ namespace MidiGenerator
             for (int i = 0; i < HighNote - LowNote; i++)
             {
                 int noteId = i + LowNote;
-                VirtualKey pk = new(this, MidiDefs.TEMP_CHANNEL, noteId) { DrawColor = DrawColor };
+                VirtualKey pk = new(this, noteId) { DrawColor = DrawColor };
 
                 // Pass along an event from a virtual key.
                 pk.SendMidi += (sender, e) => SendMidi?.Invoke(this, e);
@@ -277,9 +281,6 @@ namespace MidiGenerator
         #region Fields
         /// <summary>Hook to owner.</summary>
         readonly VirtualKeyboard _owner;
-
-        /// <summary>For event gen.</summary>
-        readonly int _channelNumber = 0;
         #endregion
 
         #region Properties
@@ -304,12 +305,10 @@ namespace MidiGenerator
         /// Normal constructor.
         /// </summary>
         /// <param name="owner"></param>
-        /// <param name="channelNumber"></param>
         /// <param name="noteId"></param>
-        public VirtualKey(VirtualKeyboard owner, int channelNumber, int noteId)
+        public VirtualKey(VirtualKeyboard owner, int noteId)
         {
             _owner = owner;
-            _channelNumber = channelNumber;
             TabStop = false;
             NoteId = noteId;
             Font = new Font("Consolas", 8F, FontStyle.Regular, GraphicsUnit.Point, 0);
@@ -325,7 +324,7 @@ namespace MidiGenerator
         {
             IsPressed = true;
             Invalidate();
-            SendMidi?.Invoke(this, new NoteOn(_channelNumber, NoteId, velocity));
+            SendMidi?.Invoke(this, new NoteOn(_owner.ChannelNumber, NoteId, velocity));
         }
 
         /// <summary>
@@ -335,7 +334,7 @@ namespace MidiGenerator
         {
             IsPressed = false;
             Invalidate();
-            SendMidi?.Invoke(this, new NoteOff(_channelNumber, NoteId));
+            SendMidi?.Invoke(this, new NoteOff(_owner.ChannelNumber, NoteId));
         }
         #endregion
 
