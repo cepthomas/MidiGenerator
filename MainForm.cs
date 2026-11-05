@@ -23,8 +23,11 @@ namespace MidiGenerator
         /// <summary>User settings.</summary>
         readonly UserSettings _settings;
 
-        /// <summary>Shorthand.</summary>
-        readonly ChannelManager CM = ChannelManager.Instance;
+        /// <summary>Service.</summary>
+        readonly ChannelManager CM;
+
+        /// <summary>Service.</summary>
+        readonly InputManager IM;
         #endregion
 
         #region Lifecycle
@@ -38,6 +41,9 @@ namespace MidiGenerator
             _settings = (UserSettings)SettingsCore.Load(appDir, typeof(UserSettings));
 
             InitializeComponent();
+
+            CM = new(Controls);
+            IM = new();
 
             Icon = Icon.ExtractAssociatedIcon(Assembly.GetExecutingAssembly().Location);
 
@@ -58,8 +64,8 @@ namespace MidiGenerator
 
             btnKillMidi.Click += (_, __) => CM.KillAll();
 
-            CM.MessageReceived += Mgr_MessageReceived;
-            CM.MessageSent += Mgr_MessageSent;
+            IM.MessageReceived += Mgr_MessageReceived;
+            //CM.MessageSent += Mgr_MessageSent;
             
             ///// Finish up. /////
             Location = _settings.FormGeometry.Location;
@@ -74,7 +80,7 @@ namespace MidiGenerator
         {
             try
             {
-                var chan = CM.OpenOutputChannel(_settings.OutputDevice, _settings.VkeyChannel.ChannelNumber, _settings.VkeyChannel.Patch);
+                var chan = CM.OpenChannel(_settings.OutputDevice, _settings.VkeyChannel.ChannelNumber, _settings.VkeyChannel.Patch);
                 CM.Bind(chan, vkeyCC);
                 // Init ChannelControl.
                 vkeyCC.Name = "Virtual Key";
@@ -88,7 +94,7 @@ namespace MidiGenerator
                 vkeyControl.ChannelNumber = _settings.VkeyChannel.ChannelNumber;
                 vkeyControl.SendMidi += SendMidiVkey;
 
-                chan = CM.OpenOutputChannel(_settings.OutputDevice, _settings.ClClChannel.ChannelNumber, _settings.ClClChannel.Patch);
+                chan = CM.OpenChannel(_settings.OutputDevice, _settings.ClClChannel.ChannelNumber, _settings.ClClChannel.Patch);
                 CM.Bind(chan, clclCC);
                 // Init ChannelControl.
                 clclCC.Name = "Click Clack";
@@ -168,7 +174,8 @@ namespace MidiGenerator
 
             if (disposing && (components is not null))
             {
-                CM.Destroy(Controls);
+                CM.Dispose();
+                IM.Dispose();
                 components.Dispose();
             }
 
