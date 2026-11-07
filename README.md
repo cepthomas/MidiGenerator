@@ -6,7 +6,7 @@ Emulated midi controllers:
 
 They can be used to drive external midi devices via USB or internal soft devices using a loopback like [LoopMidi](https://www.tobias-erichsen.de/software/loopmidi.html).
 
-Requires VS2022 and .NET8.
+Requires VS2022 and .NET10.
 
 # Components
 

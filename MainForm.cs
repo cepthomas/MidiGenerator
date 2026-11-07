@@ -88,7 +88,8 @@ namespace MidiGenerator
                 vkeyCC.State = ChannelState.Normal;
                 vkeyCC.DrawColor = _settings.DrawColor;
                 vkeyCC.SelectedColor = _settings.SelectedColor;
-                vkeyCC.Info = ($"Ch {_settings.VkeyChannel.ChannelNumber} {vkeyCC.Name}", $"{chan}");
+                vkeyCC.Info1 = $"M{_settings.VkeyChannel.ChannelNumber} {vkeyCC.Name}";
+                vkeyCC.Info2 = $"{chan}";
                 // vkeyCC.InfoClick += ChannelControl_InfoClick;
                 // Init UI surface.
                 vkeyControl.ChannelNumber = _settings.VkeyChannel.ChannelNumber;
@@ -102,7 +103,8 @@ namespace MidiGenerator
                 clclCC.State = ChannelState.Normal;
                 clclCC.DrawColor = _settings.DrawColor;
                 clclCC.SelectedColor = _settings.SelectedColor;
-                clclCC.Info = ($"Ch {_settings.ClClChannel.ChannelNumber} {clclCC.Name}", $"{chan}");
+                clclCC.Info1 = $"M{_settings.ClClChannel.ChannelNumber} {clclCC.Name}";
+                clclCC.Info2 = $"{chan}";
                 // clclCC.InfoClick += ChannelControl_InfoClick;
                 // Init UI surface.
                 clclControl.ChannelNumber = _settings.ClClChannel.ChannelNumber;
