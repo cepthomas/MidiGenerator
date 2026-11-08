@@ -80,30 +80,28 @@ namespace MidiGenerator
         {
             try
             {
-                var chan = CM.OpenChannel(_settings.OutputDevice, _settings.VkeyChannel.ChannelNumber, _settings.VkeyChannel.Patch);
+                var chan = CM.OpenChannel(_settings.OutputDevice, _settings.VkeyChannel.ChannelNumber, "Virtual Key", _settings.VkeyChannel.Patch);
                 CM.Bind(chan, vkeyCC);
                 // Init ChannelControl.
-                vkeyCC.Name = "Virtual Key";
                 vkeyCC.Volume = VolumeDefs.DEFAULT_VOLUME;
                 vkeyCC.State = ChannelState.Normal;
                 vkeyCC.DrawColor = _settings.DrawColor;
                 vkeyCC.SelectedColor = _settings.SelectedColor;
-                vkeyCC.Info1 = $"M{_settings.VkeyChannel.ChannelNumber} {vkeyCC.Name}";
+                vkeyCC.Info1 = $"M{_settings.VkeyChannel.ChannelNumber} {chan.ChannelName}";
                 vkeyCC.Info2 = $"{chan}";
                 // vkeyCC.InfoClick += ChannelControl_InfoClick;
                 // Init UI surface.
                 vkeyControl.ChannelNumber = _settings.VkeyChannel.ChannelNumber;
                 vkeyControl.SendMidi += SendMidiVkey;
 
-                chan = CM.OpenChannel(_settings.OutputDevice, _settings.ClClChannel.ChannelNumber, _settings.ClClChannel.Patch);
+                chan = CM.OpenChannel(_settings.OutputDevice, _settings.ClClChannel.ChannelNumber, "Click Clack", _settings.ClClChannel.Patch);
                 CM.Bind(chan, clclCC);
                 // Init ChannelControl.
-                clclCC.Name = "Click Clack";
                 clclCC.Volume = VolumeDefs.DEFAULT_VOLUME;
                 clclCC.State = ChannelState.Normal;
                 clclCC.DrawColor = _settings.DrawColor;
                 clclCC.SelectedColor = _settings.SelectedColor;
-                clclCC.Info1 = $"M{_settings.ClClChannel.ChannelNumber} {clclCC.Name}";
+                clclCC.Info1 = $"M{_settings.ClClChannel.ChannelNumber} {chan.ChannelName}";
                 clclCC.Info2 = $"{chan}";
                 // clclCC.InfoClick += ChannelControl_InfoClick;
                 // Init UI surface.
