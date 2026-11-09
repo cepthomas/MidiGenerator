@@ -83,7 +83,7 @@ namespace MidiGenerator
                 var chan = CM.OpenChannel(_settings.OutputDevice, _settings.VkeyChannel.ChannelNumber, "Virtual Key", _settings.VkeyChannel.Patch);
                 CM.Bind(chan, vkeyCC);
                 // Init ChannelControl.
-                vkeyCC.Volume = VolumeDefs.DEFAULT_VOLUME;
+                vkeyCC.Volume = MidiLibDefs.DEFAULT_VOLUME;
                 vkeyCC.State = ChannelState.Normal;
                 vkeyCC.DrawColor = _settings.DrawColor;
                 vkeyCC.SelectedColor = _settings.SelectedColor;
@@ -97,7 +97,7 @@ namespace MidiGenerator
                 chan = CM.OpenChannel(_settings.OutputDevice, _settings.ClClChannel.ChannelNumber, "Click Clack", _settings.ClClChannel.Patch);
                 CM.Bind(chan, clclCC);
                 // Init ChannelControl.
-                clclCC.Volume = VolumeDefs.DEFAULT_VOLUME;
+                clclCC.Volume = MidiLibDefs.DEFAULT_VOLUME;
                 clclCC.State = ChannelState.Normal;
                 clclCC.DrawColor = _settings.DrawColor;
                 clclCC.SelectedColor = _settings.SelectedColor;
