@@ -19,13 +19,13 @@ namespace MidiGenerator
         [DisplayName("Channel Number")]
         [Description("Actual 1-based midi channel number.")]
         [Browsable(true)]
-        [Editor(typeof(MidiValueTypeEditor), typeof(UITypeEditor))]
+        [Editor(typeof(ChannelNumberTypeEditor), typeof(UITypeEditor))]
         public int ChannelNumber { get; set; } = 1;
 
         [DisplayName("Channel Patch")]
         [Description("Current instrument/patch.")]
         [Browsable(true)]
-        [Editor(typeof(GenericListTypeEditor), typeof(UITypeEditor))]
+        [Editor(typeof(PatchTypeEditor), typeof(UITypeEditor))]
         public string Patch { get; set; } = "???";
     }
 
@@ -35,7 +35,7 @@ namespace MidiGenerator
         [DisplayName("Output Device")]
         [Description("Valid output device.")]
         [Browsable(true)]
-        [Editor(typeof(GenericListTypeEditor), typeof(UITypeEditor))]
+        [Editor(typeof(MidiOutputDeviceTypeEditor), typeof(UITypeEditor))]
         public string OutputDevice { get; set; } = "???";
 
         [DisplayName("Virtual Keyboard")]

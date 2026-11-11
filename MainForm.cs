@@ -203,11 +203,6 @@ namespace MidiGenerator
             //Dictionary<int, string> vals = [];
             //Enumerable.Range(0, MidiDefs.MAX_MIDI + 1).ForEach(i => vals.Add(i, MidiDefs.Instruments.GetName(i) ?? "UNKNOWN"));
 
-            List<string> instList = [];
-            Enumerable.Range(0, MidiDefs.MAX_MIDI + 1).ForEach(i => instList.Add(MidiDefs.Instruments.GetName(i) ?? $"{i:000}"));
-
-            GenericListTypeEditor.SetOptions("Patch", instList);
-            GenericListTypeEditor.SetOptions("OutputDevice", MidiOutputDevice.GetAvailableDevices());
 
             var changes = SettingsEditor.Edit(_settings, "User Settings", 300);
 
