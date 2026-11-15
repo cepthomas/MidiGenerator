@@ -25,8 +25,8 @@ namespace MidiGenerator
         [DisplayName("Channel Patch")]
         [Description("Current instrument/patch.")]
         [Browsable(true)]
-        [Editor(typeof(PatchTypeEditor), typeof(UITypeEditor))]
-        public string Patch { get; set; } = "???";
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public MidiDefs.InstrumentId Patch { get; set; }
     }
 
     [Serializable]
