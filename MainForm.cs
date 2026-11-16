@@ -25,6 +25,12 @@ namespace MidiGenerator
 
         /// <summary>Service.</summary>
         readonly ChannelManager CM;
+
+        /// <summary>Corresponding channel.</summary>
+        MidiOutput _vkeyMout;
+
+        /// <summary>Corresponding channel.</summary>
+        MidiOutput _clclMout;
         #endregion
 
         #region Lifecycle
@@ -76,41 +82,41 @@ namespace MidiGenerator
         {
             try
             {
-                var mout = CM.OpenMidiOutput(_settings.OutputDevice, _settings.VkeyChannel.ChannelNumber, "Virtual Key");
-                CM.Bind(mout, vkeyCC);
+                _vkeyMout = CM.OpenMidiOutput(_settings.OutputDevice, _settings.VkeyChannel.ChannelNumber, "Virtual Key");
+                CM.Bind(_vkeyMout, vkeyCC);
                 // Init ChannelControl.
                 vkeyCC.Volume = MidiLibDefs.DEFAULT_VOLUME;
                 vkeyCC.State = ChannelState.Normal;
                 vkeyCC.DrawColor = _settings.DrawColor;
                 vkeyCC.SelectedColor = _settings.SelectedColor;
-                vkeyCC.Info1 = $"M{_settings.VkeyChannel.ChannelNumber} {mout.ChannelName}";
-                vkeyCC.Info2 = $"{mout}";
+                vkeyCC.Info1 = $"M{_settings.VkeyChannel.ChannelNumber} {_vkeyMout.ChannelName}";
+                vkeyCC.Info2 = $"{_vkeyMout}";
                 // vkeyCC.InfoClick += ChannelControl_InfoClick;
                 // Init UI surface.
                 vkeyControl.ChannelNumber = _settings.VkeyChannel.ChannelNumber;
                 vkeyControl.SendMidi += SendMidiVkey;
                 // Set patch.
-                CM.SetPatch(mout, _settings.VkeyChannel.Patch);
-                vkeyCC.Info1 = $"M{mout.ChannelNumber} {mout.ChannelName}";
-                vkeyCC.Info2 = $"{_settings.VkeyChannel.Patch} ({Convert.ToInt32(_settings.VkeyChannel.Patch)}){Environment.NewLine}{mout}";
+                CM.SetPatch(_vkeyMout, _settings.VkeyChannel.Patch);
+                vkeyCC.Info1 = $"M{_vkeyMout.ChannelNumber} {_vkeyMout.ChannelName}";
+                vkeyCC.Info2 = $"{_settings.VkeyChannel.Patch} ({Convert.ToInt32(_settings.VkeyChannel.Patch)}){Environment.NewLine}{_vkeyMout}";
 
-                mout = CM.OpenMidiOutput(_settings.OutputDevice, _settings.ClClChannel.ChannelNumber, "Click Clack");
-                CM.Bind(mout, clclCC);
+                _clclMout = CM.OpenMidiOutput(_settings.OutputDevice, _settings.ClClChannel.ChannelNumber, "Click Clack");
+                CM.Bind(_clclMout, clclCC);
                 // Init ChannelControl.
                 clclCC.Volume = MidiLibDefs.DEFAULT_VOLUME;
                 clclCC.State = ChannelState.Normal;
                 clclCC.DrawColor = _settings.DrawColor;
                 clclCC.SelectedColor = _settings.SelectedColor;
-                clclCC.Info1 = $"M{_settings.ClClChannel.ChannelNumber} {mout.ChannelName}";
-                clclCC.Info2 = $"{mout}";
+                clclCC.Info1 = $"M{_settings.ClClChannel.ChannelNumber} {_clclMout.ChannelName}";
+                clclCC.Info2 = $"{_clclMout}";
                 // clclCC.InfoClick += ChannelControl_InfoClick;
                 // Init UI surface.
                 clclControl.ChannelNumber = _settings.ClClChannel.ChannelNumber;
                 clclControl.SendMidi += SendMidiClCl;
                 // Set patch.
-                CM.SetPatch(mout, _settings.ClClChannel.Patch);
-                clclCC.Info1 = $"M{mout.ChannelNumber} {mout.ChannelName}";
-                clclCC.Info2 = $"{_settings.ClClChannel.Patch} ({Convert.ToInt32(_settings.ClClChannel.Patch)}){Environment.NewLine}{mout}";
+                CM.SetPatch(_clclMout, _settings.ClClChannel.Patch);
+                clclCC.Info1 = $"M{_clclMout.ChannelNumber} {_clclMout.ChannelName}";
+                clclCC.Info2 = $"{_settings.ClClChannel.Patch} ({Convert.ToInt32(_settings.ClClChannel.Patch)}){Environment.NewLine}{_clclMout}";
             }
             catch (Exception ex)
             {
@@ -132,7 +138,6 @@ namespace MidiGenerator
         void SendMidiVkey(object? sender, BaseEvent e)
         {
             if (sender is not VirtualKeyboard) throw new MidiLibException("Unknown/null control");
-            var mout = CM.GetMidiOutput(vkeyCC) ?? throw new MidiLibException("Unknown/null channel");
 
             if (e is NoteOn)
             {
@@ -142,7 +147,7 @@ namespace MidiGenerator
                 non.Velocity = MathUtils.Constrain((int)vol, 0, MidiDefs.MAX_MIDI);
             }
 
-            mout.Send(e);
+            _vkeyMout.Send(e);
         }
 
         /// <summary>
@@ -154,7 +159,6 @@ namespace MidiGenerator
         void SendMidiClCl(object? sender, BaseEvent e)
         {
             if (sender is not ClickClack) throw new MidiLibException("Unknown/null control");
-            var mout = CM.GetMidiOutput(clclCC) ?? throw new MidiLibException("Unknown/null channel");
 
             if (e is NoteOn)
             {
@@ -164,7 +168,7 @@ namespace MidiGenerator
                 non.Velocity = MathUtils.Constrain((int)vol, 0, MidiDefs.MAX_MIDI);
             }
 
-            mout.Send(e);
+            _clclMout.Send(e);
         }
 
         /// <summary>
