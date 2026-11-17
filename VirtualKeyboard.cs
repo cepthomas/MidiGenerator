@@ -40,7 +40,7 @@ namespace MidiGenerator
         #region Properties
         /// <summary>Assigned channel. Must be set before using.</summary>
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public int ChannelNumber { get; set; } = 0;
+        public int MidiChannel { get; set; } = 0;
 
         /// <summary>Draw the names on the keys.</summary>
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -324,7 +324,7 @@ namespace MidiGenerator
         {
             IsPressed = true;
             Invalidate();
-            SendMidi?.Invoke(this, new NoteOn(_owner.ChannelNumber, NoteId, velocity));
+            SendMidi?.Invoke(this, new NoteOn(_owner.MidiChannel, NoteId, velocity));
         }
 
         /// <summary>
@@ -334,7 +334,7 @@ namespace MidiGenerator
         {
             IsPressed = false;
             Invalidate();
-            SendMidi?.Invoke(this, new NoteOff(_owner.ChannelNumber, NoteId));
+            SendMidi?.Invoke(this, new NoteOff(_owner.MidiChannel, NoteId));
         }
         #endregion
 

@@ -45,7 +45,7 @@ namespace MidiGenerator
         #region Properties
         /// <summary>Assigned channel. Must be set before using.</summary>
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public int ChannelNumber { get; set; } = 0;
+        public int MidiChannel { get; set; } = 0;
 
         /// <summary>Cosmetics.</summary>
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -152,12 +152,12 @@ namespace MidiGenerator
                         if (_lastNote != -1)
                         {
                             // Turn off last note.
-                            SendMidi?.Invoke(this, new NoteOff(ChannelNumber, _lastNote))   ;
+                            SendMidi?.Invoke(this, new NoteOff(MidiChannel, _lastNote));
                         }
 
                         // Start the new note.
                         _lastNote = res.Value.ux;
-                        SendMidi?.Invoke(this, new NoteOn(ChannelNumber, res.Value.ux, res.Value.uy));
+                        SendMidi?.Invoke(this, new NoteOn(MidiChannel, res.Value.ux, res.Value.uy));
                     }
                 }
             }
@@ -175,7 +175,7 @@ namespace MidiGenerator
             if (res is not null)
             {
                 _lastNote = res.Value.ux;
-                SendMidi?.Invoke(this, new NoteOn(ChannelNumber, res.Value.ux, res.Value.uy));
+                SendMidi?.Invoke(this, new NoteOn(MidiChannel, res.Value.ux, res.Value.uy));
             }
 
             base.OnMouseDown(e);
@@ -189,7 +189,7 @@ namespace MidiGenerator
         {
             if (_lastNote != -1)
             {
-                SendMidi?.Invoke(this, new NoteOff(ChannelNumber, _lastNote));
+                SendMidi?.Invoke(this, new NoteOff(MidiChannel, _lastNote));
                 _lastNote = -1;
             }
 
@@ -205,7 +205,7 @@ namespace MidiGenerator
             // Turn off last click.
             if (_lastNote != -1)
             {
-                SendMidi?.Invoke(this, new NoteOff(ChannelNumber, _lastNote));
+                SendMidi?.Invoke(this, new NoteOff(MidiChannel, _lastNote));
             }
 
             // Reset and tell client.

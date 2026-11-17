@@ -16,11 +16,11 @@ namespace MidiGenerator
     [Serializable]
     public sealed class ChannelConfig
     {
-        [DisplayName("Channel Number")]
+        [DisplayName("Midi Channel Number")]
         [Description("Actual 1-based midi channel number.")]
         [Browsable(true)]
-        [Editor(typeof(ChannelNumberTypeEditor), typeof(UITypeEditor))]
-        public int ChannelNumber { get; set; } = 1;
+        [Editor(typeof(MidiChannelTypeEditor), typeof(UITypeEditor))]
+        public int MidiChannel { get; set; } = 1;
 
         [DisplayName("Channel Patch")]
         [Description("Current instrument/patch.")]
