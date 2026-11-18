@@ -24,7 +24,7 @@ namespace MidiGenerator
         readonly UserSettings _settings;
 
         /// <summary>Service.</summary>
-        readonly ChannelManager CM;
+        readonly MidiManager MM;
 
         /// <summary>Corresponding channel.</summary>
         MidiOutput _vkeyMout;
@@ -45,7 +45,7 @@ namespace MidiGenerator
 
             InitializeComponent();
 
-            CM = new(Controls);
+            MM = new(Controls);
 
             Icon = Icon.ExtractAssociatedIcon(Assembly.GetExecutingAssembly().Location);
 
@@ -64,14 +64,14 @@ namespace MidiGenerator
                 new("WRN", Color.Green),
             ];
 
-            btnKillMidi.Click += (_, __) => CM.KillAll();
+            btnKillMidi.Click += (_, __) => MM.KillAll();
 
-            CM.MessageReceived += Mgr_MessageReceived;
-            //CM.MessageSent += Mgr_MessageSent;
+            MM.MessageReceived += Mgr_MessageReceived;
+            //MM.MessageSent += Mgr_MessageSent;
 
             ///// Init the midi controls. /////
-            _vkeyMout = CM.OpenMidiOutput(_settings.OutputDevice, _settings.VkeyChannel.MidiChannel, "Virtual Key");
-            CM.Bind(_vkeyMout, vkeyCC);
+            _vkeyMout = MM.OpenMidiOutput(_settings.OutputDevice, _settings.VkeyChannel.MidiChannel, "Virtual Key");
+            MM.Bind(_vkeyMout, vkeyCC);
             // Init ChannelControl.
             vkeyCC.Volume = MidiLibDefs.DEFAULT_VOLUME;
             vkeyCC.State = ChannelState.Normal;
@@ -84,12 +84,12 @@ namespace MidiGenerator
             vkeyControl.MidiChannel = _settings.VkeyChannel.MidiChannel;
             vkeyControl.SendMidi += SendMidiVkey;
             // Set patch.
-            CM.SetPatch(_vkeyMout, _settings.VkeyChannel.Patch);
+            MM.SetPatch(_vkeyMout, _settings.VkeyChannel.Patch);
             vkeyCC.Info1 = $"M{_vkeyMout.MidiChannel} {_vkeyMout.MidiChannel}";
             vkeyCC.Info2 = $"{_settings.VkeyChannel.Patch} ({Convert.ToInt32(_settings.VkeyChannel.Patch)}){Environment.NewLine}{_vkeyMout}";
 
-            _clclMout = CM.OpenMidiOutput(_settings.OutputDevice, _settings.ClClChannel.MidiChannel, "Click Clack");
-            CM.Bind(_clclMout, clclCC);
+            _clclMout = MM.OpenMidiOutput(_settings.OutputDevice, _settings.ClClChannel.MidiChannel, "Click Clack");
+            MM.Bind(_clclMout, clclCC);
             // Init ChannelControl.
             clclCC.Volume = MidiLibDefs.DEFAULT_VOLUME;
             clclCC.State = ChannelState.Normal;
@@ -102,7 +102,7 @@ namespace MidiGenerator
             clclControl.MidiChannel = _settings.ClClChannel.MidiChannel;
             clclControl.SendMidi += SendMidiClCl;
             // Set patch.
-            CM.SetPatch(_clclMout, _settings.ClClChannel.Patch);
+            MM.SetPatch(_clclMout, _settings.ClClChannel.Patch);
             clclCC.Info1 = $"M{_clclMout.MidiChannel} {_clclMout.MidiChannel}";
             clclCC.Info2 = $"{_settings.ClClChannel.Patch} ({Convert.ToInt32(_settings.ClClChannel.Patch)}){Environment.NewLine}{_clclMout}";
 
@@ -118,7 +118,7 @@ namespace MidiGenerator
         /// <param name="e"></param>
         protected override void OnLoad(EventArgs e)
         {
-            CM.UpdateState();
+            MM.UpdateState();
 
             base.OnLoad(e);
         }
@@ -176,7 +176,7 @@ namespace MidiGenerator
 
             if (disposing && (components is not null))
             {
-                CM.Dispose();
+                MM.Dispose();
                 components.Dispose();
             }
 
